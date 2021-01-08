@@ -1,7 +1,7 @@
 -- GRAVEngine
 workspace "GRAVEngine"
 	architecture "x64"
-	--startproject "OpenGL-Sandbox"
+	startproject "GRAVTest"
 
 
 	configurations
@@ -35,7 +35,7 @@ group "Dependencies"
 group ""
 
 include "core"
---include "OpenGL-Sandbox"
+include "test"
 
 
 
