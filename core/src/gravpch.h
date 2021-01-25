@@ -5,6 +5,9 @@
 #include <utility>
 #include <algorithm>
 #include <functional>
+#include <thread>
+#include <cstdarg>
+#include <condition_variable>
 
 // String and output
 #include <iostream>
@@ -16,10 +19,12 @@
 #include <unordered_map>
 #include <unordered_set>
 
-// Include logging
+// Include common items
+#include "common.h"
 
 
 // Check if this is a windows build
 #ifdef GRAVCORE_PLATFORM_WINDOWS
+	#define NOMINMAX
 	#include <Windows.h>
 #endif

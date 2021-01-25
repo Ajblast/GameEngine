@@ -1,5 +1,8 @@
 #pragma once
 
+#include <assert.h>
+
+// TODO: Dynamic assertion enabling
 #define ASSERTIONS_ENABLED
 
 #ifdef ASSERTIONS_ENABLED
@@ -11,33 +14,37 @@
 
 
 // Check the expression and fail if it is false
-#define ASSERT(expr) \
+#define GRAV_ASSERT(expr) \
 	if (expr) {} \
 	else \
 	{ \
-			reportAssertionFailure(#expr, \
+			GRAVEngine::Logging::reportAssertionFailure(#expr, \
 				__FILE__, __LINE__) ; \
 			debugBreak(); \
 	}
 
 // Check if this a debug build
 #ifdef GRAVCORE_DEBUG
-#define SLOW_ASSERT(expr) \
+#define GRAV_SLOW_ASSERT(expr) \
 	if (expr) {} \
 	else \
 	{ \
-		reportAssertionFailure(#expr, \
+		GRAVEngine::Logging::reportAssertionFailure(#expr, \
 			__FILE__, __LINE__); \
 		debugBreak(); \
 	}
 #else
-#define SLOW_ASSERT(expr)
+#define GRAV_SLOW_ASSERT(expr)
 #endif
+
+#define GRAV_STATIC_ASSERT(expr) static_assert(expr);
 
 #else
 
 // Evaluate to nothing
-#define ASSERT(expr)
-#define SLOW_ASSERT(expr)
+#define GRAV_ASSERT(expr)
+#define GRAV_SLOW_ASSERT(expr)
 
 #endif
+
+// TODO: Implement exceptions to code base.
