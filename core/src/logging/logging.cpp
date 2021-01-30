@@ -1,6 +1,7 @@
 #include "gravpch.h"
 #include "logging.h"
 
+// TODO: Allow time stamping and allowing categories
 void GRAVEngine::Logging::reportAssertionFailure(const char* expression, const char* file, size_t line)
 {
 	// Get the logger
@@ -8,8 +9,8 @@ void GRAVEngine::Logging::reportAssertionFailure(const char* expression, const c
 
 	// Concatenate the strings
 	std::stringstream ss;
-	ss << "Expression: " << expression << " | File: " << file << " | Line: " << line << "\n";
+	ss << "Expression: " << expression << " | File: " << file << " | Line: " << line;
 
 	// Log the assertion
-	logger->log(GRAVEngine::Logging::verbosity::critical, ss.str().c_str());
+	logger->logLine(GRAVEngine::Logging::verbosity::critical, ss.str().c_str());
 }
