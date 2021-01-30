@@ -13,8 +13,9 @@
 #include "locks/spinLock.h"
 #include "exceptions/exceptions.h"
 
-// TODO: Implement job manager and fiber based job system
 // TODO: Implement I/O threads (Socks, file I/O, system call). Slide 19 on Parallelizing the Naughty Dog Engine Using Fibers
+
+#define GRAV_MAIN_THREAD_INDEX 0
 
 namespace GRAVEngine
 {
@@ -24,13 +25,14 @@ namespace GRAVEngine
 		{
 			fiberIndex m_FiberIndex = UINT16_MAX;
 			counterTarget m_TargetValue = 0;
+			counter* counter = nullptr;
 		};
 
 
 		class jobManager
 		{
 			friend counter;
-			using mainMethodFunction = void(*)(jobManager*);
+			using mainMethodFunction = void(*)();
 
 		public:
 			jobManager();													// Constructor
@@ -42,10 +44,11 @@ namespace GRAVEngine
 			~jobManager();													// Deconstructor
 
 			// Start up the job manager
-			void startUp(jobManagerOptions& options/*, mainMethodFunction mainMethod*/);
+			void startUp(jobManagerOptions& options);
+			void runMain(mainMethodFunction mainMethod);
+			void startShutdown();
 			// Shut down the job manager
 			void shutDown();
-
 
 			// Kick jobs
 			void kickJob(const declaration& declaration);
@@ -64,6 +67,7 @@ namespace GRAVEngine
 			inline const uint8 getNumThreads() const{ return m_ThreadCount; }
 			inline const uint16 getNumFibers() const{ return m_FiberCount; }
 			inline bool isValid() const { return m_IsValid.load(std::memory_order_acquire); }
+			inline bool isShuttingDown() const { return m_IsShuttingDown.load(std::memory_order_acquire); }
 
 			gravThread* getThread(uint8 index);
 
@@ -71,17 +75,12 @@ namespace GRAVEngine
 			void spawnThread(uint8 index);
 
 			// Statically get the job instance
-			inline static jobManager* getInstance()
-			{
-				return s_Instance;
-			}
+			inline static jobManager* getInstance() { return s_Instance; }
 		private:
-			// Fiber Waiting list
-
 			// Add a fiber to the waiting list
-			void addWaitingFiber(fiberIndex index, counterTarget target);
+			void addWaitingFiber(counter* counter, fiberIndex index, counterTarget target);
 			// Check if there are any fibers that need to be removed from the waiting list and be resumed
-			void checkWaitingFibers(counterTarget target);
+			void checkWaitingFibers();
 			//void waitForCounterProxy(waitForCounterProxyArgs args);
 
 			// Thread
@@ -100,7 +99,7 @@ namespace GRAVEngine
 			bool getNextJob(declaration& declaration, tls* tls);
 
 			// Callback Function
-			//static void fiberCallbackMain(fiber* fiber);
+			static void fiberCallbackMain(fiber* fiber);
 			static void fiberCallback(fiber* fiber);
 			static void threadCallback(gravThread* gravThread);
 		private:
@@ -110,7 +109,7 @@ namespace GRAVEngine
 			waitingFiberSlot* m_WaitingFibers;
 			GRAVEngine::Locks::spinLock m_WaitingFiberLock;
 			std::vector<fiberIndex> m_ReadyFibers;
-
+			GRAVEngine::Locks::spinLock m_ReadyFiberLock;
 
 			// Threads
 			uint8 m_ThreadCount;
@@ -125,41 +124,17 @@ namespace GRAVEngine
 			std::atomic_bool* m_IdleFibers;
 
 			// Job queues
-			jobQueue* m_CriticalPriorityQueue;
-			jobQueue* m_HighPriorityQueue;
-			jobQueue* m_NormalPriorityQueue;
-			jobQueue* m_LowPriorityQueue;
+			jobQueue m_CriticalPriorityQueue;
+			jobQueue m_HighPriorityQueue;
+			jobQueue m_NormalPriorityQueue;
+			jobQueue m_LowPriorityQueue;
 
 			// Static Instance
+			mainMethodFunction m_MainMethod;
+			bool m_ShutdownAfterMain;
 			static jobManager* s_Instance;
 			std::atomic_bool m_IsValid = false;
+			std::atomic_bool m_IsShuttingDown = false;
 		};
-
-
-		//// Example basic job system
-		//GRAVEngine::Locks::spinLock jobLock;
-		//void* jobWorkerThread(void*)
-		//{
-		//
-		//	// Keep on running jobs forever...
-		//	while (true)
-		//	{
-		//		declaration declarationCopy;
-		//
-		//		// Wait for a job to become available
-		//		jobLock.acquire();
-		//		
-		//		// Copy the job declaration locally and release ou rmutex lock
-		//		declarationCopy = getNextJobFromQueue();
-		//
-		//		// Release the lock
-		//		jobLock.release();
-		//
-		//		// Run the job
-		//		declarationCopy.m_EntryPoint(declarationCopy.m_param);
-		//
-		//		// Job Done.
-		//	}
-		//}
 	}
 }

@@ -19,43 +19,30 @@ GRAVEngine::jobs::jobManager::jobManager()
 	m_WaitingFibers = nullptr;
 	m_FreeWaitingFibers = nullptr;
 
-	// Job queues
-	m_CriticalPriorityQueue = nullptr;
-	m_HighPriorityQueue = nullptr;
-	m_NormalPriorityQueue = nullptr;
-	m_LowPriorityQueue = nullptr;
-
-
+	
 	// Create the threads
 	m_Threads = nullptr;
 	m_Fibers = nullptr;
 	m_IdleFibers = nullptr;
-
-	m_IsValid.store(false, std::memory_order_release);
-
+	m_MainMethod = nullptr;
+	m_ShutdownAfterMain = true;
 }
+GRAVEngine::jobs::jobManager::~jobManager() {}
 
-GRAVEngine::jobs::jobManager::~jobManager()
-{
-	delete[] m_WaitingFibers;
-	delete[] m_FreeWaitingFibers;
-	delete[] m_Threads;
-	delete[] m_Fibers;
-	delete[] m_IdleFibers;
-
-	delete m_CriticalPriorityQueue;
-	delete m_HighPriorityQueue;
-	delete m_NormalPriorityQueue;
-	delete m_LowPriorityQueue;
-}
-
-void GRAVEngine::jobs::jobManager::startUp(jobManagerOptions& options/*, mainMethodFunction mainMethod*/)
+void GRAVEngine::jobs::jobManager::startUp(jobManagerOptions& options)
 {
 	GRAV_ASSERT(s_Instance == nullptr);
 	GRAV_ASSERT(options.m_NumFibers > 0);
 	GRAV_ASSERT(options.m_NumThreads > 0);
-	GRAV_ASSERT(options.m_ThreadAffinity && options.m_NumThreads > std::thread::hardware_concurrency() + 1);
+	if (options.m_ThreadAffinity)
+		GRAV_ASSERT(options.m_NumThreads <= std::thread::hardware_concurrency());
 	GRAV_ASSERT(options.m_MaxWaitingFibersCount > 1);
+
+	GRAV_LOG_LINE_INFO("%s: Begin Startup", __FUNCTION__);
+
+	s_Instance = this;
+
+	m_ShutdownAfterMain = options.m_ShutDownAfterMain;
 
 	// Threads
 	m_ThreadCount = options.m_NumThreads;
@@ -66,39 +53,48 @@ void GRAVEngine::jobs::jobManager::startUp(jobManagerOptions& options/*, mainMet
 	m_FiberCount = options.m_NumFibers;
 
 	// Waiting Fibers
+	GRAV_LOG_LINE_INFO("%s: Create waiting fiber list", __FUNCTION__);
 	m_MaxWaitingFibersCount = options.m_MaxWaitingFibersCount;
-	m_WaitingFibers = new waitingFiberSlot[m_MaxWaitingFibersCount];
-	m_FreeWaitingFibers = new std::atomic_bool[m_MaxWaitingFibersCount];
+	m_WaitingFibers			= new waitingFiberSlot[m_MaxWaitingFibersCount];
+	m_FreeWaitingFibers		= new std::atomic_bool[m_MaxWaitingFibersCount];
+
+	// All the slots start off free
+	for (size_t i = 0; i < m_MaxWaitingFibersCount; i++)
+		m_FreeWaitingFibers[i].store(true);
 
 	// Job queues
-	m_CriticalPriorityQueue = new jobQueue(options.m_CriticalPriorityQueueSize);
-	m_HighPriorityQueue		= new jobQueue(options.m_HighPriorityQueueSize);
-	m_NormalPriorityQueue	= new jobQueue(options.m_NormalPriorityQueueSize);
-	m_LowPriorityQueue		= new jobQueue(options.m_LowPriorityQueueSize);
+	m_CriticalPriorityQueue	= jobQueue(options.m_CriticalPriorityQueueSize);
+	m_HighPriorityQueue		= jobQueue(options.m_HighPriorityQueueSize);
+	m_NormalPriorityQueue	= jobQueue(options.m_NormalPriorityQueueSize);
+	m_LowPriorityQueue		= jobQueue(options.m_LowPriorityQueueSize);
 
 
 	// Create the threads
+	GRAV_LOG_LINE_INFO("%s: Create Threads", __FUNCTION__);
 	m_Threads = new gravThread[m_ThreadCount];
 
+	// Initialize the main thread
 	// Load up the information about the main thread
-	auto mainThread = &m_Threads[0];
+	gravThread* mainThread = &m_Threads[GRAV_MAIN_THREAD_INDEX];
+	mainThread->initializeFromCurrentThread();
+	if (m_ThreadAffinity)
+		mainThread->setAffinity(GRAV_MAIN_THREAD_INDEX);
 
 	// Get the main thread's thread local storage and convert this thread into a fiber
+	GRAV_LOG_LINE_INFO("%s: Convert the main thread into a fiber", __FUNCTION__);
 	tls* mainThreadTLS = mainThread->getTLS();
 	mainThreadTLS->m_Fiber.initializeFromCurrentThread();
 
 	// ********** This thread is a fiber from this point forward
 
-	// Set the affinity if this is the main method
-	//if (mainMethod)
-	//	if (m_ThreadAffinity)
-	//		mainThread->setAffinity(1);
 
 	// Create the fibers. Must be done after the main thread has been converted into a fiber
+	GRAV_LOG_LINE_INFO("%s: Create Fibers", __FUNCTION__);
 	m_Fibers = new fiber[m_FiberCount];
 	m_IdleFibers = new std::atomic_bool[m_FiberCount];
 
 	// Set the fiber callbacks
+	GRAV_LOG_LINE_INFO("%s: Set fiber callbacks", __FUNCTION__);
 	for (size_t i = 0; i < m_FiberCount; i++)
 	{
 		m_Fibers[i].setCallback(fiberCallback);
@@ -106,87 +102,105 @@ void GRAVEngine::jobs::jobManager::startUp(jobManagerOptions& options/*, mainMet
 	}
 
 	// Spawn the threads
+	GRAV_LOG_LINE_INFO("%s: Spawn Threads", __FUNCTION__);
 	for (threadIndex i = 0; i < m_ThreadCount; i++)
 	{
 		// set thread index
 		auto tls = m_Threads[i].getTLS();
 		tls->m_ThreadIndex = i;
 
-		//if (i == 0)
-		//	continue;
-
 		tls->m_HasAffinity = m_ThreadAffinity;
 
-		if (m_AutoInitializeThreads)
+		// Only spawn threads for not the main thread
+		if (i != GRAV_MAIN_THREAD_INDEX && m_AutoInitializeThreads)
 			spawnThread(i);
 	}
 
-	// The job manager is now valid
-	m_IsValid.store(true, std::memory_order_release);
+	m_IsValid.store(true, std::memory_order_relaxed);
+	GRAV_LOG_LINE_INFO("%s: End Startup", __FUNCTION__);
+}
+void GRAVEngine::jobs::jobManager::runMain(mainMethodFunction mainMethod)
+{
+	GRAV_ASSERT(mainMethod);
 
-	//// Set the currently free fiber
-	//mainThreadTLS->m_CurrentFiberIndex = findFreeFiber();
-	//
-	//// Calling the Main function
-	//m_MainCallback = mainMethod;
-	//if (m_MainCallback == nullptr && m_ShutdownAfterMain)
-	//{
-	//	// Null callback error
-	//}
-	//
-	//// Setup main fiber
-	//const auto mainFiber = &m_Fibers[mainThreadTLS->m_CurrentFiberIndex];
-	//mainFiber->setCallback(fiberCallbackMain);
-	//	
-	//// Execute the job system
-	//if (m_MainCallback)
-	//	mainThreadTLS->m_Fiber.switchTo(mainFiber, this);
-	//
-	//
-	//// END of the job system
-	//if (m_MainCallback)
-	//{
-	//	// Wait for all threads to shut down
-	//	for (size_t i = 0; i < m_ThreadCount; i++)
-	//	{
-	//		m_Threads[i].join();
-	//	}
-	//}
+	GRAV_LOG_LINE_INFO("%s: Begin Main Method", __FUNCTION__);
+	
+	// Set the main method
+	m_MainMethod = mainMethod;
+
+	// Get the thread local storage
+	tls* tls = getThread(GRAV_MAIN_THREAD_INDEX)->getTLS();
+
+	// Find a free fiber to run the main method code
+	tls->m_CurrentFiberIndex = findFreeFiber();
+	const auto mainFiber = &m_Fibers[tls->m_CurrentFiberIndex];
+	mainFiber->setCallback(fiberCallbackMain);
+
+	// Execute the job system
+	GRAV_LOG_LINE_INFO("%s: Execute Main Method", __FUNCTION__);
+	tls->m_Fiber.switchTo(mainFiber);
+	// This is the end of the job system after return to here from running main
+
+	// Wait for all threads to shut down
+	GRAV_LOG_LINE_INFO("%s: Wait for worker threads to join", __FUNCTION__);
+	for (size_t i = 1; i < m_ThreadCount; i++)
+		if(i != GRAV_MAIN_THREAD_INDEX)
+			m_Threads[i].join();
+	
+	GRAV_LOG_LINE_INFO("%s: End Main Method", __FUNCTION__);
+}
+void GRAVEngine::jobs::jobManager::startShutdown()
+{
+	GRAV_ASSERT(s_Instance);
+
+	GRAV_LOG_LINE_INFO("%s: Flag Shutting Down", __FUNCTION__);
+	
+	// The job manager is now shutting down is invalid
+	m_IsValid.store(false, std::memory_order_release);
+	m_IsShuttingDown.store(true, std::memory_order_release);
+
 }
 void GRAVEngine::jobs::jobManager::shutDown()
 {
 	GRAV_ASSERT(s_Instance);
+	GRAV_ASSERT(isShuttingDown());
 
 	// TODO: Properly shutdown the job manager. Thread and fiber shut down and memory management
 
-	// The job manager is now invalid
-	m_IsValid.store(false, std::memory_order_release);
+	GRAV_LOG_LINE_INFO("%s: Begin Shutdown", __FUNCTION__);
 
-	// Wait for all of the threads to complete
+	// Wait for all of the threads to complete now that the job manager is invalid
+	GRAV_LOG_LINE_INFO("%s: Wait for worker threads to join", __FUNCTION__);
 	for (size_t i = 0; i < m_ThreadCount; i++)
-	{
-		m_Threads[i].join();
-	}
+		if (i != GRAV_MAIN_THREAD_INDEX)
+			m_Threads[i].join();
 
+	// Convert the main thread fiber back into a thread
+	GRAV_LOG_LINE_INFO("%s: Convert the main fiber back into a thread", __FUNCTION__);
+	m_Threads[GRAV_MAIN_THREAD_INDEX].getTLS()->m_Fiber.convertToThread();
+
+	GRAV_LOG_LINE_INFO("%s: Delete Waiting Fibers", __FUNCTION__);
 	delete[] m_WaitingFibers;
+	GRAV_LOG_LINE_INFO("%s: Delete Free Waiting Fibers", __FUNCTION__);
 	delete[] m_FreeWaitingFibers;
+	GRAV_LOG_LINE_INFO("%s: Delete Threads", __FUNCTION__);
 	delete[] m_Threads;
+	GRAV_LOG_LINE_INFO("%s: Delete Fibers", __FUNCTION__);
 	delete[] m_Fibers;
+	GRAV_LOG_LINE_INFO("%s: Delete Idle Fibers", __FUNCTION__);
 	delete[] m_IdleFibers;
 
-	delete m_CriticalPriorityQueue;
-	delete m_HighPriorityQueue;
-	delete m_NormalPriorityQueue;
-	delete m_LowPriorityQueue;
-
 	s_Instance = nullptr;
+	GRAV_LOG_LINE_INFO("%s: End Shutdown", __FUNCTION__);
 }
 
 void GRAVEngine::jobs::jobManager::kickJob(const declaration& declaration)
 {
 	GRAV_ASSERT(declaration.m_EntryPoint);
 
-	auto queue = getQueue(declaration.m_Priority);
+	GRAV_LOG_LINE_INFO("%s: Kick Job | EntryPoint %ul | Priority %s", __FUNCTION__, declaration.m_EntryPoint, toString(declaration.m_Priority));
+
+	jobQueue& queue = getQueue(declaration.m_Priority);
 
 	// Increment the counter
 	if (declaration.m_Counter)
@@ -245,24 +259,16 @@ void GRAVEngine::jobs::jobManager::waitForCounter(counter* counter, counterTarge
 	// Get the thread local storage
 	tls* tls = getCurrentTLS();
 
-	// TODO: Determine if this block of code should be removed
 	// Should this wait block execution
 	if (blocking)
 	{
-		// Stop blocking if the target is met
-		if (counter->getValue() == target)
-			return;
-
 		// Set up condition variable
 		std::condition_variable cv;
 		waitForCounterProxyArgs args = { counter, target, &cv };
 
-
 		// Kick off proxy job to make this thread keep working while waiting on other fibers to complete
-		declaration declaration((entryPoint) waitForCounterProxy, (uintptr_t)&args, jobPriority::CRITICAL, counter );
-		//declaration declaration((entryPoint*) waitForCounterProxy, (uintptr_t)&args, jobPriority::CRITICAL, counter );
+		declaration declaration((entryPoint) waitForCounterProxy, (uintptr_t)&args, jobPriority::CRITICAL, nullptr );
 		kickJob(declaration);
-
 
 		// Lock this thread
 		std::mutex mutex;
@@ -272,32 +278,21 @@ void GRAVEngine::jobs::jobManager::waitForCounter(counter* counter, counterTarge
 		return;
 	}
 
-
 	// Add the current fiber to the waiting fiber list
-	addWaitingFiber(tls->m_CurrentFiberIndex, target);
-
-	//// Is this fiber stored
-	//auto fiberStored = new std::atomic_bool(false);
-	//// Check if the counter target has been made
-	//if (counter->addWaitingFiber(tls->m_CurrentFiberIndex, target, fiberStored))
-	//{
-	//	delete fiberStored;
-	//	return;
-	//}
+	addWaitingFiber(counter, tls->m_CurrentFiberIndex, target);
 
 	// While waiting, run other jobs
 
 	// Update the thread local storage
 	tls->m_PreviousFiberIndex = tls->m_CurrentFiberIndex;
 	tls->m_PreviousFiberDestination = fiberDestination::WAITNIG;
-	//tls->m_PreviousFiberInWaitingList = fiberStored;
 
 	// Switch to an idle fiber while waiting
 	tls->m_CurrentFiberIndex = findFreeFiber();
 	tls->m_Fiber.switchTo(&m_Fibers[tls->m_CurrentFiberIndex]);
 
 	// Clean up the previous fiber information
-	cleanPreviousFiber();
+	cleanPreviousFiber(tls);
 }
 
 
@@ -308,51 +303,59 @@ GRAVEngine::jobs::gravThread* GRAVEngine::jobs::jobManager::getThread(uint8 inde
 }
 void GRAVEngine::jobs::jobManager::spawnThread(uint8 index)
 {
+	GRAV_LOG_LINE_INFO("%s: Spawn Thread %u", __FUNCTION__, index);
+	
+	// Get the thread and spawn it. 
 	getThread(index)->spawn(threadCallback);
 }
 
 
-void GRAVEngine::jobs::jobManager::addWaitingFiber(fiberIndex index, counterTarget target)
+void GRAVEngine::jobs::jobManager::addWaitingFiber(counter* counter, fiberIndex index, counterTarget target)
 {
+	GRAV_ASSERT(counter);
+
+	// This slot is now obtained
+	Locks::scopedLock<decltype(m_WaitingFiberLock)> lock(m_WaitingFiberLock);
+
 	for (size_t i = 0; i < m_MaxWaitingFibersCount; i++)
 	{
 		// Determine if this indexed fiber is free, and obtain it if it is free
 		bool expected = true;
 		if (std::atomic_compare_exchange_strong_explicit(&m_FreeWaitingFibers[i], &expected, false, std::memory_order_seq_cst, std::memory_order_relaxed))
 		{
-			// This slot is now obtained
-			Locks::scopedLock<decltype(m_WaitingFiberLock)> lock(m_WaitingFiberLock);
-
 			// Get the slot and set the values
 			auto slot = &m_WaitingFibers[i];
 			slot->m_FiberIndex = index;
 			slot->m_TargetValue = target;
+			slot->counter = counter;
+			return;
 		}
 	}
 
 	// There are no free slots
 	throw GRAVEngine::Exceptions::counterWaitListFullException("Job Counter waiting slots full");
 }
-void GRAVEngine::jobs::jobManager::checkWaitingFibers(counterTarget target)
+void GRAVEngine::jobs::jobManager::checkWaitingFibers()
 {
+	Locks::scopedLock<decltype(m_WaitingFiberLock)> lock(m_WaitingFiberLock);
+
 	for (size_t i = 0; i < m_MaxWaitingFibersCount; i++)
 	{
 		// Determine if this indexed fiber is not free
-		bool expected = true;
 		if (m_FreeWaitingFibers[i].load(std::memory_order_acquire) == false)
 		{
-			Locks::scopedLock<decltype(m_WaitingFiberLock)> lock(m_WaitingFiberLock);
-
 			// Get the slot and set the values
 			auto slot = &m_WaitingFibers[i];
 
 			// Check to see if this waiting fiber has not meet the target
-			if (slot->m_TargetValue != target)
+			if (slot->m_TargetValue != slot->counter->getValue())
 				continue;
 
-			// This waiting fiber has meet the target, so add it to the list of fibers ready to be resumed
-			//getCurrentTLS()->m_ReadyFibers.emplace_back(slot->m_FiberIndex, slot->m_FiberStored);
-			m_ReadyFibers.emplace_back(slot->m_FiberIndex);
+			{
+				Locks::scopedLock<decltype(m_ReadyFiberLock)> lock(m_ReadyFiberLock);
+				// This waiting fiber has meet the target, so add it to the list of fibers ready to be resumed
+				m_ReadyFibers.emplace_back(slot->m_FiberIndex);
+			}
 
 			// Free this slot for use
 			m_FreeWaitingFibers[i].store(true, std::memory_order_release);
@@ -366,9 +369,9 @@ void GRAVEngine::jobs::jobManager::checkWaitingFibers(counterTarget target)
 GRAVEngine::jobs::threadIndex GRAVEngine::jobs::jobManager::getCurrentThreadIndex() const
 {
 #ifdef _WIN32
-	threadHandle handle = GetCurrentThread();
+	threadID id = GetCurrentThreadId();
 	for (threadIndex i = 0; i < m_ThreadCount; i++)
-		if (m_Threads[i].getNativeHandle() == handle)
+		if (m_Threads[i].getID() == id)
 			return i;
 #endif
 
@@ -377,9 +380,9 @@ GRAVEngine::jobs::threadIndex GRAVEngine::jobs::jobManager::getCurrentThreadInde
 GRAVEngine::jobs::gravThread* GRAVEngine::jobs::jobManager::getCurrentThread() const
 {
 #ifdef _WIN32
-	threadHandle handle = GetCurrentThread();
+	threadID id = GetCurrentThreadId();
 	for (threadIndex i = 0; i < m_ThreadCount; i++)
-		if (m_Threads[i].getNativeHandle() == handle)
+		if (m_Threads[i].getID() == id)
 			return &m_Threads[i];
 #endif
 
@@ -388,12 +391,12 @@ GRAVEngine::jobs::gravThread* GRAVEngine::jobs::jobManager::getCurrentThread() c
 GRAVEngine::jobs::tls* GRAVEngine::jobs::jobManager::getCurrentTLS() const
 {
 #ifdef _WIN32
-	threadHandle handle = GetCurrentThread();
-	for (size_t i = 0; i < m_ThreadCount; i++)
-		if (m_Threads[i].getNativeHandle() == handle)
+	threadID id = GetCurrentThreadId();
+	for (threadIndex i = 0; i < m_ThreadCount; i++)
+		if (m_Threads[i].getID() == id)
 			return m_Threads[i].getTLS();
-
 #endif
+
 	return nullptr;
 }
 
@@ -410,7 +413,7 @@ GRAVEngine::jobs::fiberIndex GRAVEngine::jobs::jobManager::findFreeFiber()
 
 			// See if the value is exchanged. If this fails, another thread beat this thread in exchanging, so don't double book the fiber
 			bool expected = true;
-			if (std::atomic_compare_exchange_weak_explicit(&m_IdleFibers[i], &expected, false, std::memory_order_release, std::memory_order_relaxed))
+			if (std::atomic_compare_exchange_strong_explicit(&m_IdleFibers[i], &expected, false, std::memory_order_release, std::memory_order_relaxed))
 				return i;
 		}
 	}
@@ -446,19 +449,19 @@ GRAVEngine::jobs::jobQueue& GRAVEngine::jobs::jobManager::getQueue(jobPriority p
 	switch (priority)
 	{
 	case GRAVEngine::jobs::jobPriority::LOW:
-		return *m_LowPriorityQueue;
+		return s_Instance->m_LowPriorityQueue;
 		break;
 	case GRAVEngine::jobs::jobPriority::NORMAL:
-		return *m_NormalPriorityQueue;
+		return s_Instance->m_NormalPriorityQueue;
 		break;
 	case GRAVEngine::jobs::jobPriority::HIGH:
-		return *m_HighPriorityQueue;
+		return s_Instance->m_HighPriorityQueue;
 		break;
 	case GRAVEngine::jobs::jobPriority::CRITICAL:
-		return *m_CriticalPriorityQueue;
+		return s_Instance->m_CriticalPriorityQueue;
 		break;
 	default:
-		return *m_LowPriorityQueue;
+		return s_Instance->m_LowPriorityQueue;
 		break;
 	}
 }
@@ -467,26 +470,24 @@ bool GRAVEngine::jobs::jobManager::getNextJob(declaration& declaration, tls* tls
 	if (tls == nullptr)
 		tls = getCurrentTLS();
 
-
 	// Always run critical jobs first
-	if (m_CriticalPriorityQueue->dequeue(declaration))
+	if (m_CriticalPriorityQueue.dequeue(declaration))
 		return true;
 
 	// Look at the fibers that were placed on the waiting list and are now ready to be ran again.
 	// Ready fibers
-	//for (auto it = tls->m_ReadyFibers.begin(); it != tls->m_ReadyFibers.end(); it++)
 	for (auto it = m_ReadyFibers.begin(); it != m_ReadyFibers.end(); it++)
 	{
 		fiberIndex index = *it;
 
-		// Make sure fiber is stored
-		//if (it->second->load(std::memory_order_acquire) == false)
-		//	continue;
-
 		// Erase the job
-		//delete it->second;
-		//tls->m_ReadyFibers.erase(it);
-		m_ReadyFibers.erase(it);
+		{
+			// TODO: Determine if the ready fiber lock needs to also enclose the loop
+			// Need lock because m_ReadyFibers is modified
+			Locks::scopedLock<decltype(m_ReadyFiberLock)> lock(m_ReadyFiberLock);
+
+			m_ReadyFibers.erase(it);
+		}
 
 		// Update the thread local storage
 		tls->m_PreviousFiberIndex = tls->m_CurrentFiberIndex;
@@ -500,38 +501,59 @@ bool GRAVEngine::jobs::jobManager::getNextJob(declaration& declaration, tls* tls
 		break;
 	}
 
-	return m_HighPriorityQueue->dequeue(declaration) || m_NormalPriorityQueue->dequeue(declaration) || m_LowPriorityQueue->dequeue(declaration);
+	if (m_HighPriorityQueue.dequeue(declaration))
+		return true;
+	if (m_NormalPriorityQueue.dequeue(declaration))
+		return true;
+	if (m_LowPriorityQueue.dequeue(declaration))
+		return true;
+
+	return false;
 }
 
-//void GRAVEngine::jobs::jobManager::fiberCallbackMain(fiber* fiber)
-//{
-//	auto manager = reinterpret_cast<jobManager*> (fiber->getUserData());
-//
-//	if (manager->m_MainCallback)
-//		manager->m_MainCallback(manager);
-//
-//	if (manager->m_ShutdownAfterMain && manager->m_MainCallback)
-//	{
-//		// Switch to an idle fiber
-//		const auto tls = manager->getCurrentTLS();
-//		tls->m_CurrentFiberIndex = manager->findFreeFiber();
-//
-//		const auto fiber = &manager->m_Fibers[tls->m_CurrentFiberIndex];
-//		tls->m_Fiber.switchTo(fiber, manager);
-//	}
-//
-//	// Switch back to the calling fiber
-//	fiber->switchToCallingFiber();
-//}
+void GRAVEngine::jobs::jobManager::fiberCallbackMain(fiber* fiber)
+{
+	GRAVEngine::jobs::jobManager* manager = GRAVEngine::jobs::jobManager::getInstance();
+
+	GRAV_LOG_LINE_INFO("%s: Begin Main Fiber Callback", __FUNCTION__);
+	
+	GRAV_LOG_LINE_INFO("%s: Before Main Execution", __FUNCTION__);
+	// Run the main method
+	manager->m_MainMethod();
+	GRAV_LOG_LINE_INFO("%s: After Main Execution", __FUNCTION__);
+
+	// Should the job system continue to run after the main method has been ran?
+	if (manager->m_ShutdownAfterMain == false)
+	{
+		// Run the main thread as any other thread now.
+		GRAV_LOG_LINE_INFO("%s: JobManager doesn't shutdown after main method. Running like normal fiber", __FUNCTION__);
+
+		// Switch to an idle fiber to replace the main fiber
+		const auto tls = manager->getCurrentTLS();
+		tls->m_CurrentFiberIndex = manager->findFreeFiber();
+
+		const auto fiber = &manager->m_Fibers[tls->m_CurrentFiberIndex];
+		tls->m_Fiber.switchTo(fiber);
+	}
+
+	// Shut down the job system
+	manager->startShutdown();
+
+	GRAV_LOG_LINE_INFO("%s: End Main Fiber Callback", __FUNCTION__);
+	// Switch back to the starting code than ran main
+	fiber->switchToCallingFiber();
+}
 void GRAVEngine::jobs::jobManager::fiberCallback(fiber* fiber)
 {
 	jobManager* manager = jobManager::getInstance();
 
+	GRAV_LOG_LINE_INFO("%s: Begin Fiber Callback", __FUNCTION__);
+	
 	// This fiber is starting. Clean the previous fiber of its resources
 	manager->cleanPreviousFiber(manager->getCurrentTLS());
 
 	declaration job;
-	while (manager->isValid())
+	while (manager->isShuttingDown() == false)
 	{
 		// Get the current thread local storage
 		tls* tls = manager->getCurrentTLS();
@@ -539,19 +561,20 @@ void GRAVEngine::jobs::jobManager::fiberCallback(fiber* fiber)
 		// Get the next job
 		if (manager->getNextJob(job, tls))
 		{
+			//GRAV_LOG_LINE_INFO("Thread %u has found a job to run.", tls->m_ThreadIndex);
+
 			// Run the job
 			job.m_EntryPoint(job.m_Param);
 
 			// Decrement the counter associated with this job if it exists
 			if (job.m_Counter)
-			{
 				// Decrement the counter because this job has now finished
 				counterTarget counter = job.m_Counter->decrement();
 
-				// Check if there are any fibers that need to be woken up
-				jobManager::getInstance()->checkWaitingFibers(counter - 1);
+			//GRAV_LOG_LINE_INFO("Thread %u has finished its job.", tls->m_ThreadIndex);
 
-			}
+			// Check if there are any fibers that need to be woken up
+			jobManager::getInstance()->checkWaitingFibers();
 
 			// Check for the next job
 			continue;
@@ -561,6 +584,8 @@ void GRAVEngine::jobs::jobManager::fiberCallback(fiber* fiber)
 		GRAVEngine::jobs::gravThread::sleepFor(1);
 	}
 
+	GRAV_LOG_LINE_INFO("%s: End Fiber Callback", __FUNCTION__);
+	
 	// Switch back to the calling thread
 	fiber->switchToCallingFiber();
 }
@@ -568,17 +593,38 @@ void GRAVEngine::jobs::jobManager::threadCallback(gravThread* gravThread)
 {
 	jobManager* manager = jobManager::getInstance();
 
+	GRAV_LOG_LINE_INFO("%s: Initialize Thread: %u", __FUNCTION__, gravThread->getID());
+
+	// Wait until the job manager is valid
+	while (manager->isShuttingDown() || manager->isValid() == false)
+	{
+		if (manager->isShuttingDown())
+		{
+			GRAV_LOG_LINE_WARN("%s: Thread: %u | JobManager was shutting down while a thread was initialing. Exit initialization.", __FUNCTION__, gravThread->getID());
+
+			return;
+		}
+
+		GRAV_LOG_LINE_INFO("%s: Thread: %u | Waiting for job manager to become valid.", __FUNCTION__, gravThread->getID());
+		GRAVEngine::jobs::gravThread::sleepFor(1);
+	}
+
 	// Get the thread's thread local storage
 	GRAVEngine::jobs::tls* tls = gravThread->getTLS();
 
 	// Set the thread's affinity
-	gravThread->setAffinity(tls->m_ThreadIndex);
+	if (tls->m_HasAffinity)
+	{
+		GRAV_LOG_LINE_INFO("%s: Thread: %u | Set Thread Affinity", __FUNCTION__, gravThread->getID());
+		gravThread->setAffinity(tls->m_ThreadIndex);
+	}
 
 	// Setup the thread's fiber
 	tls->m_Fiber.initializeFromCurrentThread();
 	tls->m_CurrentFiberIndex = manager->findFreeFiber();
 
-	// Switch
+	// Switch to the found fiber
+	GRAV_LOG_LINE_INFO("%s: Thread: %u | Start fiber", __FUNCTION__, gravThread->getID());
 	const auto fiber = &manager->m_Fibers[tls->m_CurrentFiberIndex];
 	tls->m_Fiber.switchTo(fiber);
 }

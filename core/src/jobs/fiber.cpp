@@ -47,6 +47,14 @@ void GRAVEngine::jobs::fiber::initializeFromCurrentThread()
 #endif
 }
 
+void GRAVEngine::jobs::fiber::convertToThread()
+{
+#ifdef _WIN32
+	// Turn this fiber back into a thread. Used for the main thread
+	ConvertFiberToThread();
+#endif
+}
+
 void GRAVEngine::jobs::fiber::switchTo(fiber* fiber)
 {
 	GRAV_ASSERT(fiber)

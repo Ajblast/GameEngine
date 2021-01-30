@@ -17,6 +17,7 @@ namespace GRAVEngine
 			uint16 m_NumFibers = 128;				// Number of Fibers
 			bool m_ThreadAffinity = true;			// Should threads be locked to cores. Only valid if the m_NumThreads == Num of cores
 			bool m_AutoInitializeThreads = true;	// Should threads be spawned and initialized automatically
+			bool m_ShutDownAfterMain = true;		// Should the job system shutdown after running the main method
 
 			// Wait fiber size
 			uint16 m_MaxWaitingFibersCount		= 256;

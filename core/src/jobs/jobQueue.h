@@ -12,7 +12,7 @@ namespace GRAVEngine
 		class jobQueue
 		{
 		public:
-			jobQueue() = delete;
+			jobQueue();
 			jobQueue(size_t maxSize);
 			jobQueue(const jobQueue& other);
 			jobQueue(jobQueue&& other) noexcept;

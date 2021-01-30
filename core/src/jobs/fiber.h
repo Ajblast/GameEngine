@@ -33,6 +33,7 @@ namespace GRAVEngine
 
 			// Convert the current thread to a fiber
 			void initializeFromCurrentThread();
+			void convertToThread();
 
 			// Fiber switching
 			void switchTo(fiber* fiber);
@@ -52,6 +53,8 @@ namespace GRAVEngine
 
 			// Is this a fiber created from a thread
 			bool m_IsThreadFiber = false;
+
+			// TODO: Add fiber debug string for identification
 		};
 	}
 }
