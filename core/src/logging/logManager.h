@@ -33,12 +33,14 @@ namespace GRAVEngine
 
 			// Startup the log manager
 			void startUp(std::shared_ptr<Logging::Sinks::sink> defaultLoggerSink);
+			// Startup the log manager with a default logger
+			void startUp(std::shared_ptr<Logging::logger> defaultLogger);
 			// Shutdown the log manager
 			void shutDown();
 
 			// Register a logger
 			void registerLogger(std::shared_ptr<logger> logger);
-			// Initialze a logger
+			// Initialze a logger with the default verbosity and flush verbosity
 			void initializeLogger(std::shared_ptr<logger> logger);
 
 			// Get a logger based on its name

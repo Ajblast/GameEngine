@@ -1,6 +1,7 @@
 #pragma once
 
-#include <stdio.h>	// For va_lsit et al
+#include <stdio.h>			// For va_lsit et al
+#include <initializer_list> // For bracketed list of objects
 
 #include <atomic>
 #include <string>
@@ -30,7 +31,8 @@ namespace GRAVEngine
 			explicit logger(std::string name);
 			explicit logger(std::string name, std::shared_ptr<Sinks::sink> sinkPtr);
 			template<typename it>
-			logger(std::string name, it begin, it end) : logger(std::move(name), m_Sinks(begin, end)) {}
+			logger(std::string name, it begin, it end) : m_Name(std::move(name)), m_Sinks(begin, end) {}
+			logger(std::string name, std::initializer_list<std::shared_ptr<Sinks::sink>> sinks) : logger(std::move(name), sinks.begin(), sinks.end()) {}
 			logger(const logger& other);
 			logger(logger&& other) noexcept;
 
@@ -42,6 +44,7 @@ namespace GRAVEngine
 			~logger() = default;
 
 			int log(Logging::verbosity verbosity, const char* format, ...);
+			int logLine(Logging::verbosity verbosity, const char* format, ...);
 
 			// Name
 			inline std::string name() const
@@ -104,6 +107,7 @@ namespace GRAVEngine
 			Logging::verbosity_t m_FlushVerbosity;
 
 		private:
+			int log(Logging::verbosity verbosity, bool logEnabled, const char* format, va_list args);
 			// Log a message
 			void logMessage(Logging::logMessage& message, bool logEnabled);
 			// Send a message to the sinks

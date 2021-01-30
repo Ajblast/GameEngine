@@ -14,6 +14,8 @@ void GRAVEngine::Logging::logManager::startUp(std::shared_ptr<Logging::Sinks::si
 	// Create a default file logger
 	const char* defaultLoggerName = "";
 	m_DefaultLogger = std::make_shared<Logging::logger>(defaultLoggerName, defaultLoggerSink);
+	m_DefaultLogger->setVerbosity(GRAVEngine::Logging::verbosity::trace);
+	m_DefaultLogger->setFlushVerbosity(GRAVEngine::Logging::verbosity::trace);
 
 	//auto fileSink = std::make_shared<Logging::Sinks::fileSink>();
 	//m_DefaultLogger = std::make_shared<Logging::logger>(defaultLoggerName, fileSink);
@@ -23,11 +25,26 @@ void GRAVEngine::Logging::logManager::startUp(std::shared_ptr<Logging::Sinks::si
 	s_Instance = this;
 }
 
-void GRAVEngine::Logging::logManager::shutDown()
+void GRAVEngine::Logging::logManager::startUp(std::shared_ptr<Logging::logger> defaultLogger)
 {
-	GRAV_ASSERT(s_Instance);
+	// Only one instance possible
+	GRAV_ASSERT(s_Instance == nullptr);
 
 	Locks::scopedLock<decltype(m_MapLock)> lock(m_MapLock);
+
+	// Set the default logger
+	m_DefaultLogger = defaultLogger;
+	m_Loggers[defaultLogger->name()] = defaultLogger;
+
+	// Set the static instance;
+	s_Instance = this;
+}
+
+void GRAVEngine::Logging::logManager::shutDown()
+{
+	GRAV_LOG_LINE_DEBUG("Shutting down Log Manager");
+
+	GRAV_ASSERT(s_Instance);
 
 	// Remove all of the loggers
 	removeAll();
