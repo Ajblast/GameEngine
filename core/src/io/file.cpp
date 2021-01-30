@@ -1,9 +1,9 @@
 #include "gravpch.h"
 #include "file.h"
 
-//GRAVEngine::io::file::file() : m_FilePath(nullptr), m_FileMode(fileMode::read), m_FileHandle(nullptr), m_FlushAfterWrite(false)
+//GRAVEngine::IO::file::file() : m_FilePath(nullptr), m_FileMode(fileMode::read), m_FileHandle(nullptr), m_FlushAfterWrite(false)
 //{}
-GRAVEngine::io::file::file(const char* filePath, GRAVEngine::io::fileMode fileMode, bool flushAfterWrite)
+GRAVEngine::IO::file::file(const char* filePath, GRAVEngine::IO::fileMode fileMode, bool flushAfterWrite)
 {
 	GRAV_ASSERT(filePath != nullptr);
 
@@ -27,7 +27,7 @@ GRAVEngine::io::file::file(const char* filePath, GRAVEngine::io::fileMode fileMo
 	// The file is now open here
 
 }
-GRAVEngine::io::file::file(const file& other)
+GRAVEngine::IO::file::file(const file& other)
 {
 	// Delete current resources
 	delete[] m_FilePath;
@@ -39,7 +39,7 @@ GRAVEngine::io::file::file(const file& other)
 	m_FileMode = other.m_FileMode;
 	m_FlushAfterWrite = other.m_FlushAfterWrite;
 }
-GRAVEngine::io::file& GRAVEngine::io::file::operator=(const file& other)
+GRAVEngine::IO::file& GRAVEngine::IO::file::operator=(const file& other)
 {
 	if (this != &other)
 	{
@@ -60,14 +60,14 @@ GRAVEngine::io::file& GRAVEngine::io::file::operator=(const file& other)
 
 	return *this;
 }
-GRAVEngine::io::file::file(file&& other) noexcept : m_FilePath(other.m_FilePath), m_FileMode(other.m_FileMode), m_FileHandle(other.m_FileHandle), m_FlushAfterWrite(other.m_FlushAfterWrite)
+GRAVEngine::IO::file::file(file&& other) noexcept : m_FilePath(other.m_FilePath), m_FileMode(other.m_FileMode), m_FileHandle(other.m_FileHandle), m_FlushAfterWrite(other.m_FlushAfterWrite)
 {
 	other.m_FilePath		= nullptr;
 	other.m_FileMode		= fileMode::read;
 	other.m_FileHandle		= nullptr;
 	other.m_FlushAfterWrite = false;
 }
-GRAVEngine::io::file& GRAVEngine::io::file::operator=(file&& other) noexcept
+GRAVEngine::IO::file& GRAVEngine::IO::file::operator=(file&& other) noexcept
 {
 	if (this != &other)
 	{
@@ -92,7 +92,7 @@ GRAVEngine::io::file& GRAVEngine::io::file::operator=(file&& other) noexcept
 
 }
 
-GRAVEngine::io::file::~file()
+GRAVEngine::IO::file::~file()
 {
 	// Delete the file path text
 	delete[] m_FilePath;
@@ -101,7 +101,7 @@ GRAVEngine::io::file::~file()
 	close();
 }
 
-void GRAVEngine::io::file::reopen(fileMode fileMode)
+void GRAVEngine::IO::file::reopen(fileMode fileMode)
 {
 	GRAV_ASSERT(m_FileHandle != nullptr);
 
@@ -117,7 +117,7 @@ void GRAVEngine::io::file::reopen(fileMode fileMode)
 	}
 }
 
-bool GRAVEngine::io::file::close()
+bool GRAVEngine::IO::file::close()
 {
 	if (m_FileHandle)
 	{
@@ -133,7 +133,7 @@ bool GRAVEngine::io::file::close()
 	return false;
 }
 
-bool GRAVEngine::io::file::seek(long offset, seekOrigin origin)
+bool GRAVEngine::IO::file::seek(long offset, seekOrigin origin)
 {
 	GRAV_ASSERT(m_FileHandle != nullptr);
 
@@ -151,7 +151,7 @@ bool GRAVEngine::io::file::seek(long offset, seekOrigin origin)
 	return true;
 }
 
-bool GRAVEngine::io::file::flush()
+bool GRAVEngine::IO::file::flush()
 {
 	GRAV_ASSERT(m_FileHandle != nullptr);
 
@@ -167,7 +167,7 @@ bool GRAVEngine::io::file::flush()
 	return false;
 }
 
-size_t GRAVEngine::io::file::offset()
+size_t GRAVEngine::IO::file::offset()
 {
 	GRAV_ASSERT(m_FileHandle != nullptr);
 
@@ -181,14 +181,14 @@ size_t GRAVEngine::io::file::offset()
 	return curOffset;
 }
 
-int GRAVEngine::io::file::eof()
+int GRAVEngine::IO::file::eof()
 {
 	GRAV_ASSERT(m_FileHandle != nullptr);
 
 	return feof(m_FileHandle);
 }
 
-bool GRAVEngine::io::file::endOfFile()
+bool GRAVEngine::IO::file::endOfFile()
 {
 	GRAV_ASSERT(m_FileHandle != nullptr);
 
@@ -198,7 +198,7 @@ bool GRAVEngine::io::file::endOfFile()
 	return false;
 }
 
-size_t GRAVEngine::io::file::fileSize()
+size_t GRAVEngine::IO::file::fileSize()
 {
 	// Cache the current offset
 	size_t currentPosition = offset();
@@ -213,7 +213,7 @@ size_t GRAVEngine::io::file::fileSize()
 	return fileSize;
 }
 
-size_t GRAVEngine::io::file::read(void* buffer, size_t bufferSize)
+size_t GRAVEngine::IO::file::read(void* buffer, size_t bufferSize)
 {
 	GRAV_ASSERT(buffer != nullptr);
 	GRAV_ASSERT(m_FileHandle != nullptr);
@@ -233,7 +233,7 @@ size_t GRAVEngine::io::file::read(void* buffer, size_t bufferSize)
 	return bytesRead;
 }
 
-int GRAVEngine::io::file::readChar()
+int GRAVEngine::IO::file::readChar()
 {
 	GRAV_ASSERT(m_FileHandle != nullptr);
 
@@ -247,7 +247,7 @@ int GRAVEngine::io::file::readChar()
 	return character;
 }
 
-void GRAVEngine::io::file::readAll(void*& buffer, size_t& bufferSize)
+void GRAVEngine::IO::file::readAll(void*& buffer, size_t& bufferSize)
 {
 	GRAV_ASSERT(m_FileHandle != nullptr);
 
@@ -262,7 +262,7 @@ void GRAVEngine::io::file::readAll(void*& buffer, size_t& bufferSize)
 	}
 	catch (std::bad_alloc)
 	{
-		throw Exceptions::allocationException("GRAVEngine::io::file::readAll bad allocation");
+		throw Exceptions::allocationException("GRAVEngine::IO::file::readAll bad allocation");
 	}
 
 	// Seek to the beginning of the file
@@ -272,7 +272,7 @@ void GRAVEngine::io::file::readAll(void*& buffer, size_t& bufferSize)
 	read(buffer, bufferSize);
 }
 
-size_t GRAVEngine::io::file::write(void* buffer, size_t bufferSize)
+size_t GRAVEngine::IO::file::write(void* buffer, size_t bufferSize)
 {
 	GRAV_ASSERT(buffer != nullptr);
 	GRAV_ASSERT(m_FileHandle != nullptr);
@@ -294,7 +294,7 @@ size_t GRAVEngine::io::file::write(void* buffer, size_t bufferSize)
 	return bytesWritten;
 }
 
-void GRAVEngine::io::file::writeChar(char character)
+void GRAVEngine::IO::file::writeChar(char character)
 {
 	GRAV_ASSERT(m_FileHandle != nullptr);
 
@@ -309,7 +309,7 @@ void GRAVEngine::io::file::writeChar(char character)
 		flush();
 }
 
-void GRAVEngine::io::file::errorHandle(int err)
+void GRAVEngine::IO::file::errorHandle(int err)
 {
 	if (err == 0)
 		return;
@@ -324,26 +324,26 @@ void GRAVEngine::io::file::errorHandle(int err)
 	throw Exceptions::unknownErrorException("Unknown file error");
 }
 
-const char* GRAVEngine::io::file::fileModeToString(fileMode fileMode)
+const char* GRAVEngine::IO::file::fileModeToString(fileMode fileMode)
 {
 	switch (fileMode)
 	{
-	case GRAVEngine::io::fileMode::read:
+	case GRAVEngine::IO::fileMode::read:
 		return "rb";
 		break;
-	case GRAVEngine::io::fileMode::readUpdate:
+	case GRAVEngine::IO::fileMode::readUpdate:
 		return "rb+";
 		break;
-	case GRAVEngine::io::fileMode::write:
+	case GRAVEngine::IO::fileMode::write:
 		return "wb";
 		break;
-	case GRAVEngine::io::fileMode::writeUpdate:
+	case GRAVEngine::IO::fileMode::writeUpdate:
 		return "wb+";
 		break;
-	case GRAVEngine::io::fileMode::append:
+	case GRAVEngine::IO::fileMode::append:
 		return "ab";
 		break;
-	case GRAVEngine::io::fileMode::appendUpdate:
+	case GRAVEngine::IO::fileMode::appendUpdate:
 		return "ab+";
 		break;
 	default:

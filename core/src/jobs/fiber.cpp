@@ -2,7 +2,7 @@
 #include "fiber.h"
 
 // Launch a fiber. Calls the fiber's callback function
-static void launchFiber(GRAVEngine::jobs::fiber* fiber)
+static void launchFiber(GRAVEngine::Jobs::fiber* fiber)
 {
 	// Get the function's callback function
 	auto callback = fiber->getCallback();
@@ -12,7 +12,7 @@ static void launchFiber(GRAVEngine::jobs::fiber* fiber)
 	callback(fiber);
 }
 
-GRAVEngine::jobs::fiber::fiber() : m_FunctionCallback(nullptr), m_CallingFiber(nullptr)
+GRAVEngine::Jobs::fiber::fiber() : m_FunctionCallback(nullptr), m_CallingFiber(nullptr)
 {
 #ifdef _WIN32
 	// Create the fiber with the launching fiber function
@@ -21,11 +21,11 @@ GRAVEngine::jobs::fiber::fiber() : m_FunctionCallback(nullptr), m_CallingFiber(n
 #endif
 }
 
-//GRAVEngine::jobs::fiber::fiber(fiberHandle fiber) : m_FiberHandle(fiber)
+//GRAVEngine::Jobs::fiber::fiber(fiberHandle fiber) : m_FiberHandle(fiber)
 //{
 //}
 
-GRAVEngine::jobs::fiber::~fiber()
+GRAVEngine::Jobs::fiber::~fiber()
 {
 #ifdef _WIN32
 	// Delete the system fiber
@@ -34,7 +34,7 @@ GRAVEngine::jobs::fiber::~fiber()
 #endif
 }
 
-void GRAVEngine::jobs::fiber::initializeFromCurrentThread()
+void GRAVEngine::Jobs::fiber::initializeFromCurrentThread()
 {
 #ifdef _WIN32
 	// Delete the current system fiber if there is one
@@ -47,7 +47,7 @@ void GRAVEngine::jobs::fiber::initializeFromCurrentThread()
 #endif
 }
 
-void GRAVEngine::jobs::fiber::convertToThread()
+void GRAVEngine::Jobs::fiber::convertToThread()
 {
 #ifdef _WIN32
 	// Turn this fiber back into a thread. Used for the main thread
@@ -55,7 +55,7 @@ void GRAVEngine::jobs::fiber::convertToThread()
 #endif
 }
 
-void GRAVEngine::jobs::fiber::switchTo(fiber* fiber)
+void GRAVEngine::Jobs::fiber::switchTo(fiber* fiber)
 {
 	GRAV_ASSERT(fiber)
 	GRAV_ASSERT(fiber->m_FiberHandle);
@@ -68,7 +68,7 @@ void GRAVEngine::jobs::fiber::switchTo(fiber* fiber)
 #endif
 }
 
-void GRAVEngine::jobs::fiber::switchToCallingFiber()
+void GRAVEngine::Jobs::fiber::switchToCallingFiber()
 {
 	GRAV_ASSERT(m_CallingFiber);
 	GRAV_ASSERT(m_CallingFiber->m_FiberHandle);
@@ -79,7 +79,7 @@ void GRAVEngine::jobs::fiber::switchToCallingFiber()
 #endif
 }
 
-void GRAVEngine::jobs::fiber::setCallback(fiberFunction callback)
+void GRAVEngine::Jobs::fiber::setCallback(fiberFunction callback)
 {
 	m_FunctionCallback = callback;
 }

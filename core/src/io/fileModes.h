@@ -24,7 +24,7 @@
 
 namespace GRAVEngine
 {
-	namespace io
+	namespace IO
 	{
 		enum class fileMode
 		{
@@ -46,24 +46,24 @@ namespace GRAVEngine
 			GRAVEngine_FILE_MODE_STRING_APPEND_UPDATE			
 		};
 
-		inline const char* toString(GRAVEngine::io::fileMode fileMode)
+		inline const char* toString(GRAVEngine::IO::fileMode fileMode)
 		{
 			return fileModeStrings[static_cast<int>(fileMode)];
 		}
 
-		inline GRAVEngine::io::fileMode fileModeToEnum(const char* name)
+		inline GRAVEngine::IO::fileMode fileModeToEnum(const char* name)
 		{
 			int level = 0;
 
 			for (auto levelstr : fileModeStrings)
 			{
 				if (strcmp(levelstr, name))
-					return static_cast<GRAVEngine::io::fileMode>(level);
+					return static_cast<GRAVEngine::IO::fileMode>(level);
 
 				level++;
 			}
 
-			return GRAVEngine::io::fileMode::read;
+			return GRAVEngine::IO::fileMode::read;
 		}
 	}
 }

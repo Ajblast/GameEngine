@@ -11,7 +11,7 @@
 
 namespace GRAVEngine
 {
-	namespace jobs
+	namespace Jobs
 	{
 		typedef uint16 fiberIndex;
 		typedef void* fiberHandle;

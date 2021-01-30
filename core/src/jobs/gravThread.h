@@ -8,7 +8,7 @@
 
 namespace GRAVEngine
 {
-	namespace jobs
+	namespace Jobs
 	{
 		typedef uint32 threadID;
 		typedef void* threadHandle;
@@ -16,12 +16,12 @@ namespace GRAVEngine
 		class gravThread
 		{
 		public:
-			using threadCallbackFunction = void(*)(GRAVEngine::jobs::gravThread*);
+			using threadCallbackFunction = void(*)(GRAVEngine::Jobs::gravThread*);
 
 		public:
 			gravThread();
 			gravThread(const gravThread& other) = delete;
-			virtual GRAVEngine::jobs::gravThread::~gravThread() = default;			// Deconstructing thread does not despawn it
+			virtual GRAVEngine::Jobs::gravThread::~gravThread() = default;			// Deconstructing thread does not despawn it
 
 			void spawn(threadCallbackFunction callback);
 			void setAffinity(size_t affinity);

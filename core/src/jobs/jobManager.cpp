@@ -2,9 +2,9 @@
 #include "jobManager.h"
 
 // Static initial definition of instance
-GRAVEngine::jobs::jobManager* GRAVEngine::jobs::jobManager::s_Instance = nullptr;
+GRAVEngine::Jobs::jobManager* GRAVEngine::Jobs::jobManager::s_Instance = nullptr;
 
-GRAVEngine::jobs::jobManager::jobManager()
+GRAVEngine::Jobs::jobManager::jobManager()
 {
 	// Threads
 	m_ThreadCount = 0;
@@ -27,9 +27,9 @@ GRAVEngine::jobs::jobManager::jobManager()
 	m_MainMethod = nullptr;
 	m_ShutdownAfterMain = true;
 }
-GRAVEngine::jobs::jobManager::~jobManager() {}
+GRAVEngine::Jobs::jobManager::~jobManager() {}
 
-void GRAVEngine::jobs::jobManager::startUp(jobManagerOptions& options)
+void GRAVEngine::Jobs::jobManager::startUp(jobManagerOptions& options)
 {
 	GRAV_ASSERT(s_Instance == nullptr);
 	GRAV_ASSERT(options.m_NumFibers > 0);
@@ -119,7 +119,7 @@ void GRAVEngine::jobs::jobManager::startUp(jobManagerOptions& options)
 	m_IsValid.store(true, std::memory_order_relaxed);
 	GRAV_LOG_LINE_INFO("%s: End Startup", __FUNCTION__);
 }
-void GRAVEngine::jobs::jobManager::runMain(mainMethodFunction mainMethod)
+void GRAVEngine::Jobs::jobManager::runMain(mainMethodFunction mainMethod)
 {
 	GRAV_ASSERT(mainMethod);
 
@@ -149,7 +149,7 @@ void GRAVEngine::jobs::jobManager::runMain(mainMethodFunction mainMethod)
 	
 	GRAV_LOG_LINE_INFO("%s: End Main Method", __FUNCTION__);
 }
-void GRAVEngine::jobs::jobManager::startShutdown()
+void GRAVEngine::Jobs::jobManager::startShutdown()
 {
 	GRAV_ASSERT(s_Instance);
 
@@ -160,7 +160,7 @@ void GRAVEngine::jobs::jobManager::startShutdown()
 	m_IsShuttingDown.store(true, std::memory_order_release);
 
 }
-void GRAVEngine::jobs::jobManager::shutDown()
+void GRAVEngine::Jobs::jobManager::shutDown()
 {
 	GRAV_ASSERT(s_Instance);
 	GRAV_ASSERT(isShuttingDown());
@@ -194,7 +194,7 @@ void GRAVEngine::jobs::jobManager::shutDown()
 	GRAV_LOG_LINE_INFO("%s: End Shutdown", __FUNCTION__);
 }
 
-void GRAVEngine::jobs::jobManager::kickJob(const declaration& declaration)
+void GRAVEngine::Jobs::jobManager::kickJob(const declaration& declaration)
 {
 	GRAV_ASSERT(declaration.m_EntryPoint);
 
@@ -210,21 +210,21 @@ void GRAVEngine::jobs::jobManager::kickJob(const declaration& declaration)
 	if (queue.enqueue(declaration) == false)
 		throw GRAVEngine::Exceptions::jobQueueFullException("Job queue full");
 }
-void GRAVEngine::jobs::jobManager::kickJobs(const declaration* declarations, size_t count)
+void GRAVEngine::Jobs::jobManager::kickJobs(const declaration* declarations, size_t count)
 {
 	for (size_t i = 0; i < count; i++)
 	{
 		kickJob(declarations[i]);
 	}
 }
-void GRAVEngine::jobs::jobManager::kickJobAndWait(const declaration& declaration)
+void GRAVEngine::Jobs::jobManager::kickJobAndWait(const declaration& declaration)
 {
 	GRAV_ASSERT(declaration.m_Counter);
 
 	kickJob(declaration);
 	waitForCounter(declaration.m_Counter, 0);
 }
-void GRAVEngine::jobs::jobManager::kickJobsAndWait(const declaration* declarations, size_t count)
+void GRAVEngine::Jobs::jobManager::kickJobsAndWait(const declaration* declarations, size_t count)
 {
 	// Kick off the jobs
 	kickJobs(declarations, count);
@@ -238,17 +238,17 @@ void GRAVEngine::jobs::jobManager::kickJobsAndWait(const declaration* declaratio
 
 struct waitForCounterProxyArgs
 {
-	GRAVEngine::jobs::counter* m_Counter;
-	GRAVEngine::jobs::counterTarget m_Target;
+	GRAVEngine::Jobs::counter* m_Counter;
+	GRAVEngine::Jobs::counterTarget m_Target;
 	std::condition_variable* cv;
 };
 
 void waitForCounterProxy(waitForCounterProxyArgs args)
 {
-	GRAVEngine::jobs::jobManager::getInstance()->waitForCounter(args.m_Counter, args.m_Target, false);
+	GRAVEngine::Jobs::jobManager::getInstance()->waitForCounter(args.m_Counter, args.m_Target, false);
 	args.cv->notify_all();
 }
-void GRAVEngine::jobs::jobManager::waitForCounter(counter* counter, counterTarget target, bool blocking)
+void GRAVEngine::Jobs::jobManager::waitForCounter(counter* counter, counterTarget target, bool blocking)
 {
 	GRAV_ASSERT(counter);
 	
@@ -296,12 +296,12 @@ void GRAVEngine::jobs::jobManager::waitForCounter(counter* counter, counterTarge
 }
 
 
-GRAVEngine::jobs::gravThread* GRAVEngine::jobs::jobManager::getThread(uint8 index)
+GRAVEngine::Jobs::gravThread* GRAVEngine::Jobs::jobManager::getThread(uint8 index)
 {
 	GRAV_ASSERT(index < m_ThreadCount);
 	return &m_Threads[index];
 }
-void GRAVEngine::jobs::jobManager::spawnThread(uint8 index)
+void GRAVEngine::Jobs::jobManager::spawnThread(uint8 index)
 {
 	GRAV_LOG_LINE_INFO("%s: Spawn Thread %u", __FUNCTION__, index);
 	
@@ -310,7 +310,7 @@ void GRAVEngine::jobs::jobManager::spawnThread(uint8 index)
 }
 
 
-void GRAVEngine::jobs::jobManager::addWaitingFiber(counter* counter, fiberIndex index, counterTarget target)
+void GRAVEngine::Jobs::jobManager::addWaitingFiber(counter* counter, fiberIndex index, counterTarget target)
 {
 	GRAV_ASSERT(counter);
 
@@ -335,7 +335,7 @@ void GRAVEngine::jobs::jobManager::addWaitingFiber(counter* counter, fiberIndex 
 	// There are no free slots
 	throw GRAVEngine::Exceptions::counterWaitListFullException("Job Counter waiting slots full");
 }
-void GRAVEngine::jobs::jobManager::checkWaitingFibers()
+void GRAVEngine::Jobs::jobManager::checkWaitingFibers()
 {
 	Locks::scopedLock<decltype(m_WaitingFiberLock)> lock(m_WaitingFiberLock);
 
@@ -366,7 +366,7 @@ void GRAVEngine::jobs::jobManager::checkWaitingFibers()
 
 
 
-GRAVEngine::jobs::threadIndex GRAVEngine::jobs::jobManager::getCurrentThreadIndex() const
+GRAVEngine::Jobs::threadIndex GRAVEngine::Jobs::jobManager::getCurrentThreadIndex() const
 {
 #ifdef _WIN32
 	threadID id = GetCurrentThreadId();
@@ -377,7 +377,7 @@ GRAVEngine::jobs::threadIndex GRAVEngine::jobs::jobManager::getCurrentThreadInde
 
 	return UINT8_MAX;
 }
-GRAVEngine::jobs::gravThread* GRAVEngine::jobs::jobManager::getCurrentThread() const
+GRAVEngine::Jobs::gravThread* GRAVEngine::Jobs::jobManager::getCurrentThread() const
 {
 #ifdef _WIN32
 	threadID id = GetCurrentThreadId();
@@ -388,7 +388,7 @@ GRAVEngine::jobs::gravThread* GRAVEngine::jobs::jobManager::getCurrentThread() c
 
 	return nullptr;
 }
-GRAVEngine::jobs::tls* GRAVEngine::jobs::jobManager::getCurrentTLS() const
+GRAVEngine::Jobs::tls* GRAVEngine::Jobs::jobManager::getCurrentTLS() const
 {
 #ifdef _WIN32
 	threadID id = GetCurrentThreadId();
@@ -400,7 +400,7 @@ GRAVEngine::jobs::tls* GRAVEngine::jobs::jobManager::getCurrentTLS() const
 	return nullptr;
 }
 
-GRAVEngine::jobs::fiberIndex GRAVEngine::jobs::jobManager::findFreeFiber()
+GRAVEngine::Jobs::fiberIndex GRAVEngine::Jobs::jobManager::findFreeFiber()
 {
 	while (true)
 	{
@@ -418,7 +418,7 @@ GRAVEngine::jobs::fiberIndex GRAVEngine::jobs::jobManager::findFreeFiber()
 		}
 	}
 }
-void GRAVEngine::jobs::jobManager::cleanPreviousFiber(tls* tls)
+void GRAVEngine::Jobs::jobManager::cleanPreviousFiber(tls* tls)
 {
 	GRAV_ASSERT(tls);
 
@@ -444,20 +444,20 @@ void GRAVEngine::jobs::jobManager::cleanPreviousFiber(tls* tls)
 }
 
 
-GRAVEngine::jobs::jobQueue& GRAVEngine::jobs::jobManager::getQueue(jobPriority priority)
+GRAVEngine::Jobs::jobQueue& GRAVEngine::Jobs::jobManager::getQueue(jobPriority priority)
 {
 	switch (priority)
 	{
-	case GRAVEngine::jobs::jobPriority::LOW:
+	case GRAVEngine::Jobs::jobPriority::LOW:
 		return s_Instance->m_LowPriorityQueue;
 		break;
-	case GRAVEngine::jobs::jobPriority::NORMAL:
+	case GRAVEngine::Jobs::jobPriority::NORMAL:
 		return s_Instance->m_NormalPriorityQueue;
 		break;
-	case GRAVEngine::jobs::jobPriority::HIGH:
+	case GRAVEngine::Jobs::jobPriority::HIGH:
 		return s_Instance->m_HighPriorityQueue;
 		break;
-	case GRAVEngine::jobs::jobPriority::CRITICAL:
+	case GRAVEngine::Jobs::jobPriority::CRITICAL:
 		return s_Instance->m_CriticalPriorityQueue;
 		break;
 	default:
@@ -465,7 +465,7 @@ GRAVEngine::jobs::jobQueue& GRAVEngine::jobs::jobManager::getQueue(jobPriority p
 		break;
 	}
 }
-bool GRAVEngine::jobs::jobManager::getNextJob(declaration& declaration, tls* tls)
+bool GRAVEngine::Jobs::jobManager::getNextJob(declaration& declaration, tls* tls)
 {
 	if (tls == nullptr)
 		tls = getCurrentTLS();
@@ -511,9 +511,9 @@ bool GRAVEngine::jobs::jobManager::getNextJob(declaration& declaration, tls* tls
 	return false;
 }
 
-void GRAVEngine::jobs::jobManager::fiberCallbackMain(fiber* fiber)
+void GRAVEngine::Jobs::jobManager::fiberCallbackMain(fiber* fiber)
 {
-	GRAVEngine::jobs::jobManager* manager = GRAVEngine::jobs::jobManager::getInstance();
+	GRAVEngine::Jobs::jobManager* manager = GRAVEngine::Jobs::jobManager::getInstance();
 
 	GRAV_LOG_LINE_INFO("%s: Begin Main Fiber Callback", __FUNCTION__);
 	
@@ -543,7 +543,7 @@ void GRAVEngine::jobs::jobManager::fiberCallbackMain(fiber* fiber)
 	// Switch back to the starting code than ran main
 	fiber->switchToCallingFiber();
 }
-void GRAVEngine::jobs::jobManager::fiberCallback(fiber* fiber)
+void GRAVEngine::Jobs::jobManager::fiberCallback(fiber* fiber)
 {
 	jobManager* manager = jobManager::getInstance();
 
@@ -581,7 +581,7 @@ void GRAVEngine::jobs::jobManager::fiberCallback(fiber* fiber)
 		}
 
 		// Make the thread sleep for 1 ms until there is another job
-		GRAVEngine::jobs::gravThread::sleepFor(1);
+		GRAVEngine::Jobs::gravThread::sleepFor(1);
 	}
 
 	GRAV_LOG_LINE_INFO("%s: End Fiber Callback", __FUNCTION__);
@@ -589,7 +589,7 @@ void GRAVEngine::jobs::jobManager::fiberCallback(fiber* fiber)
 	// Switch back to the calling thread
 	fiber->switchToCallingFiber();
 }
-void GRAVEngine::jobs::jobManager::threadCallback(gravThread* gravThread)
+void GRAVEngine::Jobs::jobManager::threadCallback(gravThread* gravThread)
 {
 	jobManager* manager = jobManager::getInstance();
 
@@ -606,11 +606,11 @@ void GRAVEngine::jobs::jobManager::threadCallback(gravThread* gravThread)
 		}
 
 		GRAV_LOG_LINE_INFO("%s: Thread: %u | Waiting for job manager to become valid.", __FUNCTION__, gravThread->getID());
-		GRAVEngine::jobs::gravThread::sleepFor(1);
+		GRAVEngine::Jobs::gravThread::sleepFor(1);
 	}
 
 	// Get the thread's thread local storage
-	GRAVEngine::jobs::tls* tls = gravThread->getTLS();
+	GRAVEngine::Jobs::tls* tls = gravThread->getTLS();
 
 	// Set the thread's affinity
 	if (tls->m_HasAffinity)

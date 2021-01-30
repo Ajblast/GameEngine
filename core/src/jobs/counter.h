@@ -7,7 +7,7 @@
 
 namespace GRAVEngine
 {
-	namespace jobs
+	namespace Jobs
 	{
 		typedef uint32 counterTarget;
 

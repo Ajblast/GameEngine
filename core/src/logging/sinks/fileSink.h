@@ -25,7 +25,7 @@ namespace GRAVEngine
 				virtual void sinkMessage(const Logging::logMessage& message) override;
 				virtual void flush_() override;
 
-				GRAVEngine::io::file m_File;
+				GRAVEngine::IO::file m_File;
 			};
 		}
 	}

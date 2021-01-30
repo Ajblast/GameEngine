@@ -1,11 +1,11 @@
 #include "gravpch.h"
 #include "jobQueue.h"
 
-GRAVEngine::jobs::jobQueue::jobQueue() : jobQueue(0) {}
-GRAVEngine::jobs::jobQueue::jobQueue(size_t maxSize) : m_MaxSize(maxSize) {}
-GRAVEngine::jobs::jobQueue::jobQueue(const jobQueue& other) : m_MaxSize(other.m_MaxSize), m_Queue(other.m_Queue) {}
-GRAVEngine::jobs::jobQueue::jobQueue(jobQueue&& other) noexcept : m_MaxSize(other.m_MaxSize), m_Queue(other.m_Queue) {}
-GRAVEngine::jobs::jobQueue& GRAVEngine::jobs::jobQueue::operator=(const jobQueue& other)
+GRAVEngine::Jobs::jobQueue::jobQueue() : jobQueue(0) {}
+GRAVEngine::Jobs::jobQueue::jobQueue(size_t maxSize) : m_MaxSize(maxSize) {}
+GRAVEngine::Jobs::jobQueue::jobQueue(const jobQueue& other) : m_MaxSize(other.m_MaxSize), m_Queue(other.m_Queue) {}
+GRAVEngine::Jobs::jobQueue::jobQueue(jobQueue&& other) noexcept : m_MaxSize(other.m_MaxSize), m_Queue(other.m_Queue) {}
+GRAVEngine::Jobs::jobQueue& GRAVEngine::Jobs::jobQueue::operator=(const jobQueue& other)
 {
     if (this != &other)
     {
@@ -15,7 +15,7 @@ GRAVEngine::jobs::jobQueue& GRAVEngine::jobs::jobQueue::operator=(const jobQueue
 
     return *this;
 }
-GRAVEngine::jobs::jobQueue& GRAVEngine::jobs::jobQueue::operator=(jobQueue&& other) noexcept
+GRAVEngine::Jobs::jobQueue& GRAVEngine::Jobs::jobQueue::operator=(jobQueue&& other) noexcept
 {
     if (this != &other)
     {
@@ -26,7 +26,7 @@ GRAVEngine::jobs::jobQueue& GRAVEngine::jobs::jobQueue::operator=(jobQueue&& oth
     return *this;
 }
 
-bool GRAVEngine::jobs::jobQueue::enqueue(const declaration& data)
+bool GRAVEngine::Jobs::jobQueue::enqueue(const declaration& data)
 {
     GRAVEngine::Locks::scopedLock<decltype(m_Lock)> lock(m_Lock);
 
@@ -38,7 +38,7 @@ bool GRAVEngine::jobs::jobQueue::enqueue(const declaration& data)
     return true;
 }
 
-bool GRAVEngine::jobs::jobQueue::dequeue(declaration& data)
+bool GRAVEngine::Jobs::jobQueue::dequeue(declaration& data)
 {
     GRAVEngine::Locks::scopedLock<decltype(m_Lock)> lock(m_Lock);
 

@@ -5,7 +5,7 @@
 
 namespace GRAVEngine
 {
-	namespace jobs
+	namespace Jobs
 	{
 		struct jobManagerOptions
 		{

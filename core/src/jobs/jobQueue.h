@@ -7,7 +7,7 @@
 
 namespace GRAVEngine
 {
-	namespace jobs
+	namespace Jobs
 	{
 		class jobQueue
 		{

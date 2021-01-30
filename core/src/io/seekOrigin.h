@@ -11,7 +11,7 @@
 
 namespace GRAVEngine
 {
-	namespace io
+	namespace IO
 	{
 		enum class seekOrigin
 		{
@@ -27,24 +27,24 @@ namespace GRAVEngine
 			GRAVEngine_SEEK_ORIGIN_STRING_END
 		};
 
-		inline const char* toString(GRAVEngine::io::seekOrigin seekOrigin)
+		inline const char* toString(GRAVEngine::IO::seekOrigin seekOrigin)
 		{
 			return seekOriginStrings[static_cast<int>(seekOrigin)];
 		}
 
-		inline GRAVEngine::io::seekOrigin seekOriginToEnum(const char* name)
+		inline GRAVEngine::IO::seekOrigin seekOriginToEnum(const char* name)
 		{
 			int level = 0;
 
 			for (auto levelstr : seekOriginStrings)
 			{
 				if (strcmp(levelstr, name))
-					return static_cast<GRAVEngine::io::seekOrigin>(level);
+					return static_cast<GRAVEngine::IO::seekOrigin>(level);
 
 				level++;
 			}
 
-			return GRAVEngine::io::seekOrigin::set;
+			return GRAVEngine::IO::seekOrigin::set;
 		}
 	}
 }

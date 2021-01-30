@@ -12,13 +12,13 @@
 #include <iostream>
 
 GRAVEngine::Logging::logManager logManager;
-GRAVEngine::jobs::jobManager jobManager;
+GRAVEngine::Jobs::jobManager jobManager;
 
 
 void endingJob(uintptr_t)
 {
 	GRAV_LOG_LINE_CRITICAL("This is a job to start shutting down the job manager");
-	GRAVEngine::jobs::jobManager::getInstance()->startShutdown();
+	GRAVEngine::Jobs::jobManager::getInstance()->startShutdown();
 }
 void waitJob(uintptr_t)
 {
@@ -31,30 +31,30 @@ void waitJob(uintptr_t)
 	}
 	GRAV_LOG_LINE_CRITICAL("After waiting");
 	
-	GRAVEngine::jobs::jobManager::getInstance()->kickJob({ endingJob, 0,  GRAVEngine::jobs::jobPriority::HIGH, nullptr });
+	GRAVEngine::Jobs::jobManager::getInstance()->kickJob({ endingJob, 0,  GRAVEngine::Jobs::jobPriority::HIGH, nullptr });
 }
 
 
 void mainMethod()
 {
-	GRAVEngine::jobs::jobManager::getInstance()->kickJob({ waitJob, 0,  GRAVEngine::jobs::jobPriority::NORMAL, nullptr });
+	GRAVEngine::Jobs::jobManager::getInstance()->kickJob({ waitJob, 0,  GRAVEngine::Jobs::jobPriority::NORMAL, nullptr });
 
 
 	auto job = [](uintptr_t value)
 	{
 		GRAV_LOG_LINE_CRITICAL("This is a test job entry point: %d", value);
 	};
-	GRAVEngine::jobs::counter* counter = new GRAVEngine::jobs::counter();
+	GRAVEngine::Jobs::counter* counter = new GRAVEngine::Jobs::counter();
 
 	GRAV_LOG_LINE_CRITICAL("Kick Jobs");
 	for (size_t i = 0; i < 30; i++)
 	{
 		// Kick a job
-		GRAVEngine::jobs::jobManager::getInstance()->kickJob({ job, i,  GRAVEngine::jobs::jobPriority::NORMAL, counter });
+		GRAVEngine::Jobs::jobManager::getInstance()->kickJob({ job, i,  GRAVEngine::Jobs::jobPriority::NORMAL, counter });
 	}
 	GRAV_LOG_LINE_CRITICAL("After Kick Job");
 
-	//GRAVEngine::jobs::jobManager::getInstance()->waitForCounter(counter, 0);
+	//GRAVEngine::Jobs::jobManager::getInstance()->waitForCounter(counter, 0);
 	//GRAV_LOG_LINE_CRITICAL("After Waiting on counter");
 	delete counter;
 }
@@ -102,7 +102,7 @@ int main()
 
 #pragma region SettingUpJobManager
 	// Use default job manager options
-	GRAVEngine::jobs::jobManagerOptions jobManagerOptions;
+	GRAVEngine::Jobs::jobManagerOptions jobManagerOptions;
 	jobManagerOptions.m_ShutDownAfterMain = false;
 
 	// Start up the job manager

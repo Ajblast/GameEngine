@@ -10,7 +10,7 @@
 
 namespace GRAVEngine
 {
-	namespace time
+	namespace Time
 	{
 		class timer
 		{

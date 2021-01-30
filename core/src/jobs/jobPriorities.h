@@ -14,7 +14,7 @@
 
 namespace GRAVEngine
 {
-	namespace jobs
+	namespace Jobs
 	{
 		enum class jobPriority
 		{
@@ -32,24 +32,24 @@ namespace GRAVEngine
 			GRAVEngine_JOB_PRIORITY_STRING_CRITICAL
 		};
 
-		inline const char* toString(GRAVEngine::jobs::jobPriority priority)
+		inline const char* toString(GRAVEngine::Jobs::jobPriority priority)
 		{
 			return jobPriorityStrings[static_cast<int>(priority)];
 		}
 
-		inline GRAVEngine::jobs::jobPriority jobPriorityToEnum(const char* name)
+		inline GRAVEngine::Jobs::jobPriority jobPriorityToEnum(const char* name)
 		{
 			int level = 0;
 
 			for (auto levelstr : jobPriorityStrings)
 			{
 				if (strcmp(levelstr, name))
-					return static_cast<GRAVEngine::jobs::jobPriority>(level);
+					return static_cast<GRAVEngine::Jobs::jobPriority>(level);
 
 				level++;
 			}
 
-			return GRAVEngine::jobs::jobPriority::LOW;
+			return GRAVEngine::Jobs::jobPriority::LOW;
 		}
 
 	}

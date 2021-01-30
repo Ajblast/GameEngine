@@ -1,33 +1,33 @@
 #include "gravpch.h"
 #include "textFile.h"
 
-//GRAVEngine::io::textFile::textFile() : file()
+//GRAVEngine::IO::textFile::textFile() : file()
 //{
 //}
 
-GRAVEngine::io::textFile::textFile(const char* filePath, fileMode fileMode, bool flushAfterWrite) : file(filePath, fileMode, flushAfterWrite)
+GRAVEngine::IO::textFile::textFile(const char* filePath, fileMode fileMode, bool flushAfterWrite) : file(filePath, fileMode, flushAfterWrite)
 {
 }
 
-GRAVEngine::io::textFile& GRAVEngine::io::textFile::operator=(const textFile& other)
-{
-	file::operator=(other);
-
-	return *this;
-}
-
-GRAVEngine::io::textFile::textFile(textFile&& other) noexcept : file(other)
-{
-}
-
-GRAVEngine::io::textFile& GRAVEngine::io::textFile::operator=(textFile&& other) noexcept
+GRAVEngine::IO::textFile& GRAVEngine::IO::textFile::operator=(const textFile& other)
 {
 	file::operator=(other);
 
 	return *this;
 }
 
-bool GRAVEngine::io::textFile::readString(char* buffer, int maxCharCount)
+GRAVEngine::IO::textFile::textFile(textFile&& other) noexcept : file(other)
+{
+}
+
+GRAVEngine::IO::textFile& GRAVEngine::IO::textFile::operator=(textFile&& other) noexcept
+{
+	file::operator=(other);
+
+	return *this;
+}
+
+bool GRAVEngine::IO::textFile::readString(char* buffer, int maxCharCount)
 {
 	GRAV_ASSERT(m_FileHandle != nullptr);
 
@@ -45,7 +45,7 @@ bool GRAVEngine::io::textFile::readString(char* buffer, int maxCharCount)
 	return true;
 }
 
-void GRAVEngine::io::textFile::writeString(const char* string)
+void GRAVEngine::IO::textFile::writeString(const char* string)
 {
 	GRAV_ASSERT(m_FileHandle != nullptr);
 
@@ -57,7 +57,7 @@ void GRAVEngine::io::textFile::writeString(const char* string)
 	errorHandle(err);
 }
 
-void GRAVEngine::io::textFile::writeLine(const char* string)
+void GRAVEngine::IO::textFile::writeLine(const char* string)
 {
 	GRAV_ASSERT(m_FileHandle != nullptr);
 
@@ -70,6 +70,6 @@ void GRAVEngine::io::textFile::writeLine(const char* string)
 
 
 
-//void GRAVEngine::io::textFile::readLine(char*, size_t num)
+//void GRAVEngine::IO::textFile::readLine(char*, size_t num)
 //{
 //}

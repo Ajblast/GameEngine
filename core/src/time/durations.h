@@ -5,7 +5,7 @@
 
 namespace GRAVEngine
 {
-	namespace time
+	namespace Time
 	{
 		typedef uint64 timeDurationCount;
 		typedef std::chrono::steady_clock::time_point timePoint;

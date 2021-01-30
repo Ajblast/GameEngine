@@ -5,7 +5,7 @@
 
 namespace GRAVEngine
 {
-	namespace io
+	namespace IO
 	{
 		class textFile : public file
 		{

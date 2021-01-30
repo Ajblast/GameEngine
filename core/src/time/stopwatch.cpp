@@ -1,13 +1,13 @@
 #include "gravpch.h"
 #include "stopwatch.h"
 
-GRAVEngine::time::stopwatch::stopwatch(const stopwatch& other) : m_StartTick(other.m_StartTick), m_Running(false), m_StoredDuration(other.m_StoredDuration)
+GRAVEngine::Time::stopwatch::stopwatch(const stopwatch& other) : m_StartTick(other.m_StartTick), m_Running(false), m_StoredDuration(other.m_StoredDuration)
 {
 }
-GRAVEngine::time::stopwatch::stopwatch(stopwatch&& other) noexcept : m_StartTick(std::move(other.m_StartTick)), m_Running(std::move(other.m_Running)), m_StoredDuration(std::move(other.m_Running))
+GRAVEngine::Time::stopwatch::stopwatch(stopwatch&& other) noexcept : m_StartTick(std::move(other.m_StartTick)), m_Running(std::move(other.m_Running)), m_StoredDuration(std::move(other.m_Running))
 {
 }
-GRAVEngine::time::stopwatch& GRAVEngine::time::stopwatch::operator=(stopwatch other)
+GRAVEngine::Time::stopwatch& GRAVEngine::Time::stopwatch::operator=(stopwatch other)
 {
 	m_StartTick = other.m_StartTick;
 	m_Running = other.m_Running;
@@ -15,7 +15,7 @@ GRAVEngine::time::stopwatch& GRAVEngine::time::stopwatch::operator=(stopwatch ot
 
 	return *this;
 }
-GRAVEngine::time::stopwatch& GRAVEngine::time::stopwatch::operator=(stopwatch&& other) noexcept
+GRAVEngine::Time::stopwatch& GRAVEngine::Time::stopwatch::operator=(stopwatch&& other) noexcept
 {
 	if (this != &other)
 	{
@@ -27,7 +27,7 @@ GRAVEngine::time::stopwatch& GRAVEngine::time::stopwatch::operator=(stopwatch&& 
 	return *this;
 }
 
-void GRAVEngine::time::stopwatch::start() noexcept
+void GRAVEngine::Time::stopwatch::start() noexcept
 {
 	// Do nothing if it is currently running
 	if (m_Running)
@@ -38,7 +38,7 @@ void GRAVEngine::time::stopwatch::start() noexcept
 
 	m_Running = true;
 }
-void GRAVEngine::time::stopwatch::pause() noexcept
+void GRAVEngine::Time::stopwatch::pause() noexcept
 {
 	// Do nothing if it is not currently running
 	if (!m_Running)
@@ -55,7 +55,7 @@ void GRAVEngine::time::stopwatch::pause() noexcept
 
 	m_Running = false;
 }
-void GRAVEngine::time::stopwatch::reset() noexcept
+void GRAVEngine::Time::stopwatch::reset() noexcept
 {
 	// Reset the stored duration
 	m_StoredDuration = nanoseconds(0);
@@ -64,7 +64,7 @@ void GRAVEngine::time::stopwatch::reset() noexcept
 	m_StartTick = std::chrono::steady_clock::now();
 }
 
-GRAVEngine::time::timeDurationCount GRAVEngine::time::stopwatch::elapsedNanoseconds() noexcept
+GRAVEngine::Time::timeDurationCount GRAVEngine::Time::stopwatch::elapsedNanoseconds() noexcept
 {
 	// Get the current duration
 	timeDurationCount elapsedDuration = m_StoredDuration.count();
@@ -84,7 +84,7 @@ GRAVEngine::time::timeDurationCount GRAVEngine::time::stopwatch::elapsedNanoseco
 
 	return elapsedDuration;
 }
-GRAVEngine::time::timeDurationCount GRAVEngine::time::stopwatch::elapsedMilliseconds() noexcept
+GRAVEngine::Time::timeDurationCount GRAVEngine::Time::stopwatch::elapsedMilliseconds() noexcept
 {
 	// Get the current duration
 	timeDurationCount elapsedDuration = std::chrono::duration_cast<milliseconds>(m_StoredDuration).count();
@@ -104,7 +104,7 @@ GRAVEngine::time::timeDurationCount GRAVEngine::time::stopwatch::elapsedMillisec
 
 	return elapsedDuration;
 }
-GRAVEngine::time::timeDurationCount GRAVEngine::time::stopwatch::elapsedSeconds() noexcept
+GRAVEngine::Time::timeDurationCount GRAVEngine::Time::stopwatch::elapsedSeconds() noexcept
 {
 	// Get the current duration
 	timeDurationCount elapsedDuration = std::chrono::duration_cast<seconds>(m_StoredDuration).count();
@@ -124,7 +124,7 @@ GRAVEngine::time::timeDurationCount GRAVEngine::time::stopwatch::elapsedSeconds(
 
 	return elapsedDuration;
 }
-GRAVEngine::time::timeDurationCount GRAVEngine::time::stopwatch::elapsedMinutes() noexcept
+GRAVEngine::Time::timeDurationCount GRAVEngine::Time::stopwatch::elapsedMinutes() noexcept
 {
 	// Get the current duration
 	timeDurationCount elapsedDuration = std::chrono::duration_cast<minutes>(m_StoredDuration).count();
@@ -144,7 +144,7 @@ GRAVEngine::time::timeDurationCount GRAVEngine::time::stopwatch::elapsedMinutes(
 
 	return elapsedDuration;
 }
-GRAVEngine::time::timeDurationCount GRAVEngine::time::stopwatch::elapsedHours() noexcept
+GRAVEngine::Time::timeDurationCount GRAVEngine::Time::stopwatch::elapsedHours() noexcept
 {
 	// Get the current duration
 	timeDurationCount elapsedDuration = std::chrono::duration_cast<hours>(m_StoredDuration).count();

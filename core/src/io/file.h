@@ -9,7 +9,7 @@
 
 namespace GRAVEngine
 {
-	namespace io
+	namespace IO
 	{
 		class file
 		{

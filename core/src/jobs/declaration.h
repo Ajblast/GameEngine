@@ -6,7 +6,7 @@
 
 namespace GRAVEngine
 {
-	namespace jobs
+	namespace Jobs
 	{
 		typedef void (*entryPoint)(uintptr_t param);
 

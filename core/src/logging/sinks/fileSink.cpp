@@ -1,7 +1,7 @@
 #include "gravpch.h"
 #include "fileSink.h"
 
-GRAVEngine::Logging::Sinks::fileSink::fileSink(const char* filePath, bool truncate) : m_File(GRAVEngine::io::file(filePath, GRAVEngine::io::fileMode::append, false))
+GRAVEngine::Logging::Sinks::fileSink::fileSink(const char* filePath, bool truncate) : m_File(GRAVEngine::IO::file(filePath, GRAVEngine::IO::fileMode::append, false))
 {
 	// Open the file
 	//m_File = ;

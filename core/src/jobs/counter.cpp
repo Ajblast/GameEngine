@@ -1,8 +1,8 @@
 #include "gravpch.h"
 #include "counter.h"
 
-GRAVEngine::jobs::counter::counter() {}
-GRAVEngine::jobs::counter::counter(counter&& other) noexcept //: m_MaxNumWaitingFibers(other.m_MaxNumWaitingFibers), m_WaitingFibers(other.m_WaitingFibers), m_FreeWaitingFibers(other.m_FreeWaitingFibers)
+GRAVEngine::Jobs::counter::counter() {}
+GRAVEngine::Jobs::counter::counter(counter&& other) noexcept //: m_MaxNumWaitingFibers(other.m_MaxNumWaitingFibers), m_WaitingFibers(other.m_WaitingFibers), m_FreeWaitingFibers(other.m_FreeWaitingFibers)
 {
 	// Steal other resources
 	m_Counter.store(other.m_Counter.load(std::memory_order_acquire), std::memory_order_release);
@@ -13,7 +13,7 @@ GRAVEngine::jobs::counter::counter(counter&& other) noexcept //: m_MaxNumWaiting
 	//other.m_FreeWaitingFibers = nullptr;
 	//other.m_MaxNumWaitingFibers = 0;
 }
-GRAVEngine::jobs::counter& GRAVEngine::jobs::counter::operator=(counter&& other) noexcept
+GRAVEngine::Jobs::counter& GRAVEngine::Jobs::counter::operator=(counter&& other) noexcept
 {
 	if (this != &other)
 	{
@@ -28,5 +28,5 @@ GRAVEngine::jobs::counter& GRAVEngine::jobs::counter::operator=(counter&& other)
 
 	return *this;
 }
-GRAVEngine::jobs::counter::~counter() {}
+GRAVEngine::Jobs::counter::~counter() {}
 

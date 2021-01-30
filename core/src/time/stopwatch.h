@@ -7,7 +7,7 @@
 
 namespace GRAVEngine
 {
-	namespace time
+	namespace Time
 	{
 		// TODO: Allow stopwatches to use custom clocks. Maybe
 

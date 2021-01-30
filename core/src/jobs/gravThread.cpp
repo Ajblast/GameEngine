@@ -2,9 +2,9 @@
 #include "gravThread.h"
 #include "exceptions/threadCreationException.h"
 
-GRAVEngine::jobs::gravThread::gravThread() {}
+GRAVEngine::Jobs::gravThread::gravThread() {}
 
-void GRAVEngine::jobs::gravThread::spawn(threadCallbackFunction callback)
+void GRAVEngine::Jobs::gravThread::spawn(threadCallbackFunction callback)
 {
 	// Create the thread
 #ifdef _WIN32
@@ -16,7 +16,7 @@ void GRAVEngine::jobs::gravThread::spawn(threadCallbackFunction callback)
 		throw GRAVEngine::Exceptions::threadCreationException("Unable to spawn thread.");
 }
 
-void GRAVEngine::jobs::gravThread::setAffinity(size_t affinity)
+void GRAVEngine::Jobs::gravThread::setAffinity(size_t affinity)
 {
 	if (isValid() == false)
 		return;
@@ -28,7 +28,7 @@ void GRAVEngine::jobs::gravThread::setAffinity(size_t affinity)
 #endif
 }
 
-void GRAVEngine::jobs::gravThread::join()
+void GRAVEngine::Jobs::gravThread::join()
 {
 	if (isValid() == false)
 		return;
@@ -39,7 +39,7 @@ void GRAVEngine::jobs::gravThread::join()
 #endif
 }
 
-void GRAVEngine::jobs::gravThread::initializeFromCurrentThread()
+void GRAVEngine::Jobs::gravThread::initializeFromCurrentThread()
 {
 	// Get the current thread information
 #ifdef _WIN32
@@ -48,7 +48,7 @@ void GRAVEngine::jobs::gravThread::initializeFromCurrentThread()
 #endif
 }
 
-void GRAVEngine::jobs::gravThread::sleepFor(uint32 ms)
+void GRAVEngine::Jobs::gravThread::sleepFor(uint32 ms)
 {
 #ifdef _WIN32
 	Sleep(ms);

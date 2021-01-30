@@ -6,7 +6,7 @@
 
 namespace GRAVEngine
 {
-	namespace jobs
+	namespace Jobs
 	{
 		typedef uint8 threadIndex;
 
