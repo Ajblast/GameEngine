@@ -3,7 +3,6 @@ workspace "GRAVEngine"
 	architecture "x64"
 	startproject "GRAVTest"
 
-
 	configurations
 	{
 		"Debug",
@@ -20,7 +19,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- Include directories relative to OpenGL-Core
 IncludeDir = {}
---IncludeDir["GLFW"]	=		"vendor/GLFW/include"
+IncludeDir["GLFW"]	=		"vendor/glfw/include"
 --IncludeDir["Glad"]	=		"vendor/Glad/include"
 --IncludeDir["ImGui"] =		"vendor/imgui"
 --IncludeDir["glm"]	=		"vendor/glm"
@@ -29,7 +28,7 @@ IncludeDir = {}
 
 --Projects
 group "Dependencies"
-	--include "OpenGL-Core/vendor/GLFW"
+	include "core/vendor/glfw"
 	--include "OpenGL-Core/vendor/GLAD"
 	--include "OpenGL-Core/vendor/imgui"
 group ""

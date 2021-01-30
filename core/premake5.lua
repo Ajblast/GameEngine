@@ -30,9 +30,9 @@ project "GRAVCore"
 	-- Include directories
 	includedirs
 	{
-		"src"
+		"src",
 		--"vendor/spdlog/include",
-		--"%{IncludeDir.GLFW}",
+		"%{IncludeDir.GLFW}"
 		--"%{IncludeDir.Glad}",
 		--"%{IncludeDir.ImGui}",
 		--"%{IncludeDir.glm}",
@@ -42,10 +42,10 @@ project "GRAVCore"
 	-- Link these projects into the executable
 	links 
 	{ 
-		--"GLFW",
+		"GLFW",
 		--"Glad",
 		--"ImGui",
-		--"opengl32.lib"
+		"opengl32.lib"
 	}
 
 	-- When the system is windows
@@ -54,8 +54,8 @@ project "GRAVCore"
 
 		defines
 		{
-			"GRAVCORE_PLATFORM_WINDOWS"
-			--"GLFW_INCLUDE_NONE"
+			"GRAVCORE_PLATFORM_WINDOWS",
+			"GLFW_INCLUDE_NONE"
 		}
 
 	-- When the configuration is debug
