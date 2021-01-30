@@ -20,7 +20,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 -- Include directories relative to OpenGL-Core
 IncludeDir = {}
 IncludeDir["GLFW"]	=		"vendor/glfw/include"
---IncludeDir["Glad"]	=		"vendor/Glad/include"
+IncludeDir["GLAD"]	=		"vendor/glad/include"
 --IncludeDir["ImGui"] =		"vendor/imgui"
 --IncludeDir["glm"]	=		"vendor/glm"
 --IncludeDir["stb_image"] =	"vendor/stb_image"
@@ -29,8 +29,8 @@ IncludeDir["GLFW"]	=		"vendor/glfw/include"
 --Projects
 group "Dependencies"
 	include "core/vendor/glfw"
-	--include "OpenGL-Core/vendor/GLAD"
-	--include "OpenGL-Core/vendor/imgui"
+	include "core/vendor/glad"
+	--include "core/vendor/imgui"
 group ""
 
 include "core"

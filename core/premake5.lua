@@ -32,8 +32,8 @@ project "GRAVCore"
 	{
 		"src",
 		--"vendor/spdlog/include",
-		"%{IncludeDir.GLFW}"
-		--"%{IncludeDir.Glad}",
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}"
 		--"%{IncludeDir.ImGui}",
 		--"%{IncludeDir.glm}",
 		--"%{IncludeDir.stb_image}"
@@ -43,7 +43,7 @@ project "GRAVCore"
 	links 
 	{ 
 		"GLFW",
-		--"Glad",
+		"Glad",
 		--"ImGui",
 		"opengl32.lib"
 	}
