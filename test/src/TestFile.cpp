@@ -84,7 +84,7 @@ int main()
 
 #pragma region SettingUpLogging
 	// Create a default logger with a file sink and a sink to the msvc console
-	auto fileSink = std::make_shared<GRAVEngine::Logging::Sinks::fileSink>("A:\\Users\\Austin Kincer\\Source\\Repos\\Ajblast\\GameEngine\\test\\test.txt");
+	auto fileSink = std::make_shared<GRAVEngine::Logging::Sinks::fileSink>("A:\\Users\\Austin Kincer\\Source\\Repos\\Ajblast\\GameEngine\\test\\test.log");
 	auto msvcSink = std::make_shared<GRAVEngine::Logging::Sinks::msvcSink>();
 	auto coutSink = std::make_shared<GRAVEngine::Logging::Sinks::ostreamSink>(std::cout, true);
 
