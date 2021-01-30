@@ -1,7 +1,7 @@
 # GameEngine
 # Description
 # Table of Contents
-[Coding Convetions](https://github.com/Ajblast/GameEngine/#codingconventions)
+[Coding Convetions](https://github.com/Ajblast/GameEngine#coding-conventions)
 # Installation
 # Usage
 # Contributing
