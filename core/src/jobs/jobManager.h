@@ -14,6 +14,7 @@
 #include "exceptions/exceptions.h"
 
 // TODO: Implement I/O threads (Socks, file I/O, system call). Slide 19 on Parallelizing the Naughty Dog Engine Using Fibers
+// TODO: Implement automatic allocation for counters
 
 #define GRAV_MAIN_THREAD_INDEX 0
 
