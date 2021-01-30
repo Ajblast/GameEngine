@@ -4,6 +4,7 @@
 
 # Files
 *.user
+*.log
 
 
 # Visual Studio
