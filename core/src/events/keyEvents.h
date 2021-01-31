@@ -13,7 +13,7 @@ namespace GRAVEngine
 		public:
 			Keys::keyCode getKeyCode() const { return m_KeyCode; }
 
-			EVENT_CLASS_CATEGORY(eventCategoryKeyboard, eventCategoryInput)
+			EVENT_CLASS_CATEGORY(eventCategoryKeyboard | eventCategoryInput)
 		protected:
 			keyEvent(const Keys::keyCode keyCode) : m_KeyCode(keyCode) {}
 

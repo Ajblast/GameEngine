@@ -59,8 +59,8 @@ void mainMethod()
 	delete counter;
 }
 
-int main()
-{
+//int main()
+//{
 #pragma region PathStuff
 	////wchar_t pathBuffer[MAX_PATH_LENGTH];
 	//char pathBuffer[MAX_PATH_LENGTH];
@@ -82,39 +82,39 @@ int main()
 	//std::string filePath = ss.str();
 #pragma endregion
 
-#pragma region SettingUpLogging
-	// Create a default logger with a file sink and a sink to the msvc console
-	auto fileSink = std::make_shared<GRAVEngine::Logging::Sinks::fileSink>("A:\\Users\\Austin Kincer\\Source\\Repos\\Ajblast\\GameEngine\\test\\test.log");
-	auto msvcSink = std::make_shared<GRAVEngine::Logging::Sinks::msvcSink>();
-	auto coutSink = std::make_shared<GRAVEngine::Logging::Sinks::ostreamSink>(std::cout, true);
+//#pragma region SettingUpLogging
+//	// Create a default logger with a file sink and a sink to the msvc console
+//	auto fileSink = std::make_shared<GRAVEngine::Logging::Sinks::fileSink>("A:\\Users\\Austin Kincer\\Source\\Repos\\Ajblast\\GameEngine\\test\\test.log");
+//	auto msvcSink = std::make_shared<GRAVEngine::Logging::Sinks::msvcSink>();
+//	auto coutSink = std::make_shared<GRAVEngine::Logging::Sinks::ostreamSink>(std::cout, true);
+//
+//	GRAVEngine::Logging::logger logger = GRAVEngine::Logging::logger("Default", { fileSink, msvcSink, coutSink });
+//	// Have to set the verbosity when providing a logger for startup
+//	logger.setVerbosity(GRAVEngine::Logging::verbosity::trace);
+//	logger.setFlushVerbosity(GRAVEngine::Logging::verbosity::trace);
+//
+//	// Start up the manager
+//	logManager.startUp(std::make_shared<GRAVEngine::Logging::logger> (logger));
+//	GRAV_LOG_LINE_INFO("%s: Log Manager Initialized", __FUNCTION__);
+//#pragma endregion
 
-	GRAVEngine::Logging::logger logger = GRAVEngine::Logging::logger("Default", { fileSink, msvcSink, coutSink });
-	// Have to set the verbosity when providing a logger for startup
-	logger.setVerbosity(GRAVEngine::Logging::verbosity::trace);
-	logger.setFlushVerbosity(GRAVEngine::Logging::verbosity::trace);
+	//GRAV_LOG_LINE_INFO("%s: Begin starting up managers", __FUNCTION__);
 
-	// Start up the manager
-	logManager.startUp(std::make_shared<GRAVEngine::Logging::logger> (logger));
-	GRAV_LOG_LINE_INFO("%s: Log Manager Initialized", __FUNCTION__);
-#pragma endregion
+//#pragma region SettingUpJobManager
+//	// Use default job manager options
+//	GRAVEngine::Jobs::jobManagerOptions jobManagerOptions;
+//	jobManagerOptions.m_ShutDownAfterMain = false;
+//
+//	// Start up the job manager
+//	jobManager.startUp(jobManagerOptions);
+//	GRAV_LOG_LINE_INFO("%s: Job Manager Initialized", __FUNCTION__);
+//#pragma endregion
 
-	GRAV_LOG_LINE_INFO("%s: Begin starting up managers", __FUNCTION__);
-
-#pragma region SettingUpJobManager
-	// Use default job manager options
-	GRAVEngine::Jobs::jobManagerOptions jobManagerOptions;
-	jobManagerOptions.m_ShutDownAfterMain = false;
-
-	// Start up the job manager
-	jobManager.startUp(jobManagerOptions);
-	GRAV_LOG_LINE_INFO("%s: Job Manager Initialized", __FUNCTION__);
-#pragma endregion
-
-	jobManager.runMain(mainMethod);
+	//jobManager.runMain(mainMethod);
 
 
-	GRAV_LOG_LINE_INFO("%s: Begin shutting down managers", __FUNCTION__);
-	jobManager.shutDown();
-	logManager.shutDown();
-}
+	//GRAV_LOG_LINE_INFO("%s: Begin shutting down managers", __FUNCTION__);
+	//jobManager.shutDown();
+	//logManager.shutDown();
+//}
 

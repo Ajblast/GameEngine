@@ -33,9 +33,10 @@ namespace GRAVEngine
 		class jobManager
 		{
 			friend counter;
-			using mainMethodFunction = void(*)();
 
 		public:
+			using mainMethodFunction = void(*)();
+
 			jobManager();													// Constructor
 			jobManager(const jobManager&) = delete;							// Cannot copy the job manager
 			jobManager(jobManager&& other) = delete;						// Move constructor

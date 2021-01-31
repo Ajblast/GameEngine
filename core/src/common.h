@@ -10,6 +10,8 @@
 
 #define BIT(x) (1 << x)
 
+#define GRAV_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
+
 // TODO: Change this new to allow tracking of memory allocations
 
 #define STRING_COPY(destination, source, maxSize) \
