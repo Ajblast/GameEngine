@@ -1,8 +1,9 @@
 #pragma once
 
+#include "common.h"
 #include "baseSink.h"
 
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 namespace GRAVEngine
 {
 	namespace Logging

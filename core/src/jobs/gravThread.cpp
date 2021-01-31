@@ -7,7 +7,7 @@ GRAVEngine::Jobs::gravThread::gravThread() {}
 void GRAVEngine::Jobs::gravThread::spawn(threadCallbackFunction callback)
 {
 	// Create the thread
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	m_ThreadHandle = CreateThread(0, 0, (LPTHREAD_START_ROUTINE)callback, this, 0, (DWORD*) &m_ThreadID);
 #endif
 
@@ -21,7 +21,7 @@ void GRAVEngine::Jobs::gravThread::setAffinity(size_t affinity)
 	if (isValid() == false)
 		return;
 
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	// Mask the CPU and set the affinity
 	DWORD_PTR mask = 1ull << affinity;
 	SetThreadAffinityMask(m_ThreadHandle, mask);
@@ -34,7 +34,7 @@ void GRAVEngine::Jobs::gravThread::join()
 		return;
 
 	// Join the thread handle
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	WaitForSingleObject(m_ThreadHandle, INFINITE);
 #endif
 }
@@ -42,7 +42,7 @@ void GRAVEngine::Jobs::gravThread::join()
 void GRAVEngine::Jobs::gravThread::initializeFromCurrentThread()
 {
 	// Get the current thread information
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	m_ThreadHandle = GetCurrentThread();
 	m_ThreadID = GetCurrentThreadId();
 #endif
@@ -50,7 +50,7 @@ void GRAVEngine::Jobs::gravThread::initializeFromCurrentThread()
 
 void GRAVEngine::Jobs::gravThread::sleepFor(uint32 ms)
 {
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	Sleep(ms);
 #elif LINUX
 	sleep(ms);

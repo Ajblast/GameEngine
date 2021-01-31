@@ -368,7 +368,7 @@ void GRAVEngine::Jobs::jobManager::checkWaitingFibers()
 
 GRAVEngine::Jobs::threadIndex GRAVEngine::Jobs::jobManager::getCurrentThreadIndex() const
 {
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	threadID id = GetCurrentThreadId();
 	for (threadIndex i = 0; i < m_ThreadCount; i++)
 		if (m_Threads[i].getID() == id)
@@ -379,7 +379,7 @@ GRAVEngine::Jobs::threadIndex GRAVEngine::Jobs::jobManager::getCurrentThreadInde
 }
 GRAVEngine::Jobs::gravThread* GRAVEngine::Jobs::jobManager::getCurrentThread() const
 {
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	threadID id = GetCurrentThreadId();
 	for (threadIndex i = 0; i < m_ThreadCount; i++)
 		if (m_Threads[i].getID() == id)
@@ -390,7 +390,7 @@ GRAVEngine::Jobs::gravThread* GRAVEngine::Jobs::jobManager::getCurrentThread() c
 }
 GRAVEngine::Jobs::tls* GRAVEngine::Jobs::jobManager::getCurrentTLS() const
 {
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	threadID id = GetCurrentThreadId();
 	for (threadIndex i = 0; i < m_ThreadCount; i++)
 		if (m_Threads[i].getID() == id)

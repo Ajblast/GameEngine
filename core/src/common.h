@@ -19,7 +19,7 @@ strncpy(tmp, source, stringLength); \
 tmp[stringLength - 1] = 0; \
 destination = tmp
 
-
+#include "platform.h"
 #include "dataPrimitives.h"
 #include "assertion.h"
 #include "errorCodes.h"

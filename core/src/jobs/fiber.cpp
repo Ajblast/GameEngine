@@ -14,7 +14,7 @@ static void launchFiber(GRAVEngine::Jobs::fiber* fiber)
 
 GRAVEngine::Jobs::fiber::fiber() : m_FunctionCallback(nullptr), m_CallingFiber(nullptr)
 {
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	// Create the fiber with the launching fiber function
 	m_FiberHandle = (fiberHandle) CreateFiber(0, (LPFIBER_START_ROUTINE) launchFiber, this);
 	m_IsThreadFiber = false;
@@ -27,7 +27,7 @@ GRAVEngine::Jobs::fiber::fiber() : m_FunctionCallback(nullptr), m_CallingFiber(n
 
 GRAVEngine::Jobs::fiber::~fiber()
 {
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	// Delete the system fiber
 	if (m_FiberHandle && m_IsThreadFiber == false)
 		DeleteFiber(m_FiberHandle);
@@ -36,7 +36,7 @@ GRAVEngine::Jobs::fiber::~fiber()
 
 void GRAVEngine::Jobs::fiber::initializeFromCurrentThread()
 {
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	// Delete the current system fiber if there is one
 	if (m_FiberHandle && m_IsThreadFiber == false)
 		DeleteFiber(m_FiberHandle);
@@ -49,7 +49,7 @@ void GRAVEngine::Jobs::fiber::initializeFromCurrentThread()
 
 void GRAVEngine::Jobs::fiber::convertToThread()
 {
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	// Turn this fiber back into a thread. Used for the main thread
 	ConvertFiberToThread();
 #endif
@@ -63,7 +63,7 @@ void GRAVEngine::Jobs::fiber::switchTo(fiber* fiber)
 	// Switch to a fiber and pass it the given data
 	fiber->m_CallingFiber = this;
 
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	SwitchToFiber(fiber->m_FiberHandle);
 #endif
 }
@@ -74,7 +74,7 @@ void GRAVEngine::Jobs::fiber::switchToCallingFiber()
 	GRAV_ASSERT(m_CallingFiber->m_FiberHandle);
 
 	// Switch to the calling fiber
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 	SwitchToFiber(m_CallingFiber->m_FiberHandle);
 #endif
 }

@@ -2,7 +2,7 @@
 
 #include "common.h"
 
-#ifdef _WIN32
+#ifdef GRAV_PLATFORM_WINDOWS
 #ifndef	WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
