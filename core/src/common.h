@@ -8,6 +8,8 @@
 #define ASSERTIONS_ENABLED
 #endif
 
+#define BIT(x) (1 << x)
+
 // TODO: Change this new to allow tracking of memory allocations
 
 #define STRING_COPY(destination, source, maxSize) \
