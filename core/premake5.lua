@@ -30,12 +30,12 @@ project "GRAVCore"
 	-- Include directories
 	includedirs
 	{
-		"src"
+		"src",
 		--"vendor/spdlog/include",
 		--"%{IncludeDir.GLFW}",
 		--"%{IncludeDir.Glad}",
 		--"%{IncludeDir.ImGui}",
-		--"%{IncludeDir.glm}",
+		"%{IncludeDir.glm}"
 		--"%{IncludeDir.stb_image}"
 	}
 
@@ -46,6 +46,7 @@ project "GRAVCore"
 		--"Glad",
 		--"ImGui",
 		--"opengl32.lib"
+		"glm"
 	}
 
 	-- When the system is windows
