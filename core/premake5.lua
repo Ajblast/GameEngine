@@ -35,7 +35,7 @@ project "GRAVCore"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.GLAD}"
 		--"%{IncludeDir.ImGui}",
-		--"%{IncludeDir.glm}",
+		"%{IncludeDir.glm}"
 		--"%{IncludeDir.stb_image}"
 	}
 
@@ -45,6 +45,8 @@ project "GRAVCore"
 		"GLFW",
 		"GLAD",
 		--"ImGui",
+		--"opengl32.lib"
+		"glm"
 		"opengl32.lib"
 	}
 

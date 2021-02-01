@@ -22,7 +22,7 @@ IncludeDir = {}
 IncludeDir["GLFW"]	=		"vendor/glfw/include"
 IncludeDir["GLAD"]	=		"vendor/glad/include"
 --IncludeDir["ImGui"] =		"vendor/imgui"
---IncludeDir["glm"]	=		"vendor/glm"
+IncludeDir["glm"]	=		"vendor/glm"
 --IncludeDir["stb_image"] =	"vendor/stb_image"
 
 
@@ -31,6 +31,10 @@ group "Dependencies"
 	include "core/vendor/glfw"
 	include "core/vendor/glad"
 	--include "core/vendor/imgui"
+	--include "OpenGL-Core/vendor/GLFW"
+	--include "OpenGL-Core/vendor/GLAD"
+	--include "OpenGL-Core/vendor/imgui"
+	include "core/vendor/glm"
 group ""
 
 include "core"
