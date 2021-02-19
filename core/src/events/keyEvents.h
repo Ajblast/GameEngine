@@ -2,7 +2,7 @@
 
 #include "common.h"
 #include "event.h"
-#include "keyCodes.h"
+#include "io/keyCodes.h"
 
 namespace GRAVEngine
 {
