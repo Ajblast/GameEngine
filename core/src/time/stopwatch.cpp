@@ -67,101 +67,71 @@ void GRAVEngine::Time::stopwatch::reset() noexcept
 GRAVEngine::Time::timeDurationCount GRAVEngine::Time::stopwatch::elapsedNanoseconds() noexcept
 {
 	// Get the current duration
-	timeDurationCount elapsedDuration = m_StoredDuration.count();
+	nanoseconds elapsedDuration = m_StoredDuration;
 
 	// Calculate the current duration if the timer is running
 	if(m_Running)
 	{ 
-		// Get the current time
-		timePoint currentTick = std::chrono::steady_clock::now();
-
-		// Get the current duration
-		nanoseconds currentDuration = std::chrono::duration_cast<nanoseconds>(currentTick - m_StartTick);
-
-		// Add the curernt duration to the elapsed duration
-		elapsedDuration += currentDuration.count();
+		// Add to the duration if the stopwatch is running
+		elapsedDuration += (std::chrono::steady_clock::now() - m_StartTick);
 	}
 
-	return elapsedDuration;
+	return std::chrono::duration_cast<nanoseconds>(elapsedDuration).count();
 }
-GRAVEngine::Time::timeDurationCount GRAVEngine::Time::stopwatch::elapsedMilliseconds() noexcept
+double GRAVEngine::Time::stopwatch::elapsedMilliseconds() noexcept
 {
 	// Get the current duration
-	timeDurationCount elapsedDuration = std::chrono::duration_cast<milliseconds>(m_StoredDuration).count();
+	nanoseconds elapsedDuration = m_StoredDuration;
 
 	// Calculate the current duration if the timer is running
 	if (m_Running)
 	{
-		// Get the current time
-		timePoint currentTick = std::chrono::steady_clock::now();
-
-		// Get the current duration
-		nanoseconds currentDuration = std::chrono::duration_cast<milliseconds>(currentTick - m_StartTick);
-
-		// Add the curernt duration to the elapsed duration
-		elapsedDuration += currentDuration.count();
+		// Add to the duration if the stopwatch is running
+		elapsedDuration += (std::chrono::steady_clock::now() - m_StartTick);
 	}
 
-	return elapsedDuration;
+	return std::chrono::duration_cast<milliseconds>(elapsedDuration).count();
 }
-GRAVEngine::Time::timeDurationCount GRAVEngine::Time::stopwatch::elapsedSeconds() noexcept
+double GRAVEngine::Time::stopwatch::elapsedSeconds() noexcept
 {
 	// Get the current duration
-	timeDurationCount elapsedDuration = std::chrono::duration_cast<seconds>(m_StoredDuration).count();
+	nanoseconds elapsedDuration = m_StoredDuration;
 
 	// Calculate the current duration if the timer is running
 	if (m_Running)
 	{
-		// Get the current time
-		timePoint currentTick = std::chrono::steady_clock::now();
-
-		// Get the current duration
-		nanoseconds currentDuration = std::chrono::duration_cast<seconds>(currentTick - m_StartTick);
-
-		// Add the curernt duration to the elapsed duration
-		elapsedDuration += currentDuration.count();
+		// Add to the duration if the stopwatch is running
+		elapsedDuration += (std::chrono::steady_clock::now() - m_StartTick);
 	}
 
-	return elapsedDuration;
+	return std::chrono::duration_cast<seconds>(elapsedDuration).count();
 }
-GRAVEngine::Time::timeDurationCount GRAVEngine::Time::stopwatch::elapsedMinutes() noexcept
+double GRAVEngine::Time::stopwatch::elapsedMinutes() noexcept
 {
 	// Get the current duration
-	timeDurationCount elapsedDuration = std::chrono::duration_cast<minutes>(m_StoredDuration).count();
+	nanoseconds elapsedDuration = m_StoredDuration;
 
 	// Calculate the current duration if the timer is running
 	if (m_Running)
 	{
-		// Get the current time
-		timePoint currentTick = std::chrono::steady_clock::now();
-
-		// Get the current duration
-		nanoseconds currentDuration = std::chrono::duration_cast<minutes>(currentTick - m_StartTick);
-
-		// Add the curernt duration to the elapsed duration
-		elapsedDuration += currentDuration.count();
+		// Add to the duration if the stopwatch is running
+		elapsedDuration += (std::chrono::steady_clock::now() - m_StartTick);
 	}
 
-	return elapsedDuration;
+	return std::chrono::duration_cast<minutes>(elapsedDuration).count();
 }
-GRAVEngine::Time::timeDurationCount GRAVEngine::Time::stopwatch::elapsedHours() noexcept
+double GRAVEngine::Time::stopwatch::elapsedHours() noexcept
 {
 	// Get the current duration
-	timeDurationCount elapsedDuration = std::chrono::duration_cast<hours>(m_StoredDuration).count();
+	nanoseconds elapsedDuration = m_StoredDuration;
 
 	// Calculate the current duration if the timer is running
 	if (m_Running)
 	{
-		// Get the current time
-		timePoint currentTick = std::chrono::steady_clock::now();
-
-		// Get the current duration
-		nanoseconds currentDuration = std::chrono::duration_cast<hours>(currentTick - m_StartTick);
-
-		// Add the curernt duration to the elapsed duration
-		elapsedDuration += currentDuration.count();
+		// Add to the duration if the stopwatch is running
+		elapsedDuration += (std::chrono::steady_clock::now() - m_StartTick);
 	}
 
-	return elapsedDuration;
+	return std::chrono::duration_cast<hours>(elapsedDuration).count();
 }
 

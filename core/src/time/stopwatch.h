@@ -28,10 +28,10 @@ namespace GRAVEngine
 			void reset() noexcept;
 
 			timeDurationCount elapsedNanoseconds() noexcept;
-			timeDurationCount elapsedMilliseconds() noexcept;
-			timeDurationCount elapsedSeconds() noexcept;
-			timeDurationCount elapsedMinutes() noexcept;
-			timeDurationCount elapsedHours() noexcept;
+			double elapsedMilliseconds() noexcept;
+			double elapsedSeconds() noexcept;
+			double elapsedMinutes() noexcept;
+			double elapsedHours() noexcept;
 
 
 		private:
