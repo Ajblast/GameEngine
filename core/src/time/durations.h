@@ -11,10 +11,10 @@ namespace GRAVEngine
 		typedef std::chrono::steady_clock::time_point timePoint;
 
 		typedef std::chrono::duration<timeDurationCount, std::nano>	nanoseconds;
-		typedef std::chrono::duration<double, std::milli>			milliseconds;
-		typedef std::chrono::duration<double>						seconds;
-		typedef std::chrono::duration<double, std::ratio<60>>		minutes;
-		typedef std::chrono::duration<double, std::ratio<3600>>		hours;
+		typedef std::chrono::duration<float, std::milli>			milliseconds;
+		typedef std::chrono::duration<float>						seconds;
+		typedef std::chrono::duration<float, std::ratio<60>>		minutes;
+		typedef std::chrono::duration<float, std::ratio<3600>>		hours;
 
 		constexpr timeDurationCount clockFrequency()
 		{

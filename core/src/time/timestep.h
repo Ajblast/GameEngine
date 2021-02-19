@@ -11,8 +11,11 @@ namespace GRAVEngine
 		class timestep
 		{
 		public:
+			// Clock start and stop points
 			timestep(timePoint startTick, timePoint endTick) : m_Time(endTick - startTick) {}
+			// The amount of time in nanoseconds
 			timestep(timeDurationCount time = 0) : m_Time(time) {}
+			// The amount of time in seconds
 			timestep(float time = 0.0f) : m_Time(std::chrono::duration_cast<nanoseconds>(seconds(time))) {}
 
 			operator float() const
