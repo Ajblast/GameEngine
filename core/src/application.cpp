@@ -2,7 +2,6 @@
 #include "application.h"
 
 #include <GLFW/glfw3.h>
-
 #include "io/input.h"
 #include <glad/glad.h>
 
@@ -19,7 +18,8 @@ GRAVEngine::application::application(const std::string& name)
 
 	// TODO: Initialize the renderer
 
-
+	 m_ImGuiLayer = new Layers::imguiLayer();
+	 pushOverlay(m_ImGuiLayer);
 }
 
 GRAVEngine::application::~application()
@@ -34,7 +34,31 @@ void GRAVEngine::application::onEvent(Events::event& event)
 	dispatcher.dispatch<Events::windowCloseEvent>(GRAV_BIND_EVENT_FN(application::onWindowClose));
 	dispatcher.dispatch<Events::windowResizeEvent>(GRAV_BIND_EVENT_FN(application::onWindowResize));
 
-	// TODO: For every layer, send an event to it
+	// Reverse iterate over the layerstack to pass events
+	for (auto it = m_LayerStack.rbegin(); it != m_LayerStack.rend(); ++it)
+	{
+		// Stop iterating if the event has been handled
+		if (event.m_Handled)
+			break;
+		// Send the event
+		(*it)->onEvent(event);
+	}
+}
+
+void GRAVEngine::application::pushLayer(Layers::layer* layer)
+{
+	// Push the layer
+	m_LayerStack.pushLayer(layer);
+	// Tell the layer that it is now attached
+	layer->onAttach();
+}
+
+void GRAVEngine::application::pushOverlay(Layers::layer* overlay)
+{
+	// Push the overlay
+	m_LayerStack.pushOverlay(overlay);
+	// Tell the overlay that it is now attached
+	overlay->onAttach();
 }
 
 void GRAVEngine::application::close()
@@ -48,15 +72,29 @@ void GRAVEngine::application::run()
 
 	while (m_Running)
 	{
-		// TODO: Update delta time
+		// Get the delta time
+		float time = (float)glfwGetTime();
+		Time::timestep timestep = Time::timestep(time - m_LastFrameTime);
+		m_LastFrameTime = time;
 
 		if (m_Minimized == false)
 		{
-			// TODO: Update every layer
+			// Update layers
+			for (Layers::layer* layer : m_LayerStack)
+				layer->onUpdate(timestep);
 
-			// TODO: ImGUI
+			// Start updating the ImGuiLayer
+			m_ImGuiLayer->begin();
+			// For each layer, render ImGui
+			for (Layers::layer* layer : m_LayerStack)
+				layer->onImGuiRender();
+			// End updating the ImGuiLayer
+			m_ImGuiLayer->end();
 
 
+			// TODO: Critical move this io key pressed event into the sandbox application
+
+			// Test code for colors
 			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 
