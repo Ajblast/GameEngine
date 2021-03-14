@@ -1,13 +1,13 @@
 #pragma once
 
 #include "common.h"
-#include "rendering/windowProperties.h"
-#include "rendering/window.h"
+#include "rendering/windows/windowProperties.h"
+#include "rendering/windows/window.h"
 #include "rendering/graphicsContext.h"
 
 #include <GLFW/glfw3.h>
-#define GRAV_GLFW_CONTEXT_VERSION_MAJOR 3
-#define GRAV_GLFW_CONTEXT_VERSION_MINOR 3
+#define GRAV_GLFW_CONTEXT_VERSION_MAJOR 4
+#define GRAV_GLFW_CONTEXT_VERSION_MINOR 6
 #define GRAV_GLFW_OPENGL_PROFILE GLFW_OPENGL_CORE_PROFILE
 
 namespace GRAVEngine
