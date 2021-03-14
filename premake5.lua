@@ -23,7 +23,7 @@ IncludeDir["GLFW"]	=		"vendor/glfw/include"
 IncludeDir["GLAD"]	=		"vendor/glad/include"
 --IncludeDir["ImGui"] =		"vendor/imgui"
 IncludeDir["glm"]	=		"vendor/glm"
---IncludeDir["stb_image"] =	"vendor/stb_image"
+IncludeDir["stb_image"] =	"vendor/stb_image"
 
 
 --Projects

@@ -14,11 +14,11 @@ project "GRAVCore"
 	files
 	{
 		"src/**.h",
-		"src/**.cpp"
-		--"vendor/stb_image/**.h",
-		--"vendor/stb_image/**.cpp",
-		--"vendor/glm/glm/**.hpp",
-		--"vendor/glm/glm/**.inl",
+		"src/**.cpp",
+		"vendor/stb_image/**.h",
+		"vendor/stb_image/**.cpp",
+		"vendor/glm/glm/**.hpp",
+		"vendor/glm/glm/**.inl"
 	}
 
 	-- Define the following
@@ -35,8 +35,8 @@ project "GRAVCore"
 		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.GLAD}",
 		--"%{IncludeDir.ImGui}",
-		"%{IncludeDir.glm}"
-		--"%{IncludeDir.stb_image}"
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.stb_image}"
 	}
 
 	-- Link these projects into the executable
@@ -46,7 +46,7 @@ project "GRAVCore"
 		"GLAD",
 		--"ImGui",
 		--"opengl32.lib"
-		"glm",
+		--"glm",
 		"opengl32.lib"
 	}
 
