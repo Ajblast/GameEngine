@@ -1,8 +1,10 @@
 #include "gravpch.h"
 #include "application.h"
 
-#include <GLFW/glfw3.h>
 #include "io/input.h"
+#include "rendering/renderer/renderer.h"
+
+#include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
 GRAVEngine::application* GRAVEngine::application::s_Instance = nullptr;
@@ -16,7 +18,8 @@ GRAVEngine::application::application(const std::string& name)
 	m_Window = Rendering::window::create(Rendering::windowProperties(name));
 	m_Window->setEventCallback(GRAV_BIND_EVENT_FN(application::onEvent));
 
-	// TODO: Initialize the renderer
+	// Startup the rendering
+	Rendering::renderer::startup();
 
 	 m_ImGuiLayer = new Layers::imguiLayer();
 	 pushOverlay(m_ImGuiLayer);
@@ -92,19 +95,7 @@ void GRAVEngine::application::run()
 			m_ImGuiLayer->end();
 
 
-			// TODO: Critical move this io key pressed event into the sandbox application
 			// TODO: Critical test time to make sure it is actually working
-
-			// Test code for colors
-			glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-
-
-			if (IO::Input::isKeyPressed(Keys::Space))
-			{
-				GRAV_LOG_LINE_INFO("%s: Space Pressed!!!", __FUNCTION__);
-				close();
-			}
 		}
 
 		// TODO: Update the window
@@ -132,7 +123,7 @@ bool GRAVEngine::application::onWindowResize(Events::windowResizeEvent& event)
 	}
 
 	m_Minimized = false;
-	// TODO: Tell renderer that the window resized
+	Rendering::renderer::onWindowResize(event.getWidth(), event.getHeight());
 
 	// Event is not handeled no matter what
 	return false;

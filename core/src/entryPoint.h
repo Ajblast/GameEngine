@@ -4,6 +4,7 @@
 #include "application.h"
 #include "jobs/jobManager.h"
 #include "logging/sinks/sinks.h"
+#include "rendering/renderer/rendererCommand.h"
 #include <iostream>
 
 #ifdef GRAV_PLATFORM_WINDOWS
@@ -14,7 +15,7 @@ int main(int argc, char** argv)
 
 #pragma region SettingUpLogging
 	// Create a default logger with a file sink and a sink to the msvc console
-	auto fileSink = std::make_shared<GRAVEngine::Logging::Sinks::fileSink>("A:\\Users\\Austin Kincer\\Source\\Repos\\Ajblast\\GameEngine\\test\\test.log");
+	auto fileSink = std::make_shared<GRAVEngine::Logging::Sinks::fileSink>("A:\\Development\\source\\Ajblast\\GameEngine\\test\\test.log");
 	auto msvcSink = std::make_shared<GRAVEngine::Logging::Sinks::msvcSink>();
 	auto coutSink = std::make_shared<GRAVEngine::Logging::Sinks::ostreamSink>(std::cout, true);
 

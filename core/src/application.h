@@ -1,11 +1,13 @@
 #pragma once
 
 #include "common.h"
-#include "rendering/window.h"
+#include "rendering/windows/window.h"
 #include "events/event.h"
 #include "events/eventDispatcher.h"
 #include "events/applicationEvents.h"
+
 #include "time/timestep.h"
+
 #include "layers/layerStack.h"
 #include "layers/imgui/imguiLayer.h"
 

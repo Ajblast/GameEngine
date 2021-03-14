@@ -18,6 +18,14 @@ void GRAVEngine::Rendering::openglContext::startup()
 	// Load glad
 	int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	GRAV_ASSERT(status);
+
+	GRAV_LOG_INFO("OpenGL Info:");
+	GRAV_LOG_INFO("  Vendor: %s", glGetString(GL_VENDOR));
+	GRAV_LOG_INFO("  Renderer: %s", glGetString(GL_RENDERER));
+	GRAV_LOG_INFO("  Version: %s\n", glGetString(GL_VERSION));
+
+	// GRAVEngine requires at least OpenGL version 4.5!"
+	GRAV_ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5))
 }
 
 void GRAVEngine::Rendering::openglContext::swapBuffers()

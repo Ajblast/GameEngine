@@ -21,3 +21,18 @@
 
 // ImGui
 #include "layers/imgui/imguiLayer.h"
+
+// Renderer
+#include "rendering/renderer/renderer.h"
+#include "rendering/renderer/renderer2D.h"
+#include "rendering/renderer/rendererCommand.h"
+
+#include "rendering/vertexArray.h"
+#include "rendering/buffers/vertexBuffer.h"
+#include "rendering/buffers/indexBuffer.h"
+#include "rendering/buffers/bufferLayout.h"
+
+#include "rendering/textures/texture.h"
+#include "rendering/textures/texture2D.h"
+
+#include "rendering/cameras/orthographicCamera.h"
