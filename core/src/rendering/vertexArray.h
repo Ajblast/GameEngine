@@ -21,16 +21,14 @@ namespace GRAVEngine
 			virtual void unbind() const = 0;
 
 			// Add a vertex buffer
-			virtual void addVertexBuffer(vertexBuffer* vertexBuffer) = 0;
+			virtual void addVertexBuffer(const ref<vertexBuffer>& vertexBuffer) = 0;
 			// Set the index buffer
-			virtual void setIndexBuffer(indexBuffer* indexBuffer) = 0;
+			virtual void setIndexBuffer(const ref<indexBuffer>& indexBuffer) = 0;
 
 			// Get a list of the vertex buffers
-			virtual const std::vector<vertexBuffer*>& getVertexBuffers() const = 0;
+			virtual const std::vector<ref<vertexBuffer>>& getVertexBuffers() const = 0;
 			// Get the index buffer
-			virtual const indexBuffer* getIndexBuffer() const = 0;
-
-			//static vertexArray* create();
+			virtual const ref<indexBuffer>& getIndexBuffer() const = 0;
 		};
 	}
 }

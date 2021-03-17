@@ -3,7 +3,7 @@
 
 GRAVEngine::Logging::logger::logger(std::string name) : m_Name(std::move(name)), m_Sinks()
 {}
-GRAVEngine::Logging::logger::logger(std::string name, std::shared_ptr<Sinks::sink> sinkPtr) 
+GRAVEngine::Logging::logger::logger(std::string name, ref<Sinks::sink> sinkPtr) 
 	: m_Name(std::move(name)), m_Sinks(1, sinkPtr), m_Verbosity(static_cast<int>(Logging::verbosity::trace)), m_FlushVerbosity(static_cast<int>(Logging::verbosity::trace))
 {}
 GRAVEngine::Logging::logger::logger(const logger& other) :

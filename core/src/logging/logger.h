@@ -29,10 +29,10 @@ namespace GRAVEngine
 		{
 		public:
 			explicit logger(std::string name);
-			explicit logger(std::string name, std::shared_ptr<Sinks::sink> sinkPtr);
+			explicit logger(std::string name, ref<Sinks::sink> sinkPtr);
 			template<typename it>
 			logger(std::string name, it begin, it end) : m_Name(std::move(name)), m_Sinks(begin, end) {}
-			logger(std::string name, std::initializer_list<std::shared_ptr<Sinks::sink>> sinks) : logger(std::move(name), sinks.begin(), sinks.end()) {}
+			logger(std::string name, std::initializer_list<ref<Sinks::sink>> sinks) : logger(std::move(name), sinks.begin(), sinks.end()) {}
 			logger(const logger& other);
 			logger(logger&& other) noexcept;
 
@@ -101,7 +101,7 @@ namespace GRAVEngine
 
 		private:
 			std::string m_Name;
-			std::vector<std::shared_ptr<Sinks::sink>> m_Sinks;
+			std::vector<ref<Sinks::sink>> m_Sinks;
 
 			Logging::verbosity_t m_Verbosity;
 			Logging::verbosity_t m_FlushVerbosity;

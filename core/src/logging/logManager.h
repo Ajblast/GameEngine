@@ -29,27 +29,31 @@ namespace GRAVEngine
 			explicit logManager() {}
 			logManager(const logManager&) = delete;				// Delete copy constructor
 			logManager& operator= (const logManager&) = delete;	// Delete set constructor
-			~logManager() = default;
+			~logManager()
+			{
+				// Shutdown the log manager
+				shutDown();
+			}
 
 			// Startup the log manager
-			void startUp(std::shared_ptr<Logging::Sinks::sink> defaultLoggerSink);
+			void startUp(ref<Logging::Sinks::sink> defaultLoggerSink);
 			// Startup the log manager with a default logger
-			void startUp(std::shared_ptr<Logging::logger> defaultLogger);
+			void startUp(ref<Logging::logger> defaultLogger);
 			// Shutdown the log manager
 			void shutDown();
 
 			// Register a logger
-			void registerLogger(std::shared_ptr<logger> logger);
+			void registerLogger(ref<logger> logger);
 			// Initialze a logger with the default verbosity and flush verbosity
-			void initializeLogger(std::shared_ptr<logger> logger);
+			void initializeLogger(ref<logger> logger);
 
 			// Get a logger based on its name
-			std::shared_ptr<logger> get(const std::string& loggerName);
+			ref<logger> get(const std::string& loggerName);
 			// Get the default logger
-			std::shared_ptr<logger> defaultLogger();
+			ref<logger> defaultLogger();
 
 			// Set the default logger
-			void setDefaultLogger(std::shared_ptr<logger> logger);
+			void setDefaultLogger(ref<logger> logger);
 
 			// Set the verbosity of all loggers
 			void setVerbosity(Logging::verbosity verbosity);
@@ -69,9 +73,9 @@ namespace GRAVEngine
 			void setVerbosities(std::unordered_map<std::string, Logging::verbosity> verbosities, bool setUnspecified, Logging::verbosity& verbosity);
 
 			// Statically get the logging instance
-			inline static logManager* getInstance()
+			inline static logManager& getInstance()
 			{
-				return s_Instance;
+				return *s_Instance;
 			}
 		private:
 //			logManager();
@@ -83,8 +87,8 @@ namespace GRAVEngine
 			Logging::verbosity_t m_FlushVerbosity;
 			Logging::verbosity_t m_Verbosity;
 
-			std::shared_ptr<logger> m_DefaultLogger;
-			std::unordered_map<std::string, std::shared_ptr<logger>> m_Loggers;
+			ref<logger> m_DefaultLogger;
+			std::unordered_map<std::string, ref<logger>> m_Loggers;
 			std::unordered_map<std::string, Logging::verbosity> m_LoggerVerbosities;
 
 			bool m_AutomaticRegistration = true;
