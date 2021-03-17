@@ -45,7 +45,7 @@ namespace GRAVEngine
 			};
 
 			GLFWwindow* m_Window;
-			graphicsContext* m_Context;
+			scope<graphicsContext> m_Context;
 			windowData m_Data;
 		};
 	}

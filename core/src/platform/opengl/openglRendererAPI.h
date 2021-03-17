@@ -24,26 +24,7 @@ namespace GRAVEngine
 			virtual void clear() override;
 			
 			// Draw a vertex array by indices
-			virtual void drawIndexed(vertexArray*& vertexArray, uint32 indexCount = 0) override;
-
-			// Create an index buffer
-			virtual indexBuffer* createIndexBuffer(uint32* indices, uint32 count) override;
-			// Create a vertex buffer
-			virtual vertexBuffer* createVertexBuffer(uint32 size) override;
-			// Create a vertex buffer
-			virtual vertexBuffer* createVertexBuffer(float* vertices, uint32 size) override;
-			// Create a vertex array
-			virtual vertexArray* createVertexArray() override;
-
-			// Create a shader
-			virtual shader* createShader(const std::string& filePath) override;
-			// Create a shader
-			virtual shader* createShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) override;
-
-			// Create a texture
-			virtual texture2D* createTexture(uint32 width, uint32 height) override;
-			// Create a texture
-			virtual texture2D* createTexture(const std::string& path) override;
+			virtual void drawIndexed(const ref<vertexArray>& vertexArray, uint32 indexCount = 0) override;
 		};
 	}
 }

@@ -2,7 +2,7 @@
 #include "rendererCommand.h"
 
 // Create the static instance of the renderering API
-GRAVEngine::Rendering::rendererAPI* GRAVEngine::Rendering::rendererCommand::s_RendererAPI = GRAVEngine::Rendering::rendererAPI::create();
+GRAVEngine::scope<GRAVEngine::Rendering::rendererAPI> GRAVEngine::Rendering::rendererCommand::s_RendererAPI = GRAVEngine::Rendering::rendererAPI::create();
 
 void GRAVEngine::Rendering::rendererCommand::startup()
 {
@@ -24,7 +24,7 @@ void GRAVEngine::Rendering::rendererCommand::clear()
 	s_RendererAPI->clear();
 }
 
-void GRAVEngine::Rendering::rendererCommand::drawIndexed(vertexArray*& vertexArray, uint32 count)
+void GRAVEngine::Rendering::rendererCommand::drawIndexed(const ref<vertexArray>& vertexArray, uint32 count)
 {
 	s_RendererAPI->drawIndexed(vertexArray, count);
 }

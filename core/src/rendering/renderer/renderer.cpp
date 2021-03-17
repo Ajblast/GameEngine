@@ -37,7 +37,7 @@ void GRAVEngine::Rendering::renderer::endScene()
 {
 }
 
-void GRAVEngine::Rendering::renderer::submit(shader*& shader, vertexArray*& vertexArray, const glm::mat4& transform)
+void GRAVEngine::Rendering::renderer::submit(const ref<shader>& shader, const ref<vertexArray>& vertexArray, const glm::mat4& transform)
 {
 	// Bind the shader
 	shader->bind();

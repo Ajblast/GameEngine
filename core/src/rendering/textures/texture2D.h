@@ -11,7 +11,7 @@ namespace GRAVEngine
 		{
 		public:
 			texture2D(uint32 width, uint32 height) : m_Width(width), m_Height(height), m_RendererID(0) {}
-			texture2D(const std::string& path) : m_Path(path), m_RendererID(0) {}
+			texture2D(const std::string& path) : m_Width(0), m_Height(0), m_Path(path), m_RendererID(0) {}
 			virtual ~texture2D() = default;
 
 			virtual uint32_t getWidth() const override { return m_Width; }

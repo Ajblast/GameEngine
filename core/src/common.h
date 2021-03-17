@@ -29,6 +29,7 @@ strncpy(tmp, source, stringLength); \
 tmp[stringLength - 1] = 0; \
 destination = tmp
 
+#include "memory/pointers/pointers.h"
 #include "dataPrimitives.h"
 #include "assertion.h"
 #include "errorCodes.h"

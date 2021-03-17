@@ -25,9 +25,6 @@ namespace GRAVEngine
 			virtual const bufferLayout& getLayout() const = 0;
 			// Set the buffer's layout
 			virtual void setLayout(const bufferLayout& layout) = 0;
-
-			//static vertexBuffer* create(uint32 size);
-			//static vertexBuffer* create(float* vertices, uint32 size);
 		};
 
 	}

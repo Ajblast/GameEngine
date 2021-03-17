@@ -31,7 +31,7 @@ namespace GRAVEngine
 			// Get the native representation of this window
 			virtual void* getNativeWindow() const = 0;
 
-			static window* create(const windowProperties& properties = windowProperties());
+			static scope<window> create(const windowProperties& properties = windowProperties());
 		};
 	}
 }
