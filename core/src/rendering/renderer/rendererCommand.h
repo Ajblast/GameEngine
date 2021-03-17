@@ -22,9 +22,9 @@ namespace GRAVEngine
 			static void clear();
 
 			// Draw an indexed vertex array
-			static void drawIndexed(vertexArray*& vertexArray, uint32 count = 0);
+			static void drawIndexed(const ref<vertexArray>& vertexArray, uint32 count = 0);
 		private:
-			static rendererAPI* s_RendererAPI;
+			static scope<rendererAPI> s_RendererAPI;
 		};
 	}
 }

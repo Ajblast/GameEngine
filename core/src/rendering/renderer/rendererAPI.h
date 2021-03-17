@@ -6,6 +6,7 @@
 #include "rendering/vertexArray.h"
 #include "rendering/shaders/shader.h"
 #include "rendering/textures/texture2D.h"
+#include "rendering/graphicsContext.h"
 #include <glm/vec4.hpp>
 
 namespace GRAVEngine
@@ -36,31 +37,33 @@ namespace GRAVEngine
 			virtual void clear() = 0;
 
 			// Draw a vertex array by indices
-			virtual void drawIndexed(vertexArray*& vertexArray, uint32 indexCount = 0) = 0;
+			virtual void drawIndexed(const ref<vertexArray>& vertexArray, uint32 indexCount = 0) = 0;
 
 
 #pragma region FactoryMethods
-			virtual indexBuffer* createIndexBuffer(uint32* indices, uint32 count) = 0;
-			virtual vertexBuffer* createVertexBuffer(uint32 size) = 0;
-			virtual vertexBuffer* createVertexBuffer(float* vertices, uint32 size) = 0;
-			virtual vertexArray* createVertexArray() = 0;
+			static ref<indexBuffer> createIndexBuffer(uint32* indices, uint32 count);
+			static ref<vertexBuffer> createVertexBuffer(uint32 size);
+			static ref<vertexBuffer> createVertexBuffer(float* vertices, uint32 size);
+			static ref<vertexArray> createVertexArray();
 
 			// Create a shader from a file
-			virtual shader* createShader(const std::string& filePath) = 0;
+			static ref<shader> createShader(const std::string& filePath);
 			// Create a shader with a vertex and fragment string
-			virtual shader* createShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) = 0;
+			static ref<shader> createShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc);
 
-			virtual texture2D* createTexture(uint32 width, uint32 height) = 0;
-			virtual texture2D* createTexture(const std::string& path) = 0;
+			static ref<texture2D> createTexture(uint32 width, uint32 height);
+			static ref<texture2D> createTexture(const std::string& path);
+
+			static scope<graphicsContext> createContext(void* window);
 #pragma endregion
 
 
 			// Get the current API
 			static API getAPI() { return s_API; }
 			// Create an API. TODO: Remove this method somehow
-			static rendererAPI* create();
+			static scope<rendererAPI> create();
 
-			inline static rendererAPI* getInstance() { return s_Instance; }
+			inline static rendererAPI& getInstance() { return *s_Instance; }
 		protected:
 			static rendererAPI* s_Instance;
 		private:
