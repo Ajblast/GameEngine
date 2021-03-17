@@ -50,7 +50,7 @@ void GRAVEngine::Rendering::openglVertexArray::unbind() const
 	glBindVertexArray(0);					// Unbind this vertex array from the GPU
 }
 
-void GRAVEngine::Rendering::openglVertexArray::addVertexBuffer(vertexBuffer* vertexBuffer)
+void GRAVEngine::Rendering::openglVertexArray::addVertexBuffer(const ref<vertexBuffer>& vertexBuffer)
 {
 	// Assure that the vertex buffer has a layout
 	GRAV_ASSERT(vertexBuffer->getLayout().getElements().size());
@@ -134,7 +134,7 @@ void GRAVEngine::Rendering::openglVertexArray::addVertexBuffer(vertexBuffer* ver
 	m_VertexBuffers.push_back(vertexBuffer);
 }
 
-void GRAVEngine::Rendering::openglVertexArray::setIndexBuffer(indexBuffer* indexBuffer)
+void GRAVEngine::Rendering::openglVertexArray::setIndexBuffer(const ref<indexBuffer>& indexBuffer)
 {
 	bind();	// Bind this vertex array
 	indexBuffer->bind();

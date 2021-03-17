@@ -15,9 +15,9 @@ int main(int argc, char** argv)
 
 #pragma region SettingUpLogging
 	// Create a default logger with a file sink and a sink to the msvc console
-	auto fileSink = std::make_shared<GRAVEngine::Logging::Sinks::fileSink>("A:\\Development\\source\\Ajblast\\GameEngine\\test\\test.log");
-	auto msvcSink = std::make_shared<GRAVEngine::Logging::Sinks::msvcSink>();
-	auto coutSink = std::make_shared<GRAVEngine::Logging::Sinks::ostreamSink>(std::cout, true);
+	auto fileSink = GRAVEngine::createRef<GRAVEngine::Logging::Sinks::fileSink>("A:\\Development\\source\\Ajblast\\GameEngine\\test\\test.log");
+	auto msvcSink = GRAVEngine::createRef<GRAVEngine::Logging::Sinks::msvcSink>();
+	auto coutSink = GRAVEngine::createRef<GRAVEngine::Logging::Sinks::ostreamSink>(std::cout, true);
 
 	GRAVEngine::Logging::logger logger = GRAVEngine::Logging::logger("Default", { fileSink, msvcSink, coutSink });
 	// Have to set the verbosity when providing a logger for startup
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 	logger.setFlushVerbosity(GRAVEngine::Logging::verbosity::trace);
 
 	// Start up the manager
-	logManager.startUp(std::make_shared<GRAVEngine::Logging::logger>(logger));
+	logManager.startUp(GRAVEngine::createRef<GRAVEngine::Logging::logger>(logger));
 	GRAV_LOG_LINE_INFO("%s: Log Manager Initialized", __FUNCTION__);
 #pragma endregion
 

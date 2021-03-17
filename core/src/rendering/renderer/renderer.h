@@ -34,7 +34,7 @@ namespace GRAVEngine
 
 			// Submit a vertex array for rendering with a specific shader
 			// TODO: Implement an asynchronous way to submit data. i.e., allow storage of vertex information such that it can all be done in one step without blocking
-			static void submit(shader*& shader, vertexArray*& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
+			static void submit(const ref<shader>& shader, const ref<vertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
 
 			// Get the current rendering API
 			static rendererAPI::API getAPI() { return rendererAPI::getAPI(); }

@@ -20,9 +20,6 @@ namespace GRAVEngine
 
 			// Get the number of indices
 			virtual uint32 getCount() const = 0;
-
-			//// Create an index buffer
-			//static indexBuffer* create(uint32* indices, uint32 count);
 		};
 	}
 }

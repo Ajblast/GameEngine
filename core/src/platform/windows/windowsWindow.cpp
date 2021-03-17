@@ -4,6 +4,8 @@
 #include "events/applicationEvents.h"
 #include "events/mouseEvents.h"
 #include "events/keyEvents.h"
+
+#include "rendering/renderer/rendererAPI.h"
 #include "platform/opengl/openglContext.h"
 
 namespace GRAVEngine
@@ -70,8 +72,15 @@ namespace GRAVEngine
 
 				glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GRAV_GLFW_CONTEXT_VERSION_MAJOR);
 				glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GRAV_GLFW_CONTEXT_VERSION_MINOR);
-				glfwWindowHint(GLFW_OPENGL_PROFILE, GRAV_GLFW_OPENGL_PROFILE);
 			}
+
+#ifdef GRAV_DEBUG
+			if (Rendering::rendererAPI::getAPI() == Rendering::rendererAPI::API::OpenGL)
+			{
+				glfwWindowHint(GLFW_OPENGL_PROFILE, GRAV_GLFW_OPENGL_PROFILE);
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+			}
+#endif
 
 			// Create the window
 			m_Window = glfwCreateWindow((int)properties.m_Width, (int)properties.m_Height, m_Data.m_Title.c_str(), nullptr, nullptr);
@@ -85,7 +94,7 @@ namespace GRAVEngine
 			++s_GLFWWindowCount;
 
 			// Create the context of the window
-			m_Context = new openglContext(m_Window);
+			m_Context = Rendering::rendererAPI::createContext(m_Window);
 			m_Context->startup();
 
 

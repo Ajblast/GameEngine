@@ -15,21 +15,21 @@ namespace GRAVEngine
 		{
 		public:
 			// Add a shader to this library
-			void add(const std::string& name, shader* shader);
+			void add(const std::string& name, const ref<shader>& shader);
 			// Add a shader to this library
-			void add(shader* shader);
+			void add(const ref<shader>& shader);
 
 			// Create a shader from the file path and load it into the library
-			shader* load(const std::string& filepath);
+			ref<shader> load(const std::string& filepath);
 			// Create a shader from the file path and load it into the library
-			shader* load(const std::string& name, const std::string& filepath);
+			ref<shader> load(const std::string& name, const std::string& filepath);
 
-			shader* get(const std::string& name);
+			ref<shader> get(const std::string& name);
 
 			bool exists(const std::string& name) const;
 		private:
 			// TODO: Change to allow memory management
-			std::unordered_map<std::string, shader*> m_Shaders;
+			std::unordered_map<std::string, ref<shader>> m_Shaders;
 		};
 	}
 }

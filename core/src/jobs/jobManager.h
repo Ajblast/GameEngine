@@ -26,7 +26,7 @@ namespace GRAVEngine
 		{
 			fiberIndex m_FiberIndex = UINT16_MAX;
 			counterTarget m_TargetValue = 0;
-			counter* counter = nullptr;
+			ref<counter> counter = nullptr;
 		};
 
 
@@ -59,7 +59,7 @@ namespace GRAVEngine
 			void kickJobsAndWait(const declaration* declarations, size_t count);
 
 			// Wait for a job to terminate
-			void waitForCounter(counter* counter, counterTarget target, bool blocking = true);
+			void waitForCounter(ref<counter> counter, counterTarget target, bool blocking = true);
 
 
 			counter* allocCounter();
@@ -77,10 +77,10 @@ namespace GRAVEngine
 			void spawnThread(uint8 index);
 
 			// Statically get the job instance
-			inline static jobManager* getInstance() { return s_Instance; }
+			inline static jobManager& getInstance() { return *s_Instance; }
 		private:
 			// Add a fiber to the waiting list
-			void addWaitingFiber(counter* counter, fiberIndex index, counterTarget target);
+			void addWaitingFiber(ref<counter> counter, fiberIndex index, counterTarget target);
 			// Check if there are any fibers that need to be removed from the waiting list and be resumed
 			void checkWaitingFibers();
 			//void waitForCounterProxy(waitForCounterProxyArgs args);

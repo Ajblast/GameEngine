@@ -49,7 +49,7 @@ namespace GRAVEngine
 		bool onWindowResize(Events::windowResizeEvent& event);
 
 	private:
-		Rendering::window* m_Window;
+		scope<Rendering::window> m_Window;
 
 		bool m_Running = true;
 		bool m_Minimized = false;

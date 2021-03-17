@@ -27,16 +27,16 @@ struct renderer2DData
 	static const GRAVEngine::uint32 s_MaxIndices = s_MaxQuads * 6;
 	static const GRAVEngine::uint32 s_MaxTextureSlots = 32; // TODO: RenderCaps
 
-	GRAVEngine::Rendering::vertexArray*		m_QuadVertexArray;	// The quad vertex array
-	GRAVEngine::Rendering::vertexBuffer*	m_QuadVertexBuffer;	// The quad vertex buffer
-	GRAVEngine::Rendering::shader*			m_TextureShader;	// The rendering texture shader
-	GRAVEngine::Rendering::texture2D*		m_WhiteTexture;		// The white default texture
+	GRAVEngine::ref<GRAVEngine::Rendering::vertexArray>		m_QuadVertexArray;	// The quad vertex array
+	GRAVEngine::ref<GRAVEngine::Rendering::vertexBuffer>	m_QuadVertexBuffer;	// The quad vertex buffer
+	GRAVEngine::ref<GRAVEngine::Rendering::shader>			m_TextureShader;	// The rendering texture shader
+	GRAVEngine::ref<GRAVEngine::Rendering::texture2D>		m_WhiteTexture;		// The white default texture
 
 	GRAVEngine::uint32 m_QuadIndexCount	= 0;		// The current quad count
 	quadVertex* m_QuadVertexBufferBase	= nullptr;	// Array of quad vertexes
 	quadVertex* m_QuadVertexBufferPtr	= nullptr;	// The current quad vertex
 
-	std::array<GRAVEngine::Rendering::texture2D*, s_MaxTextureSlots> m_TextureSlots;	// Array of textures
+	std::array<GRAVEngine::ref<GRAVEngine::Rendering::texture2D>, s_MaxTextureSlots> m_TextureSlots;	// Array of textures
 	GRAVEngine::uint32 m_TextureSlotIndex = 1; // 0 = white texture
 
 	glm::vec4 m_QuadVertexPositions[4];	// The default quad vertex positions
@@ -50,10 +50,10 @@ static renderer2DData s_Data;
 void GRAVEngine::Rendering::renderer2D::startup()
 {
 	// Create the data VAO
-	s_Data.m_QuadVertexArray = rendererAPI::getInstance()->createVertexArray();
+	s_Data.m_QuadVertexArray = rendererAPI::getInstance().createVertexArray();
 
 	// Create the vertex buffer for the vertex data
-	s_Data.m_QuadVertexBuffer = rendererAPI::getInstance()->createVertexBuffer(s_Data.s_MaxVertices * sizeof(quadVertex));
+	s_Data.m_QuadVertexBuffer = rendererAPI::getInstance().createVertexBuffer(s_Data.s_MaxVertices * sizeof(quadVertex));
 	s_Data.m_QuadVertexBuffer->setLayout({
 		{shaderDataType::FLOAT3, "a_Position"},
 		{shaderDataType::FLOAT4, "a_Color"},
@@ -86,12 +86,12 @@ void GRAVEngine::Rendering::renderer2D::startup()
 	}
 
 	// Create the index buffer for the quads. Can delete the temporary array since the data is copied to the GPU
-	indexBuffer* quadIB= rendererAPI::getInstance()->createIndexBuffer(quadIndices, s_Data.s_MaxIndices);
+	ref<indexBuffer> quadIB= rendererAPI::getInstance().createIndexBuffer(quadIndices, s_Data.s_MaxIndices);
 	s_Data.m_QuadVertexArray->setIndexBuffer(quadIB);
 	delete[] quadIndices;
 
 	// Create the white texture and set its data
-	s_Data.m_WhiteTexture = rendererAPI::getInstance()->createTexture(1, 1);
+	s_Data.m_WhiteTexture = rendererAPI::getInstance().createTexture(1, 1);
 	uint32 whiteTextureData = 0xffffffff;
 	s_Data.m_WhiteTexture->setData(&whiteTextureData, sizeof(uint32));
 
@@ -101,7 +101,7 @@ void GRAVEngine::Rendering::renderer2D::startup()
 		samplers[i] = i;
 
 	// Create the textured shader
-	s_Data.m_TextureShader = rendererAPI::getInstance()->createShader("assets/shaders/texture.glsl");
+	s_Data.m_TextureShader = rendererAPI::getInstance().createShader("assets/shaders/texture.glsl");
 	s_Data.m_TextureShader->bind();
 	s_Data.m_TextureShader->setIntArray("u_Textures", samplers, s_Data.s_MaxTextureSlots);
 
@@ -184,15 +184,15 @@ void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::vec3& position, cons
 	drawQuad(transform, color);
 
 }
-void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size, texture2D*& texture, float tilingFactor, const glm::vec4& tintColor)
-{
-	drawQuad({ position.x, position.y, 0.0f }, size, texture, tilingFactor, tintColor);
-}
-void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size, texture2D*& texture, float tilingFactor, const glm::vec4& tintColor)
+void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size, const ref<texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 {
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 	drawQuad(transform, texture, tilingFactor, tintColor);
+}
+void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::vec2& position, const glm::vec2& size, const ref<texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
+{
+	drawQuad({ position.x, position.y, 0.0f }, size, texture, tilingFactor, tintColor);
 }
 void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::mat4& transform, const glm::vec4& color)
 {
@@ -220,7 +220,7 @@ void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::mat4& transform, con
 	s_Data.m_QuadIndexCount += 6;
 	s_Data.m_Stats.m_QuadCount++;
 }
-void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::mat4& transform, texture2D*& texture, float tilingFactor, const glm::vec4& tintColor)
+void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::mat4& transform, const ref<texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 {
 	constexpr size_t quadVertexCount = 4;
 	constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
@@ -283,11 +283,11 @@ void GRAVEngine::Rendering::renderer2D::drawRotatedQuad(const glm::vec3& positio
 
 	drawQuad(transform, color);
 }
-void GRAVEngine::Rendering::renderer2D::drawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, texture2D*& texture, float tilingFactor, const glm::vec4& tintColor)
+void GRAVEngine::Rendering::renderer2D::drawRotatedQuad(const glm::vec2& position, const glm::vec2& size, float rotation, const ref<texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 {
 	drawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tilingFactor, tintColor);
 }
-void GRAVEngine::Rendering::renderer2D::drawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, texture2D*& texture, float tilingFactor, const glm::vec4& tintColor)
+void GRAVEngine::Rendering::renderer2D::drawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const ref<texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 {
 	glm::mat4 transform =
 		glm::translate(glm::mat4(1.0f), position) *
