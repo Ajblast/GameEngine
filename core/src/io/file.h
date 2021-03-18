@@ -31,6 +31,7 @@ namespace GRAVEngine
 				return m_FilePath;
 			}
 
+			bool tryOpen(const std::string& filePath, fileMode fileMode, bool flushAfterWrite);
 			void open(const std::string& filePath, fileMode fileMode, bool flushAfterWrite);
 			// Reopen the file with a new file mode
 			void reopen(fileMode fileMode);

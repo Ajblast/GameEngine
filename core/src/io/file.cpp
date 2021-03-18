@@ -68,6 +68,26 @@ GRAVEngine::IO::file::~file()
 	close();
 }
 
+bool GRAVEngine::IO::file::tryOpen(const std::string& filePath, fileMode fileMode, bool flushAfterWrite)
+{
+	try
+	{
+		open(filePath, fileMode, flushAfterWrite);
+		return true;
+	}
+	catch (Exceptions::IO::ioException)
+	{
+		return false;
+	}
+	catch (Exceptions::unknownErrorException)
+	{
+		return false;
+	}
+
+	// Unknown exception type
+	return false;
+}
+
 void GRAVEngine::IO::file::open(const std::string& filePath, fileMode fileMode, bool flushAfterWrite)
 {
 	// Close the current file if it is open
