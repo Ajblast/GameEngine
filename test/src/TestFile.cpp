@@ -18,7 +18,7 @@ GRAVEngine::Jobs::jobManager jobManager;
 void endingJob(uintptr_t)
 {
 	GRAV_LOG_LINE_CRITICAL("This is a job to start shutting down the job manager");
-	GRAVEngine::Jobs::jobManager::getInstance().startShutdown();
+	GRAVEngine::Jobs::jobManager::getInstance()->startShutdown();
 }
 void waitJob(uintptr_t)
 {
@@ -31,13 +31,13 @@ void waitJob(uintptr_t)
 	}
 	GRAV_LOG_LINE_CRITICAL("After waiting");
 	
-	GRAVEngine::Jobs::jobManager::getInstance().kickJob({ endingJob, 0,  GRAVEngine::Jobs::jobPriority::HIGH, nullptr });
+	GRAVEngine::Jobs::jobManager::getInstance()->kickJob({ endingJob, 0,  GRAVEngine::Jobs::jobPriority::HIGH, nullptr });
 }
 
 
 void mainMethod()
 {
-	GRAVEngine::Jobs::jobManager::getInstance().kickJob({ waitJob, 0,  GRAVEngine::Jobs::jobPriority::NORMAL, nullptr });
+	GRAVEngine::Jobs::jobManager::getInstance()->kickJob({ waitJob, 0,  GRAVEngine::Jobs::jobPriority::NORMAL, nullptr });
 
 
 	auto job = [](uintptr_t value)
@@ -51,7 +51,7 @@ void mainMethod()
 	for (size_t i = 0; i < 30; i++)
 	{
 		// Kick a job
-		GRAVEngine::Jobs::jobManager::getInstance().kickJob({ job, i,  GRAVEngine::Jobs::jobPriority::NORMAL, counter });
+		GRAVEngine::Jobs::jobManager::getInstance()->kickJob({ job, i,  GRAVEngine::Jobs::jobPriority::NORMAL, counter });
 	}
 	GRAV_LOG_LINE_CRITICAL("After Kick Job");
 
