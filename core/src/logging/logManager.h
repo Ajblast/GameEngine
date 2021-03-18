@@ -29,11 +29,7 @@ namespace GRAVEngine
 			explicit logManager() {}
 			logManager(const logManager&) = delete;				// Delete copy constructor
 			logManager& operator= (const logManager&) = delete;	// Delete set constructor
-			~logManager()
-			{
-				// Shutdown the log manager
-				shutDown();
-			}
+			~logManager() = default;
 
 			// Startup the log manager
 			void startUp(ref<Logging::Sinks::sink> defaultLoggerSink);
