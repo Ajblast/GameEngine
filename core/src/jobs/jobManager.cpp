@@ -245,7 +245,7 @@ struct waitForCounterProxyArgs
 
 void waitForCounterProxy(waitForCounterProxyArgs args)
 {
-	GRAVEngine::Jobs::jobManager::getInstance().waitForCounter(args.m_Counter, args.m_Target, false);
+	GRAVEngine::Jobs::jobManager::getInstance()->waitForCounter(args.m_Counter, args.m_Target, false);
 	args.cv->notify_all();
 }
 void GRAVEngine::Jobs::jobManager::waitForCounter(ref<counter> counter, counterTarget target, bool blocking)
@@ -513,7 +513,7 @@ bool GRAVEngine::Jobs::jobManager::getNextJob(declaration& declaration, tls* tls
 
 void GRAVEngine::Jobs::jobManager::fiberCallbackMain(fiber* fiber)
 {
-	GRAVEngine::Jobs::jobManager& manager = GRAVEngine::Jobs::jobManager::getInstance();
+	GRAVEngine::Jobs::jobManager& manager = *GRAVEngine::Jobs::jobManager::getInstance();
 
 	GRAV_LOG_LINE_INFO("%s: Begin Main Fiber Callback", __FUNCTION__);
 	
@@ -545,7 +545,7 @@ void GRAVEngine::Jobs::jobManager::fiberCallbackMain(fiber* fiber)
 }
 void GRAVEngine::Jobs::jobManager::fiberCallback(fiber* fiber)
 {
-	jobManager& manager = jobManager::getInstance();
+	jobManager& manager = *jobManager::getInstance();
 
 	GRAV_LOG_LINE_INFO("%s: Begin Fiber Callback", __FUNCTION__);
 	
@@ -574,7 +574,7 @@ void GRAVEngine::Jobs::jobManager::fiberCallback(fiber* fiber)
 			//GRAV_LOG_LINE_INFO("Thread %u has finished its job.", tls->m_ThreadIndex);
 
 			// Check if there are any fibers that need to be woken up
-			jobManager::getInstance().checkWaitingFibers();
+			jobManager::getInstance()->checkWaitingFibers();
 
 			// Check for the next job
 			continue;
@@ -591,7 +591,7 @@ void GRAVEngine::Jobs::jobManager::fiberCallback(fiber* fiber)
 }
 void GRAVEngine::Jobs::jobManager::threadCallback(gravThread* gravThread)
 {
-	jobManager& manager = jobManager::getInstance();
+	jobManager& manager = *jobManager::getInstance();
 
 	GRAV_LOG_LINE_INFO("%s: Initialize Thread: %u", __FUNCTION__, gravThread->getID());
 

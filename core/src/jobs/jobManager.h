@@ -73,11 +73,8 @@ namespace GRAVEngine
 
 			gravThread* getThread(uint8 index);
 
-			// Spawn a worker thread
-			void spawnThread(uint8 index);
-
 			// Statically get the job instance
-			inline static jobManager& getInstance() { return *s_Instance; }
+			inline static jobManager* getInstance() { return s_Instance; }
 		private:
 			// Add a fiber to the waiting list
 			void addWaitingFiber(ref<counter> counter, fiberIndex index, counterTarget target);
@@ -89,6 +86,9 @@ namespace GRAVEngine
 			threadIndex getCurrentThreadIndex() const;
 			gravThread* getCurrentThread() const;
 			tls* getCurrentTLS() const;
+
+			// Spawn a worker thread
+			void spawnThread(uint8 index);
 
 			// Fiber
 			fiberIndex findFreeFiber();
