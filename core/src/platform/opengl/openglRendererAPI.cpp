@@ -22,7 +22,7 @@ void GRAVEngine::Rendering::openglMessageCallback(unsigned source, unsigned type
 void GRAVEngine::Rendering::openglRendererAPI::startup()
 {
 	// Enable opengl message logging
-#ifdef GRAV_DEBUG
+#ifdef GRAVCORE_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glDebugMessageCallback(GRAVEngine::Rendering::openglMessageCallback, nullptr);
