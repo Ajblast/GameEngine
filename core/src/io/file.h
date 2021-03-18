@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdio>
+#include <string>
 #include "common.h"
 #include "fileModes.h"
 #include "seekOrigin.h"
@@ -14,8 +15,8 @@ namespace GRAVEngine
 		class file
 		{
 		public:
-			file() = delete;
-			file(const char* filePath, fileMode fileMode, bool flushAfterWrite);
+			file();
+			file(const std::string& filePath, fileMode fileMode, bool flushAfterWrite);
 			file(const file& other);
 			file& operator= (const file& other);
 		
@@ -25,11 +26,12 @@ namespace GRAVEngine
 			~file();
 
 			// Get the file path
-			inline const char* filePath()
+			inline const std::string& filePath()
 			{
 				return m_FilePath;
 			}
 
+			void open(const std::string& filePath, fileMode fileMode, bool flushAfterWrite);
 			// Reopen the file with a new file mode
 			void reopen(fileMode fileMode);
 			// Close the file
@@ -61,11 +63,12 @@ namespace GRAVEngine
 			// Write a character (byte) to the file
 			void writeChar(char character);
 
+			inline bool isOpen() { return m_FileHandle != nullptr; }
 		protected:
 			void errorHandle(int err);
 			const char* fileModeToString(fileMode fileMode);
 		protected:
-			const char* m_FilePath;	// File path
+			std::string m_FilePath;	// File path
 			fileMode m_FileMode;	// File mode
 			FILE* m_FileHandle;		// File handle when the file is open
 			bool m_FlushAfterWrite;	// Should the buffer be flushed after every write?

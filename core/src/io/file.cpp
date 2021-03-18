@@ -1,20 +1,86 @@
 #include "gravpch.h"
 #include "file.h"
 
-//GRAVEngine::IO::file::file() : m_FilePath(nullptr), m_FileMode(fileMode::read), m_FileHandle(nullptr), m_FlushAfterWrite(false)
-//{}
-GRAVEngine::IO::file::file(const char* filePath, GRAVEngine::IO::fileMode fileMode, bool flushAfterWrite)
+GRAVEngine::IO::file::file() : m_FileMode(fileMode::read), m_FileHandle(nullptr), m_FlushAfterWrite(false)
+{}
+GRAVEngine::IO::file::file(const std::string& filePath, GRAVEngine::IO::fileMode fileMode, bool flushAfterWrite) : m_FileHandle(nullptr)
 {
-	GRAV_ASSERT(filePath != nullptr);
+	// Open the file
+	open(filePath, fileMode, flushAfterWrite);
+}
+GRAVEngine::IO::file::file(const file& other)
+{
+	// Delete current resources
+	close();
 
-	STRING_COPY(m_FilePath, filePath, MAX_PATH_LENGTH);
+	// Copy resources
+	m_FilePath = other.m_FilePath;
+	m_FileHandle = other.m_FileHandle;
+	m_FileMode = other.m_FileMode;
+	m_FlushAfterWrite = other.m_FlushAfterWrite;
+}
+GRAVEngine::IO::file& GRAVEngine::IO::file::operator=(const file& other)
+{
+	if (this != &other)
+	{
+		// Close the current file
+		close();
+
+		// Copy the file handle
+		m_FilePath			= other.m_FilePath;
+		m_FileHandle		= other.m_FileHandle;
+		m_FileMode			= other.m_FileMode;
+		m_FlushAfterWrite	= other.m_FlushAfterWrite;
+	}
+
+	return *this;
+}
+GRAVEngine::IO::file::file(file&& other) noexcept : m_FilePath(std::move(other.m_FilePath)), m_FileMode(other.m_FileMode), m_FileHandle(other.m_FileHandle), m_FlushAfterWrite(other.m_FlushAfterWrite)
+{
+	other.m_FileMode		= fileMode::read;
+	other.m_FileHandle		= nullptr;
+	other.m_FlushAfterWrite = false;
+}
+GRAVEngine::IO::file& GRAVEngine::IO::file::operator=(file&& other) noexcept
+{
+	if (this != &other)
+	{
+		// Close the current file
+		close();
+
+		// Steal resources
+		m_FilePath			= std::move(other.m_FilePath);
+		m_FileHandle		= other.m_FileHandle;
+		m_FileMode			= other.m_FileMode;
+		m_FlushAfterWrite	= other.m_FlushAfterWrite;
+
+		// Release pointers to resources
+		other.m_FileHandle	= nullptr;
+	}
+	
+	return *this;
+
+}
+
+GRAVEngine::IO::file::~file()
+{
+	// Close the file handle
+	close();
+}
+
+void GRAVEngine::IO::file::open(const std::string& filePath, fileMode fileMode, bool flushAfterWrite)
+{
+	// Close the current file if it is open
+	if (isOpen())
+		close();
 
 	// Set file mode and file size
+	m_FilePath = filePath;
 	m_FileMode = fileMode;
 	m_FlushAfterWrite = flushAfterWrite;
 
 	// Opening the file
-	m_FileHandle = fopen(m_FilePath, fileModeToString(m_FileMode));
+	m_FileHandle = fopen(m_FilePath.c_str(), fileModeToString(m_FileMode));
 
 	// Error Handling
 	if (!m_FileHandle)
@@ -25,88 +91,14 @@ GRAVEngine::IO::file::file(const char* filePath, GRAVEngine::IO::fileMode fileMo
 	}
 
 	// The file is now open here
-
-}
-GRAVEngine::IO::file::file(const file& other)
-{
-	// Delete current resources
-	delete[] m_FilePath;
-	close();
-
-	// Copy resources
-	STRING_COPY(m_FilePath, other.m_FilePath, MAX_PATH_LENGTH);
-	m_FileHandle = other.m_FileHandle;
-	m_FileMode = other.m_FileMode;
-	m_FlushAfterWrite = other.m_FlushAfterWrite;
-}
-GRAVEngine::IO::file& GRAVEngine::IO::file::operator=(const file& other)
-{
-	if (this != &other)
-	{
-		// Delete existing resources
-		delete[] m_FilePath;
-
-		// Close the current file
-		close();
-
-		// Copy the string
-		STRING_COPY(m_FilePath, other.m_FilePath, MAX_PATH_LENGTH);
-
-		// Copy the file handle
-		m_FileHandle		= other.m_FileHandle;
-		m_FileMode			= other.m_FileMode;
-		m_FlushAfterWrite	= other.m_FlushAfterWrite;
-	}
-
-	return *this;
-}
-GRAVEngine::IO::file::file(file&& other) noexcept : m_FilePath(other.m_FilePath), m_FileMode(other.m_FileMode), m_FileHandle(other.m_FileHandle), m_FlushAfterWrite(other.m_FlushAfterWrite)
-{
-	other.m_FilePath		= nullptr;
-	other.m_FileMode		= fileMode::read;
-	other.m_FileHandle		= nullptr;
-	other.m_FlushAfterWrite = false;
-}
-GRAVEngine::IO::file& GRAVEngine::IO::file::operator=(file&& other) noexcept
-{
-	if (this != &other)
-	{
-		// Delete the file path
-		delete[] m_FilePath;
-
-		// Close the current file
-		close();
-
-		// Steal resources
-		m_FilePath			= other.m_FilePath;
-		m_FileHandle		= other.m_FileHandle;
-		m_FileMode			= other.m_FileMode;
-		m_FlushAfterWrite	= other.m_FlushAfterWrite;
-
-		// Release pointers to resources
-		other.m_FilePath	= nullptr;
-		other.m_FileHandle	= nullptr;
-	}
-	
-	return *this;
-
-}
-
-GRAVEngine::IO::file::~file()
-{
-	// Delete the file path text
-	delete[] m_FilePath;
-
-	// Close the file handle
-	close();
 }
 
 void GRAVEngine::IO::file::reopen(fileMode fileMode)
 {
-	GRAV_ASSERT(m_FileHandle != nullptr);
+	GRAV_ASSERT(isOpen());
 
 	// Reopen the file mode
-	m_FileHandle = freopen(m_FilePath, fileModeToString(fileMode), m_FileHandle);
+	m_FileHandle = freopen(m_FilePath.c_str(), fileModeToString(fileMode), m_FileHandle);
 
 	// Error Handling
 	if (!m_FileHandle)
@@ -135,7 +127,8 @@ bool GRAVEngine::IO::file::close()
 
 bool GRAVEngine::IO::file::seek(long offset, seekOrigin origin)
 {
-	GRAV_ASSERT(m_FileHandle != nullptr);
+	if (isOpen() == false)
+		return false;
 
 	// Seek into the file
 	int seekVal = fseek(m_FileHandle, offset, static_cast<int>(origin));
@@ -153,7 +146,8 @@ bool GRAVEngine::IO::file::seek(long offset, seekOrigin origin)
 
 bool GRAVEngine::IO::file::flush()
 {
-	GRAV_ASSERT(m_FileHandle != nullptr);
+	if (isOpen() == false)
+		return false;
 
 	size_t eof = fflush(m_FileHandle);
 
@@ -169,7 +163,7 @@ bool GRAVEngine::IO::file::flush()
 
 size_t GRAVEngine::IO::file::offset()
 {
-	GRAV_ASSERT(m_FileHandle != nullptr);
+	GRAV_ASSERT(isOpen());
 
 	// Get the size
 	size_t curOffset = ftell(m_FileHandle);
@@ -183,14 +177,14 @@ size_t GRAVEngine::IO::file::offset()
 
 int GRAVEngine::IO::file::eof()
 {
-	GRAV_ASSERT(m_FileHandle != nullptr);
+	GRAV_ASSERT(isOpen());
 
 	return feof(m_FileHandle);
 }
 
 bool GRAVEngine::IO::file::endOfFile()
 {
-	GRAV_ASSERT(m_FileHandle != nullptr);
+	GRAV_ASSERT(isOpen());
 
 	if(eof())
 			return true;
@@ -216,7 +210,7 @@ size_t GRAVEngine::IO::file::fileSize()
 size_t GRAVEngine::IO::file::read(void* buffer, size_t bufferSize)
 {
 	GRAV_ASSERT(buffer != nullptr);
-	GRAV_ASSERT(m_FileHandle != nullptr);
+	GRAV_ASSERT(isOpen());
 
 	// Do nothing if nowhere to put data
 	if (bufferSize == 0)
@@ -235,7 +229,7 @@ size_t GRAVEngine::IO::file::read(void* buffer, size_t bufferSize)
 
 int GRAVEngine::IO::file::readChar()
 {
-	GRAV_ASSERT(m_FileHandle != nullptr);
+	GRAV_ASSERT(isOpen());
 
 	// Get a character
 	int character = fgetc(m_FileHandle);
@@ -249,7 +243,7 @@ int GRAVEngine::IO::file::readChar()
 
 void GRAVEngine::IO::file::readAll(void*& buffer, size_t& bufferSize)
 {
-	GRAV_ASSERT(m_FileHandle != nullptr);
+	GRAV_ASSERT(isOpen());
 
 	// Set the buffer size
 	bufferSize = fileSize();
@@ -275,7 +269,7 @@ void GRAVEngine::IO::file::readAll(void*& buffer, size_t& bufferSize)
 size_t GRAVEngine::IO::file::write(void* buffer, size_t bufferSize)
 {
 	GRAV_ASSERT(buffer != nullptr);
-	GRAV_ASSERT(m_FileHandle != nullptr);
+	GRAV_ASSERT(isOpen());
 
 	// Do nothing if there is no data to write
 	if (bufferSize == 0)
@@ -296,7 +290,7 @@ size_t GRAVEngine::IO::file::write(void* buffer, size_t bufferSize)
 
 void GRAVEngine::IO::file::writeChar(char character)
 {
-	GRAV_ASSERT(m_FileHandle != nullptr);
+	GRAV_ASSERT(isOpen());
 
 	// Block here until all data has been written
 	size_t bytesWritten = fputc(character, m_FileHandle);

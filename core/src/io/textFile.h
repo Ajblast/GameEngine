@@ -9,8 +9,9 @@ namespace GRAVEngine
 	{
 		class textFile : public file
 		{
-			textFile() = delete;
-			textFile(const char* filePath, fileMode fileMode, bool flushAfterWrite);
+		public:
+			textFile();
+			textFile(const std::string& filePath, fileMode fileMode, bool flushAfterWrite);
 			textFile& operator= (const textFile& other);
 
 			textFile(textFile&& other) noexcept;
@@ -19,8 +20,10 @@ namespace GRAVEngine
 			// Read in a string into buffer. Returns false if file is at eof. String may have changed if error occurs while reading
 			bool readString(char* buffer, int num);
 			//void readLine(char*, size_t num);
+			void writeString(const std::string& string);
 			void writeString(const char* string);
 			// Write a string and append a newline character to the end of the string
+			void writeLine(const std::string& string);
 			void writeLine(const char* string);
 		};
 	}
