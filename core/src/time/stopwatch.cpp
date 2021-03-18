@@ -46,6 +46,7 @@ void GRAVEngine::Time::stopwatch::pause() noexcept
 
 	// Get the current time
 	timePoint currentTick = std::chrono::steady_clock::now();
+	m_EndTick = std::chrono::steady_clock::now();
 
 	// Get the current duration
 	nanoseconds currentDuration = std::chrono::duration_cast<nanoseconds>(currentTick - m_StartTick);
@@ -62,65 +63,35 @@ void GRAVEngine::Time::stopwatch::reset() noexcept
 
 	// Set the starting tick
 	m_StartTick = std::chrono::steady_clock::now();
+	m_EndTick = std::chrono::steady_clock::now();
 }
 
 GRAVEngine::Time::timeDurationCount GRAVEngine::Time::stopwatch::elapsedNanoseconds() noexcept
 {
-	// Get the current duration
-	nanoseconds elapsedDuration = m_StoredDuration;
-
-	// Calculate the current duration if the timer is running
-	if(m_Running)
-	{ 
-		// Add to the duration if the stopwatch is running
-		elapsedDuration += (std::chrono::steady_clock::now() - m_StartTick);
-	}
-
-	return std::chrono::duration_cast<nanoseconds>(elapsedDuration).count();
+	return elapsedNanosecondsDuration().count();
+}
+double GRAVEngine::Time::stopwatch::elapsedMicroseconds() noexcept
+{
+	return elapsedMicrosecondsDuration().count();
 }
 double GRAVEngine::Time::stopwatch::elapsedMilliseconds() noexcept
 {
-	// Get the current duration
-	nanoseconds elapsedDuration = m_StoredDuration;
-
-	// Calculate the current duration if the timer is running
-	if (m_Running)
-	{
-		// Add to the duration if the stopwatch is running
-		elapsedDuration += (std::chrono::steady_clock::now() - m_StartTick);
-	}
-
-	return std::chrono::duration_cast<milliseconds>(elapsedDuration).count();
+	return elapsedMillisecondsDuration().count();
 }
 double GRAVEngine::Time::stopwatch::elapsedSeconds() noexcept
 {
-	// Get the current duration
-	nanoseconds elapsedDuration = m_StoredDuration;
-
-	// Calculate the current duration if the timer is running
-	if (m_Running)
-	{
-		// Add to the duration if the stopwatch is running
-		elapsedDuration += (std::chrono::steady_clock::now() - m_StartTick);
-	}
-
-	return std::chrono::duration_cast<seconds>(elapsedDuration).count();
+	return elapsedSecondsDuration().count();
 }
 double GRAVEngine::Time::stopwatch::elapsedMinutes() noexcept
 {
-	// Get the current duration
-	nanoseconds elapsedDuration = m_StoredDuration;
-
-	// Calculate the current duration if the timer is running
-	if (m_Running)
-	{
-		// Add to the duration if the stopwatch is running
-		elapsedDuration += (std::chrono::steady_clock::now() - m_StartTick);
-	}
-
-	return std::chrono::duration_cast<minutes>(elapsedDuration).count();
+	return elapsedMinutesDuration().count();
 }
 double GRAVEngine::Time::stopwatch::elapsedHours() noexcept
+{
+	return elapsedHoursDuration().count();
+}
+
+GRAVEngine::Time::nanoseconds GRAVEngine::Time::stopwatch::elapsedNanosecondsDuration() noexcept
 {
 	// Get the current duration
 	nanoseconds elapsedDuration = m_StoredDuration;
@@ -132,6 +103,26 @@ double GRAVEngine::Time::stopwatch::elapsedHours() noexcept
 		elapsedDuration += (std::chrono::steady_clock::now() - m_StartTick);
 	}
 
-	return std::chrono::duration_cast<hours>(elapsedDuration).count();
+	return std::chrono::duration_cast<nanoseconds>(elapsedDuration);
+}
+GRAVEngine::Time::microseconds GRAVEngine::Time::stopwatch::elapsedMicrosecondsDuration() noexcept
+{
+	return std::chrono::duration_cast<microseconds>(elapsedNanosecondsDuration());
+}
+GRAVEngine::Time::milliseconds GRAVEngine::Time::stopwatch::elapsedMillisecondsDuration() noexcept
+{
+	return std::chrono::duration_cast<milliseconds>(elapsedNanosecondsDuration());
+}
+GRAVEngine::Time::seconds GRAVEngine::Time::stopwatch::elapsedSecondsDuration() noexcept
+{
+	return std::chrono::duration_cast<seconds>(elapsedNanosecondsDuration());
+}
+GRAVEngine::Time::minutes GRAVEngine::Time::stopwatch::elapsedMinutesDuration() noexcept
+{
+	return std::chrono::duration_cast<minutes>(elapsedNanosecondsDuration());
+}
+GRAVEngine::Time::hours GRAVEngine::Time::stopwatch::elapsedHoursDuration() noexcept
+{
+	return std::chrono::duration_cast<hours>(elapsedNanosecondsDuration());
 }
 
