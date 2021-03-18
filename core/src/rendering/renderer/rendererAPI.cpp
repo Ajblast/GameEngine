@@ -11,9 +11,6 @@ GRAVEngine::Rendering::rendererAPI* GRAVEngine::Rendering::rendererAPI::create()
 	{
 	case Rendering::rendererAPI::API::NONE:    GRAV_ASSERT(false); return nullptr; // RendererAPI::None is currently not supported!
 	case Rendering::rendererAPI::API::OpenGL:  return new openglRendererAPI();
+	default: GRAV_ASSERT(false); return nullptr;
 	}
-
-	// Unknown RendererAPI!
-	GRAV_ASSERT(false);
-	return nullptr;
 }

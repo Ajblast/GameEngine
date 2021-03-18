@@ -34,6 +34,9 @@ namespace GRAVEngine
 		// Close the application
 		void close();
 
+		// Get the ImGuiLayer
+		Layers::imguiLayer* getImGuiLayer() { return m_ImGuiLayer; }
+
 		// Get the application instance
 		static application& getInstance() { return *s_Instance; }
 

@@ -17,7 +17,7 @@ project "GRAVTest"
 	{
 		--"../OpenGL-Core/vendor/spdlog/include",
 		"../core/src",
-		--"../OpenGL-Core/vendor",
+		"../core/vendor",
 		"../core/%{IncludeDir.glm}"
 		--"../OpenGL-Core/%{IncludeDir.Glad}",
 		--"../OpenGL-Core/%{IncludeDir.ImGui}"
