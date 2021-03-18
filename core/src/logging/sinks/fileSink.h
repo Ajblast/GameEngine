@@ -15,8 +15,8 @@ namespace GRAVEngine
 			class fileSink final : public baseSink
 			{
 			public:
-				explicit fileSink(const char* filePath, bool truncate = false);
-				inline const char* filePath()
+				explicit fileSink(const std::string& filePath, bool truncate = false);
+				inline const std::string& filePath()
 				{
 					return m_File.filePath();
 				}
