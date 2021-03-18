@@ -69,9 +69,9 @@ namespace GRAVEngine
 			void setVerbosities(std::unordered_map<std::string, Logging::verbosity> verbosities, bool setUnspecified, Logging::verbosity& verbosity);
 
 			// Statically get the logging instance
-			inline static logManager& getInstance()
+			inline static logManager* getInstance()
 			{
-				return *s_Instance;
+				return s_Instance;
 			}
 		private:
 //			logManager();
