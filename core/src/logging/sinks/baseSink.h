@@ -10,13 +10,12 @@ namespace GRAVEngine
 	{
 		namespace Sinks
 		{
-
 			// Base sink class which handles locking. Implementations do not need to worry about locking
 			class baseSink : public sink
 			{
 			public:
 				baseSink() {}
-				~baseSink() override = default;
+				virtual ~baseSink() override = default;
 
 				baseSink(const baseSink&) = delete;	// Delete copy constructor
 				baseSink(baseSink&&) = delete;		// Delete move constructor
