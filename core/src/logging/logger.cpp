@@ -83,7 +83,6 @@ int GRAVEngine::Logging::logger::log(GRAVEngine::Logging::verbosity verbosity, c
 
 	return charsWritten;
 }
-
 int GRAVEngine::Logging::logger::logLine(Logging::verbosity verbosity, const char* format, ...)
 {
 	int charsWritten = 0;
@@ -133,7 +132,6 @@ int GRAVEngine::Logging::logger::log(Logging::verbosity verbosity, bool logEnabl
 
 	return charsWritten;
 }
-
 void GRAVEngine::Logging::logger::logMessage(Logging::logMessage& message, bool logEnabled)
 {
 	if (logEnabled)

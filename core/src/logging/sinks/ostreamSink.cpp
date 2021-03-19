@@ -3,7 +3,7 @@
 
 void GRAVEngine::Logging::Sinks::ostreamSink::sinkMessage(const Logging::logMessage& message)
 {
-	m_ostream.write(message.m_Payload, strlen(message.m_Payload));
+	m_ostream.write(message.m_Payload.c_str(), message.m_Payload.size());
 	if (m_ForceFlush)
 		m_ostream.flush();
 }
