@@ -21,6 +21,8 @@ void GRAVEngine::Rendering::openglMessageCallback(unsigned source, unsigned type
 
 void GRAVEngine::Rendering::openglRendererAPI::startup()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Enable opengl message logging
 #ifdef GRAVCORE_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
@@ -62,6 +64,8 @@ void GRAVEngine::Rendering::openglRendererAPI::clear()
 
 void GRAVEngine::Rendering::openglRendererAPI::drawIndexed(const ref<vertexArray>& vertexArray, uint32 indexCount)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Get the index count. Either the number of provided indexes for the amount of indexes in the index buffer
 	uint32 count = indexCount ? indexCount : vertexArray->getIndexBuffer()->getCount();
 

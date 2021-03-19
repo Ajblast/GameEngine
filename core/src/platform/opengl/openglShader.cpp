@@ -26,6 +26,8 @@ namespace GRAVEngine
 
 GRAVEngine::Rendering::openglShader::openglShader(const std::string& filepath)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	std::string source = readFile(filepath);
 	auto shaderSources = preProcess(source);
 	compile(shaderSources);
@@ -40,6 +42,8 @@ GRAVEngine::Rendering::openglShader::openglShader(const std::string& filepath)
 GRAVEngine::Rendering::openglShader::openglShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc) :
 	m_Name(name)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	std::unordered_map<GLenum, std::string> sources;
 	sources[GL_VERTEX_SHADER] = vertexSrc;
 	sources[GL_FRAGMENT_SHADER] = fragmentSrc;
@@ -48,47 +52,67 @@ GRAVEngine::Rendering::openglShader::openglShader(const std::string& name, const
 
 GRAVEngine::Rendering::openglShader::~openglShader()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Delete this shader from the GPU
 	glDeleteProgram(m_RendererID);
 }
 
 void GRAVEngine::Rendering::openglShader::bind() const
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Use the shader
 	glUseProgram(m_RendererID);
 }
 void GRAVEngine::Rendering::openglShader::unbind() const
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Use null shader
 	glUseProgram(m_RendererID);
 }
 
 void GRAVEngine::Rendering::openglShader::setInt(const std::string& name, int32 value)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	uploadUniformInt(name, value);
 }
 void GRAVEngine::Rendering::openglShader::setIntArray(const std::string& name, int32* values, uint32 count)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	uploadUniformIntArray(name, values, count);
 }
 void GRAVEngine::Rendering::openglShader::setFloat(const std::string& name, float value)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	uploadUniformFloat(name, value);
 }
 void GRAVEngine::Rendering::openglShader::setFloat2(const std::string& name, const glm::vec2& value)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	uploadUniformFloat2(name, value);
 }
 void GRAVEngine::Rendering::openglShader::setFloat3(const std::string& name, const glm::vec3& value)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	uploadUniformFloat3(name, value);
 }
 void GRAVEngine::Rendering::openglShader::setFloat4(const std::string& name, const glm::vec4& value)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	uploadUniformFloat4(name, value);
 }
 void GRAVEngine::Rendering::openglShader::setMat4(const std::string& name, const glm::mat4& value)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	uploadUniformMat4(name, value);
 }
 
@@ -135,6 +159,8 @@ void GRAVEngine::Rendering::openglShader::uploadUniformMat4(const std::string& n
 
 std::string GRAVEngine::Rendering::openglShader::readFile(const std::string& filepath)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	std::string result;
 	try
 	{
@@ -181,6 +207,8 @@ std::string GRAVEngine::Rendering::openglShader::readFile(const std::string& fil
 
 std::unordered_map<GLenum, std::string> GRAVEngine::Rendering::openglShader::preProcess(const std::string& source)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	std::unordered_map<GLenum, std::string> shaderSources;
 
 	const char* typeToken = "#type";			// The token before defining the type the next section of shader code is
@@ -209,6 +237,8 @@ std::unordered_map<GLenum, std::string> GRAVEngine::Rendering::openglShader::pre
 
 void GRAVEngine::Rendering::openglShader::compile(const std::unordered_map<GLenum, std::string>& shaderSources)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Create a rendering program
 	GLuint program = glCreateProgram();
 	GRAV_ASSERT(shaderSources.size() <= 2);	// Only two shaders currently supported

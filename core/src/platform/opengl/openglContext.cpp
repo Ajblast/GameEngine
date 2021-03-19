@@ -12,6 +12,8 @@ GRAVEngine::Rendering::openglContext::openglContext(GLFWwindow* windowHandle) : 
 
 void GRAVEngine::Rendering::openglContext::startup()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Make this context's window the current context
 	glfwMakeContextCurrent(m_WindowHandle);
 
@@ -30,6 +32,8 @@ void GRAVEngine::Rendering::openglContext::startup()
 
 void GRAVEngine::Rendering::openglContext::swapBuffers()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Swap the buffers
 	glfwSwapBuffers(m_WindowHandle);
 }

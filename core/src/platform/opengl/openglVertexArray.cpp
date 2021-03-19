@@ -32,26 +32,36 @@ namespace GRAVEngine
 
 GRAVEngine::Rendering::openglVertexArray::openglVertexArray()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	glCreateVertexArrays(1, &m_RendererID);	// Create a vertex array on the GPU
 }
 
 GRAVEngine::Rendering::openglVertexArray::~openglVertexArray()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	glDeleteVertexArrays(1, &m_RendererID);	// Delete the vertex array on the GPU
 }
 
 void GRAVEngine::Rendering::openglVertexArray::bind() const
 {
+	GRAV_PROFILE_FUNCTION();
+
 	glBindVertexArray(m_RendererID);		// Bind this vertex array to the GPU
 }
 
 void GRAVEngine::Rendering::openglVertexArray::unbind() const
 {
+	GRAV_PROFILE_FUNCTION();
+
 	glBindVertexArray(0);					// Unbind this vertex array from the GPU
 }
 
 void GRAVEngine::Rendering::openglVertexArray::addVertexBuffer(const ref<vertexBuffer>& vertexBuffer)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Assure that the vertex buffer has a layout
 	GRAV_ASSERT(vertexBuffer->getLayout().getElements().size());
 
@@ -136,6 +146,8 @@ void GRAVEngine::Rendering::openglVertexArray::addVertexBuffer(const ref<vertexB
 
 void GRAVEngine::Rendering::openglVertexArray::setIndexBuffer(const ref<indexBuffer>& indexBuffer)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	bind();	// Bind this vertex array
 	indexBuffer->bind();
 

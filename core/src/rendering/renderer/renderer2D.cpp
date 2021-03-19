@@ -49,6 +49,8 @@ static renderer2DData s_Data;
 
 void GRAVEngine::Rendering::renderer2D::startup()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Create the data VAO
 	s_Data.m_QuadVertexArray = rendererAPI::getInstance().createVertexArray();
 
@@ -116,11 +118,15 @@ void GRAVEngine::Rendering::renderer2D::startup()
 }
 void GRAVEngine::Rendering::renderer2D::shutdown()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	delete[] s_Data.m_QuadVertexBufferBase;
 }
 
 void GRAVEngine::Rendering::renderer2D::beginScene(const camera& camera, const glm::mat4& transform)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Get the projection of the camera
 	glm::mat4 viewProj = camera.getProjectionMatrix() * glm::inverse(transform);
 
@@ -132,6 +138,8 @@ void GRAVEngine::Rendering::renderer2D::beginScene(const camera& camera, const g
 }
 void GRAVEngine::Rendering::renderer2D::beginScene(const editorCamera& camera)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Get the projection of the camera
 	glm::mat4 viewProj = camera.getViewProjectionMatrix();
 
@@ -143,6 +151,8 @@ void GRAVEngine::Rendering::renderer2D::beginScene(const editorCamera& camera)
 }
 void GRAVEngine::Rendering::renderer2D::beginScene(const orthographicCamera& camera)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Set the texture view project matrix
 	s_Data.m_TextureShader->bind();
 	s_Data.m_TextureShader->setMat4("u_ViewProjection", camera.getViewProjectionMatrix());
@@ -152,11 +162,15 @@ void GRAVEngine::Rendering::renderer2D::beginScene(const orthographicCamera& cam
 }
 void GRAVEngine::Rendering::renderer2D::endScene()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Flush the scene for rendering
 	flush();
 }
 void GRAVEngine::Rendering::renderer2D::flush()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	if (s_Data.m_QuadIndexCount == 0)
 		return; // Nothing to draw
 
@@ -179,6 +193,8 @@ void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::vec2& position, cons
 }
 void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	glm::mat4 transform = glm::translate(glm::mat4(1.0), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 	drawQuad(transform, color);
@@ -186,6 +202,8 @@ void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::vec3& position, cons
 }
 void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::vec3& position, const glm::vec2& size, const ref<texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
 
 	drawQuad(transform, texture, tilingFactor, tintColor);
@@ -196,6 +214,8 @@ void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::vec2& position, cons
 }
 void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::mat4& transform, const glm::vec4& color)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	constexpr size_t quadVertexCount = 4;
 	const float textureIndex = 0.0f; // White texture
 	constexpr glm::vec2 textureCoords[] = { {0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f} };
@@ -222,6 +242,8 @@ void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::mat4& transform, con
 }
 void GRAVEngine::Rendering::renderer2D::drawQuad(const glm::mat4& transform, const ref<texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	constexpr size_t quadVertexCount = 4;
 	constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
 
@@ -275,6 +297,8 @@ void GRAVEngine::Rendering::renderer2D::drawRotatedQuad(const glm::vec2& positio
 }
 void GRAVEngine::Rendering::renderer2D::drawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const glm::vec4& color)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Get the rotated quad transform
 	glm::mat4 transform = 
 		glm::translate(glm::mat4(1.0f), position) * 
@@ -289,6 +313,8 @@ void GRAVEngine::Rendering::renderer2D::drawRotatedQuad(const glm::vec2& positio
 }
 void GRAVEngine::Rendering::renderer2D::drawRotatedQuad(const glm::vec3& position, const glm::vec2& size, float rotation, const ref<texture2D>& texture, float tilingFactor, const glm::vec4& tintColor)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	glm::mat4 transform =
 		glm::translate(glm::mat4(1.0f), position) *
 		glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f }) *

@@ -21,15 +21,21 @@ namespace GRAVEngine
 
 		windowsWindow::windowsWindow(const windowProperties& properties)
 		{
+			GRAV_PROFILE_FUNCTION();
+
 			startup(properties);
 		}
 		windowsWindow::~windowsWindow()
 		{
+			GRAV_PROFILE_FUNCTION();
+
 			shutdown();
 		}
 
 		void windowsWindow::onUpdate()
 		{
+			GRAV_PROFILE_FUNCTION();
+
 			// Poll for events and swap the buffers
 			glfwPollEvents();
 			m_Context->swapBuffers();
@@ -37,6 +43,8 @@ namespace GRAVEngine
 
 		void windowsWindow::setVSync(bool enabled)
 		{
+			GRAV_PROFILE_FUNCTION();
+
 			if (enabled)
 				glfwSwapInterval(1);
 			else
@@ -51,6 +59,8 @@ namespace GRAVEngine
 
 		void windowsWindow::startup(const windowProperties& properties)
 		{
+			GRAV_PROFILE_FUNCTION();
+
 			m_Data.m_Title = properties.m_Title;
 			m_Data.m_Width = properties.m_Width;
 			m_Data.m_Height = properties.m_Height;
@@ -82,16 +92,20 @@ namespace GRAVEngine
 			}
 #endif
 
-			// Create the window
-			m_Window = glfwCreateWindow((int)properties.m_Width, (int)properties.m_Height, m_Data.m_Title.c_str(), nullptr, nullptr);
-			if (m_Window == nullptr)
 			{
-				GRAV_LOG_LINE_ERROR("Error in creating window (%s)", m_Data.m_Title.c_str());
-				return;
-			}
+				GRAV_PROFILE_SCOPE("glfwCreateWindow");
 
-			// Increment the window count
-			++s_GLFWWindowCount;
+				// Create the window
+				m_Window = glfwCreateWindow((int)properties.m_Width, (int)properties.m_Height, m_Data.m_Title.c_str(), nullptr, nullptr);
+				if (m_Window == nullptr)
+				{
+					GRAV_LOG_LINE_ERROR("Error in creating window (%s)", m_Data.m_Title.c_str());
+					return;
+				}
+
+				// Increment the window count
+				++s_GLFWWindowCount;
+			}
 
 			// Create the context of the window
 			m_Context = Rendering::rendererAPI::createContext(m_Window);
@@ -192,6 +206,8 @@ namespace GRAVEngine
 		}
 		void windowsWindow::shutdown()
 		{
+			GRAV_PROFILE_FUNCTION();
+
 			// Destroy the window decrement the count
 			glfwDestroyWindow(m_Window);
 			--s_GLFWWindowCount;

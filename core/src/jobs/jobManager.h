@@ -72,6 +72,7 @@ namespace GRAVEngine
 			inline bool isShuttingDown() const { return m_IsShuttingDown.load(std::memory_order_acquire); }
 
 			gravThread* getThread(uint8 index);
+			threadID getCurrentThreadID() const;
 
 			// Statically get the job instance
 			inline static jobManager* getInstance() { return s_Instance; }

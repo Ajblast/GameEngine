@@ -21,6 +21,8 @@ GRAVEngine::Layers::imguiLayer::imguiLayer() : layer("ImGuiLayer")
 
 void GRAVEngine::Layers::imguiLayer::onAttach()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -34,8 +36,8 @@ void GRAVEngine::Layers::imguiLayer::onAttach()
 
 
 	// Add fonts
-	io.Fonts->AddFontFromFileTTF("../core/assets/fonts/opensans/OpenSans-Bold.ttf", 18.0f);
-	io.FontDefault = io.Fonts->AddFontFromFileTTF("../core/assets/fonts/opensans/OpenSans-Regular.ttf", 18.0f);
+	io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/OpenSans-Bold.ttf", 18.0f);
+	io.FontDefault = io.Fonts->AddFontFromFileTTF("assets/fonts/opensans/OpenSans-Regular.ttf", 18.0f);
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
@@ -77,6 +79,8 @@ void GRAVEngine::Layers::imguiLayer::onAttach()
 
 void GRAVEngine::Layers::imguiLayer::onDetach()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Shutdown the layer context
 	switch (Rendering::rendererAPI::getAPI())
 	{
@@ -107,6 +111,8 @@ void GRAVEngine::Layers::imguiLayer::onEvent(Events::event& event)
 
 void GRAVEngine::Layers::imguiLayer::begin()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Start platform frame
 	switch (Rendering::rendererAPI::getAPI())
 	{
@@ -128,6 +134,8 @@ void GRAVEngine::Layers::imguiLayer::begin()
 
 void GRAVEngine::Layers::imguiLayer::end()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	ImGuiIO& io = ImGui::GetIO();
 	application& app = application::getInstance();
 	io.DisplaySize = ImVec2((float)app.getWindow().getWidth(), (float)app.getWindow().getHeight());

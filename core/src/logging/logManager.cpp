@@ -44,7 +44,9 @@ void GRAVEngine::Logging::logManager::startUp(ref<Logging::logger> defaultLogger
 
 void GRAVEngine::Logging::logManager::shutDown()
 {
-	GRAV_LOG_LINE_DEBUG("Shutting down Log Manager");
+	GRAV_PROFILE_FUNCTION();
+
+	GRAV_LOG_LINE_DEBUG("%s: Shutting down Log Manager", GRAV_CLEAN_FUNC_SIG);
 
 	GRAV_ASSERT(s_Instance);
 
