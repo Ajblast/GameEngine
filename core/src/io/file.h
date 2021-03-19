@@ -23,7 +23,7 @@ namespace GRAVEngine
 			file(file&& other) noexcept;
 			file& operator= (file&& other) noexcept;
 
-			~file();
+			virtual ~file();
 
 			// Get the file path
 			inline const std::string& filePath()
