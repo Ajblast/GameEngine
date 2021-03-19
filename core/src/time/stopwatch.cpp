@@ -1,6 +1,9 @@
 #include "gravpch.h"
 #include "stopwatch.h"
 
+GRAVEngine::Time::stopwatch::stopwatch() : m_StartTick(std::chrono::steady_clock::now()), m_EndTick(std::chrono::steady_clock::now()), m_StoredDuration(0)
+{
+}
 GRAVEngine::Time::stopwatch::stopwatch(const stopwatch& other) : m_StartTick(other.m_StartTick), m_Running(false), m_StoredDuration(other.m_StoredDuration)
 {
 }
@@ -46,7 +49,7 @@ void GRAVEngine::Time::stopwatch::pause() noexcept
 
 	// Get the current time
 	timePoint currentTick = std::chrono::steady_clock::now();
-	m_EndTick = std::chrono::steady_clock::now();
+	m_EndTick = currentTick;
 
 	// Get the current duration
 	nanoseconds currentDuration = std::chrono::duration_cast<nanoseconds>(currentTick - m_StartTick);

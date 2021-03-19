@@ -14,7 +14,7 @@ namespace GRAVEngine
 		class stopwatch
 		{
 		public:
-			stopwatch() = default;
+			stopwatch();
 			stopwatch(const stopwatch& other);
 			stopwatch(stopwatch&& other) noexcept;
 
