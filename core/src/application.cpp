@@ -12,6 +12,8 @@ GRAVEngine::application* GRAVEngine::application::s_Instance = nullptr;
 GRAVEngine::application::application(const std::string& name)
 {
 	GRAV_ASSERT(s_Instance == nullptr);
+	GRAV_PROFILE_FUNCTION();
+
 	s_Instance = this;
 
 	// Create the starting window
@@ -27,11 +29,16 @@ GRAVEngine::application::application(const std::string& name)
 
 GRAVEngine::application::~application()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// TODO: Shutdown the renderer
+	Rendering::renderer::shutdown();
 }
 
 void GRAVEngine::application::onEvent(Events::event& event)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Dispatch an event
 	Events::eventDispatcher dispatcher(event);
 	dispatcher.dispatch<Events::windowCloseEvent>(GRAV_BIND_EVENT_FN(application::onWindowClose));
@@ -50,6 +57,8 @@ void GRAVEngine::application::onEvent(Events::event& event)
 
 void GRAVEngine::application::pushLayer(Layers::layer* layer)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Push the layer
 	m_LayerStack.pushLayer(layer);
 	// Tell the layer that it is now attached
@@ -58,6 +67,8 @@ void GRAVEngine::application::pushLayer(Layers::layer* layer)
 
 void GRAVEngine::application::pushOverlay(Layers::layer* overlay)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Push the overlay
 	m_LayerStack.pushOverlay(overlay);
 	// Tell the overlay that it is now attached
@@ -71,10 +82,12 @@ void GRAVEngine::application::close()
 
 void GRAVEngine::application::run()
 {
-	GRAV_LOG_LINE_INFO("%s: Run Application", __FUNCTION__);
+	GRAV_PROFILE_FUNCTION();
 
 	while (m_Running)
 	{
+		GRAV_PROFILE_SCOPE("RunLoop");
+
 		// Get the delta time
 		float time = (float)glfwGetTime();
 		Time::timestep timestep = Time::timestep(time - m_LastFrameTime);
@@ -82,15 +95,21 @@ void GRAVEngine::application::run()
 
 		if (m_Minimized == false)
 		{
-			// Update layers
-			for (Layers::layer* layer : m_LayerStack)
-				layer->onUpdate(timestep);
+			{
+				GRAV_PROFILE_SCOPE("LayerStack onUpdate");
+				// Update layers
+				for (Layers::layer* layer : m_LayerStack)
+					layer->onUpdate(timestep);
+			}
 
 			// Start updating the ImGuiLayer
 			m_ImGuiLayer->begin();
-			// For each layer, render ImGui
-			for (Layers::layer* layer : m_LayerStack)
-				layer->onImGuiRender();
+			{
+				GRAV_PROFILE_SCOPE("LayerStack onImGuiRender");
+				// For each layer, render ImGui
+				for (Layers::layer* layer : m_LayerStack)
+					layer->onImGuiRender();
+			}
 			// End updating the ImGuiLayer
 			m_ImGuiLayer->end();
 
@@ -105,7 +124,6 @@ void GRAVEngine::application::run()
 
 bool GRAVEngine::application::onWindowClose(Events::windowCloseEvent& event)
 {
-	GRAV_LOG_LINE_INFO("%s: Close Window", __FUNCTION__);
 	m_Running = false;
 
 	// This event is now handled
@@ -114,7 +132,7 @@ bool GRAVEngine::application::onWindowClose(Events::windowCloseEvent& event)
 
 bool GRAVEngine::application::onWindowResize(Events::windowResizeEvent& event)
 {
-	//GRAV_LOG_LINE_INFO("%s: Resize Window", __FUNCTION__);
+	GRAV_PROFILE_FUNCTION();
 
 	if (event.getWidth() == 0 || event.getHeight() == 0)
 	{

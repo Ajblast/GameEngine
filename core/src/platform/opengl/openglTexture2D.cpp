@@ -5,6 +5,8 @@
 
 GRAVEngine::Rendering::openglTexture2D::openglTexture2D(uint32 width, uint32 height) : texture2D(width, height)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	m_InternalFormat = GL_RGBA8;
 	m_DataFormat = GL_RGBA;
 
@@ -17,9 +19,10 @@ GRAVEngine::Rendering::openglTexture2D::openglTexture2D(uint32 width, uint32 hei
 	glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 }
-
 GRAVEngine::Rendering::openglTexture2D::openglTexture2D(const std::string& path) : texture2D(path)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	int width, height, channels;
 	stbi_set_flip_vertically_on_load(1);
 	stbi_uc* data = nullptr;
@@ -66,15 +69,18 @@ GRAVEngine::Rendering::openglTexture2D::openglTexture2D(const std::string& path)
 	// Free the image from stbi
 	stbi_image_free(data);
 }
-
 GRAVEngine::Rendering::openglTexture2D::~openglTexture2D()
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Delete the texture from the graphics card
 	glDeleteTextures(1, &m_RendererID);
 }
 
 void GRAVEngine::Rendering::openglTexture2D::setData(void* data, uint32 size)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Set the data of the texture
 	uint32 bpp = m_DataFormat == GL_RGBA ? 4 : 3;
 	GRAV_ASSERT(size == m_Width * m_Height * bpp); //"Data must be entire texture!"
@@ -83,6 +89,8 @@ void GRAVEngine::Rendering::openglTexture2D::setData(void* data, uint32 size)
 
 void GRAVEngine::Rendering::openglTexture2D::bind(uint32 slot) const
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Bind this texture to the slot
 	glBindTextureUnit(slot, m_RendererID);
 }

@@ -23,6 +23,8 @@
 // Include common items
 #include "common.h"
 
+// Include the instrumentor
+#include "debug/instrumentation/instrumentor.h"
 
 // Check if this is a windows build
 #ifdef GRAVCORE_PLATFORM_WINDOWS
