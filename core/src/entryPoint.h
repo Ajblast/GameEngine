@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 	GRAVEngine::Jobs::jobManager jobManager;
 	GRAVEngine::instrumentor instrumentor;
 
-	GRAV_PROFILE_START_SESSION("Manager Startup", "GRAVEngineProfile-ManagerStartup.json");
+	GRAV_PROFILE_START_SESSION("Manager Startup", "debug/profiles/GRAVEngineProfile-ManagerStartup.json");
 #pragma region SettingUpLogging
 	// Create a default logger with a file sink and a sink to the msvc console
 	auto fileSink = GRAVEngine::createRef<GRAVEngine::Logging::Sinks::fileSink>("A:\\Development\\source\\Ajblast\\GameEngine\\test\\test.log");
@@ -46,22 +46,22 @@ int main(int argc, char** argv)
 #pragma endregion
 	GRAV_PROFILE_END_SESSION();
 
-	GRAV_PROFILE_START_SESSION("Application Startup", "GRAVEngineProfile-ApplicationStartup.json");
+	GRAV_PROFILE_START_SESSION("Application Startup", "debug/profiles/GRAVEngineProfile-ApplicationStartup.json");
 	auto application = GRAVEngine::createApplication();
 	GRAV_PROFILE_END_SESSION();
 
 	// Run the application
-	GRAV_PROFILE_START_SESSION("Runtime", "GRAVEngineProfile-RunTime.json");
+	GRAV_PROFILE_START_SESSION("Runtime", "debug/profiles/GRAVEngineProfile-RunTime.json");
 	//jobManager.runMain( []() { });
 	application->run();
 	GRAV_PROFILE_END_SESSION();
 
-	GRAV_PROFILE_START_SESSION("Application Shutdown", "GRAVEngineProfile-ApplicationShutdown.json");
+	GRAV_PROFILE_START_SESSION("Application Shutdown", "debug/profiles/GRAVEngineProfile-ApplicationShutdown.json");
 	delete application;
 	GRAV_PROFILE_END_SESSION();
 
 #pragma region ShuttingDownManagers
-	GRAV_PROFILE_START_SESSION("Manager Shutdown", "GRAVEngineProfile-ManagerShutdown.json");
+	GRAV_PROFILE_START_SESSION("Manager Shutdown", "debug/profiles/GRAVEngineProfile-ManagerShutdown.json");
 	jobManager.startShutdown();
 	jobManager.shutDown();
 	logManager.shutDown();
