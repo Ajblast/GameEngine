@@ -14,16 +14,6 @@
 
 #define GRAV_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
-// TODO: Change this new to allow tracking of memory allocations
-// TODO: Get rid of this function and the const char* and just use std::string. Why did I even use them in the first place??
-#define STRING_COPY(destination, source, maxSize) \
-size_t stringLength = strlen(source) + 1; \
-stringLength = std::min(stringLength, (size_t)maxSize); \
-\
-char* tmp = new char[stringLength]; \
-strncpy(tmp, source, stringLength); \
-tmp[stringLength - 1] = 0; \
-destination = tmp
 
 #include "memory/pointers/pointers.h"
 #include "dataPrimitives.h"
