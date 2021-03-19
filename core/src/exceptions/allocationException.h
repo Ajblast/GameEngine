@@ -10,18 +10,18 @@ namespace GRAVEngine
 		class allocationException : public std::bad_alloc
 		{
 		public:
-			explicit allocationException(const char* message);
-			explicit allocationException(const std::string& message) : allocationException(message.c_str()) {}
-			allocationException(const allocationException& other) noexcept;
+			explicit allocationException(const char* message) : allocationException(std::string(message)) {}
+			explicit allocationException(const std::string& message) : m_Message("bad allocation: " + message) {}
+			allocationException(const allocationException& other) noexcept : m_Message(other.m_Message) {}
 
 			allocationException& operator= (const allocationException& other) noexcept;
 
 			const char* what() const noexcept override;
 
-			~allocationException() noexcept;
+			~allocationException() noexcept = default;
 
 		private:
-			const char* m_Message;
+			std::string m_Message;
 
 		};
 	}

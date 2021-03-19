@@ -13,22 +13,22 @@ namespace GRAVEngine
 			class unauthorizedAccessException : public ioException
 			{
 			public:
-				explicit unauthorizedAccessException(const char* fileName, const char* description);
-				explicit unauthorizedAccessException(const std::string& fileName, const std::string& description) : unauthorizedAccessException(fileName.c_str(), description.c_str()) {}
-				unauthorizedAccessException(const unauthorizedAccessException& other) noexcept;
+				explicit unauthorizedAccessException(const char* fileName, const char* description) : unauthorizedAccessException(std::string(fileName), std::string(description)) {}
+				explicit unauthorizedAccessException(const std::string& fileName, const std::string& description) : m_FileName(fileName), ioException(description) {}
+				unauthorizedAccessException(const unauthorizedAccessException& other) noexcept : m_FileName(other.m_FileName), ioException(other.what()) {}
 
 				unauthorizedAccessException& operator= (const unauthorizedAccessException& other) noexcept;
 
 
-				inline const char* getFileName() const noexcept
+				inline const std::string& getFileName() const noexcept
 				{
 					return m_FileName;
 				}
 
-				~unauthorizedAccessException() noexcept;
+				~unauthorizedAccessException() noexcept = default;
 
 			private:
-				const char* m_FileName;
+				std::string m_FileName;
 
 			};
 		}

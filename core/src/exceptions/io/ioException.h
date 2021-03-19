@@ -14,6 +14,7 @@ namespace GRAVEngine
 				explicit ioException(const std::string& description) : std::runtime_error(description) {}
 				explicit ioException(const char* description) : std::runtime_error(description) {}
 				ioException(const ioException& other) noexcept : std::runtime_error(other) {}
+				virtual ~ioException() = default;
 			};
 					
 

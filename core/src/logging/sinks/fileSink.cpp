@@ -10,7 +10,7 @@ GRAVEngine::Logging::Sinks::fileSink::fileSink(const std::string& filePath, bool
 void GRAVEngine::Logging::Sinks::fileSink::sinkMessage(const Logging::logMessage& message)
 {
 	// Write the message to the file
-	m_File.write((void*)message.m_Payload, strlen(message.m_Payload));
+	m_File.write((void*)message.m_Payload.c_str(), message.m_Payload.size());
 }
 
 void GRAVEngine::Logging::Sinks::fileSink::flush_()

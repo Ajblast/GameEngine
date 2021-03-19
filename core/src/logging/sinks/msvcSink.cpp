@@ -11,7 +11,7 @@
 
 void GRAVEngine::Logging::Sinks::msvcSink::sinkMessage(const Logging::logMessage& message)
 {
-	OutputDebugStringA(message.m_Payload);
+	OutputDebugStringA(message.m_Payload.c_str());
 }
 
 void GRAVEngine::Logging::Sinks::msvcSink::flush_()
