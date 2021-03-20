@@ -6,6 +6,7 @@
 # Files
 *.user
 *.log
+*.asta.lock
 
 
 # Visual Studio
