@@ -2,12 +2,8 @@
 
 #include "common.h"
 
-#include "rendering/cameras/orthographicCamera.h"
-
 #include "rendering/textures/texture2D.h"
-
 #include "rendering/cameras/camera.h"
-#include "rendering/cameras/editorCamera.h"
 
 #include <glm/glm.hpp>
 
@@ -27,10 +23,7 @@ namespace GRAVEngine
 			static void shutdown();
 
 			// Begin drawing a scene with a transform
-			static void beginScene(const camera& camera, const glm::mat4& transform);
-			// Being drawing a scene with the editor camera
-			static void beginScene(const editorCamera& camera);
-			static void beginScene(const orthographicCamera& camera); // TODO: Remove
+			static void beginScene(const camera& camera);
 			// End drawing the current scene
 			static void endScene();
 			// Flush the scene to the buffer

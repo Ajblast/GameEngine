@@ -123,43 +123,20 @@ void GRAVEngine::Rendering::renderer2D::shutdown()
 	delete[] s_Data.m_QuadVertexBufferBase;
 }
 
-void GRAVEngine::Rendering::renderer2D::beginScene(const camera& camera, const glm::mat4& transform)
+void GRAVEngine::Rendering::renderer2D::beginScene(const camera& camera)
 {
 	GRAV_PROFILE_FUNCTION();
 
 	// Get the projection of the camera
-	glm::mat4 viewProj = camera.getProjectionMatrix() * glm::inverse(transform);
+	//glm::mat4 viewProj = camera.getProjectionMatrix() * glm::inverse(transform);
 
 	// Set the view matrix
-	s_Data.m_TextureShader->bind();
-	s_Data.m_TextureShader->setMat4("u_ViewProjection", viewProj);
-
-	startBatch();
-}
-void GRAVEngine::Rendering::renderer2D::beginScene(const editorCamera& camera)
-{
-	GRAV_PROFILE_FUNCTION();
-
-	// Get the projection of the camera
-	glm::mat4 viewProj = camera.getViewProjectionMatrix();
-
-	// Set the view matrix
-	s_Data.m_TextureShader->bind();
-	s_Data.m_TextureShader->setMat4("u_ViewProjection", viewProj);
-
-	startBatch();
-}
-void GRAVEngine::Rendering::renderer2D::beginScene(const orthographicCamera& camera)
-{
-	GRAV_PROFILE_FUNCTION();
-
-	// Set the texture view project matrix
 	s_Data.m_TextureShader->bind();
 	s_Data.m_TextureShader->setMat4("u_ViewProjection", camera.getViewProjectionMatrix());
 
-	// Start the batch for rendering
 	startBatch();
 }
+
 void GRAVEngine::Rendering::renderer2D::endScene()
 {
 	GRAV_PROFILE_FUNCTION();
