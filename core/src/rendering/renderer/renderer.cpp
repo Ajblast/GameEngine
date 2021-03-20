@@ -33,7 +33,7 @@ void GRAVEngine::Rendering::renderer::onWindowResize(uint32 width, uint32 height
 	rendererCommand::setViewPort(0, 0, width, height);
 }
 
-void GRAVEngine::Rendering::renderer::beginScene(orthographicCamera& camera)
+void GRAVEngine::Rendering::renderer::beginScene(camera& camera)
 {
 	GRAV_PROFILE_FUNCTION();
 

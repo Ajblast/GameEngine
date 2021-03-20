@@ -5,7 +5,7 @@
 #include "rendering/renderer/rendererCommand.h"
 #include "rendering/renderer/renderer2D.h"
 #include "rendering/shaders/shader.h"
-#include "rendering/cameras/orthographicCamera.h"
+#include "rendering/cameras/camera.h"
 #include <glm/mat4x4.hpp>
 
 namespace GRAVEngine
@@ -28,7 +28,7 @@ namespace GRAVEngine
 			static void onWindowResize(uint32 width, uint32 height);
 
 			// Begin drawing a scene with an orthographic camera
-			static void beginScene(orthographicCamera& camera);
+			static void beginScene(camera& camera);
 			// End drawing the scene
 			static void endScene();
 
