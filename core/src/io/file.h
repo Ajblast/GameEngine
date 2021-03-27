@@ -2,7 +2,6 @@
 
 #include <cstdio>
 #include <string>
-#include <filesystem>
 #include "common.h"
 #include "fileModes.h"
 #include "seekOrigin.h"

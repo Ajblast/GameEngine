@@ -99,16 +99,6 @@ void GRAVEngine::IO::file::open(const std::string& filePath, fileMode fileMode, 
 	m_FileMode = fileMode;
 	m_FlushAfterWrite = flushAfterWrite;
 
-	// Check if the file directory exists, and create it if needed if it is not a read operation
-	if (fileMode != fileMode::read && fileMode != fileMode::readUpdate)
-	{
-		std::filesystem::path path(filePath);
-		if (std::filesystem::exists(path.remove_filename()) == false)
-		{
-			std::filesystem::create_directories(path);
-		}
-	}
-
 	// Opening the file
 	m_FileHandle = fopen(m_FilePath.c_str(), fileModeToString(m_FileMode));
 
