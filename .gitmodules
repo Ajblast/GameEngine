@@ -4,3 +4,6 @@
 [submodule "core/vendor/imgui"]
 	path = core/vendor/imgui
 	url = https://github.com/Ajblast/imgui
+[submodule "core/vendor/assimp"]
+	path = core/vendor/assimp
+	url = https://github.com/Ajblast/assimp
