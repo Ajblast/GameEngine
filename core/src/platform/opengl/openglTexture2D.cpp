@@ -27,7 +27,7 @@ GRAVEngine::Rendering::openglTexture2D::openglTexture2D(const std::string& path)
 	stbi_set_flip_vertically_on_load(1);
 	stbi_uc* data = nullptr;
 	{
-		GRAV_PROFILE_SCOPE("stbi_load - openGLTexture2D::openGLTexture2D(const std::string&)");
+		//HZ_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
 		data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 	}
 	// Check if the data was actually loadded
@@ -55,7 +55,6 @@ GRAVEngine::Rendering::openglTexture2D::openglTexture2D(const std::string& path)
 
 	// Create the texture
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
-	// Set the format, width, and height of the texture
 	glTextureStorage2D(m_RendererID, 1, internalFormat, m_Width, m_Height);
 
 	// Set the texture parameters
@@ -65,7 +64,6 @@ GRAVEngine::Rendering::openglTexture2D::openglTexture2D(const std::string& path)
 	glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	// Set the pixel information of the texture (send to GPU)
 	glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
 
 	// Free the image from stbi
