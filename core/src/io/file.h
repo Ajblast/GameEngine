@@ -1,8 +1,10 @@
 #pragma once
 
-#include <cstdio>
 #include <string>
 #include <filesystem>
+#include <iostream>
+#include <fstream>
+
 #include "common.h"
 #include "fileModes.h"
 #include "seekOrigin.h"
@@ -17,63 +19,107 @@ namespace GRAVEngine
 		{
 		public:
 			file();
-			file(const std::string& filePath, fileMode fileMode, bool flushAfterWrite);
-			file(const file& other);
-			file& operator= (const file& other);
+			file(const std::string& filePath, fileMode mode, bool flushAfterWrite);
+			file(const file& other) = delete;				// Can't copy file streams
+			file& operator= (const file& other) = delete;	// Can't copy file streams
 		
 			file(file&& other) noexcept;
 			file& operator= (file&& other) noexcept;
 
 			virtual ~file();
 
-			// Get the file path
-			inline const std::string& filePath()
-			{
-				return m_FilePath;
-			}
-
-			bool tryOpen(const std::string& filePath, fileMode fileMode, bool flushAfterWrite);
-			void open(const std::string& filePath, fileMode fileMode, bool flushAfterWrite);
+			#pragma region FileOpening
+			// Try to open the file
+			bool tryOpen(const std::string& filePath, fileMode mode, bool flushAfterWrite);
+			// Open the file
+			void open(const std::string& filePath, fileMode mode, bool flushAfterWrite);
 			// Reopen the file with a new file mode
-			void reopen(fileMode fileMode);
+			void reopen(fileMode mode);
 			// Close the file
 			bool close();
+			#pragma endregion
 
-			// Seek into the file
-			bool seek(long offset, seekOrigin origin);
+			#pragma region Seeking
+			// Seek into the file the write position
+			bool seekWrite(long offset, seekOrigin origin);
+			// Seek into the file the read position
+			bool seekRead(long offset, seekOrigin origin);
+			#pragma endregion
+
 			// Flush the write buffer
 			bool flush();
 
-			// Get the offset into the file
-			size_t offset();
-			// Get the end of file flag. Returns 0 if the file is not at the end of the file
-			int eof();
-			// Is the file at the end of the file
-			bool endOfFile();
+			#pragma region Offsets
+			// Get the write offset into the file
+			const size_t offsetWrite();
+			// Get the read offset into the file
+			const size_t offsetRead();
 			// Get the size of the file in bytes
-			size_t fileSize();
+			const size_t fileSize();
+			#pragma endregion
 
+			#pragma region Input
+			// Amount of characters read from the last read operation
+			size_t readCount();
+			// Peek the next read character
+			int peek();
 			// Read bufferSize bytes into a buffer
-			size_t read(void* buffer, size_t bufferSize);
+			void read(char* buffer, size_t bufferSize);
 			// Read a character. Returns eof if it was the end of the file
 			int readChar();
 			// Read the entire file into a buffer. Memory allocated
-			void readAll(void*& buffer, size_t& bufferSize);
+			void readAll(char*& buffer, size_t& bufferSize);
+			#pragma endregion
 
+			#pragma region Output
 			// Write all of the bytes in the buffer
-			size_t write(void* buffer, size_t bufferSize);
+			void write(const char* buffer, size_t bufferSize);
 			// Write a character (byte) to the file
 			void writeChar(char character);
+			#pragma endregion
 
-			inline bool isOpen() { return m_FileHandle != nullptr; }
+			#pragma region Getters
+			// Get the file mode
+			inline const fileMode fileMode() const { return m_FileMode; }
+			// Get the file path
+			inline const std::string& filePath() { return m_FilePath; }
+
+			// Is the file open
+			inline const bool isOpen() const { return m_Stream.is_open(); }
+			// Is the file at the end of the file
+			inline const bool endOfFile() const { return m_Stream.eof(); }
+			// Did the last io operation fail
+			inline const bool failed() const { return m_Stream.fail(); }
+			#pragma endregion
+
+			#pragma region FileModeTests
+			// Is read enabled
+			inline const bool isInput() { return (m_FileMode & fileMode::INPUT) == fileMode::INPUT; }
+			// Is write enabled
+			inline const bool isOutput() { return (m_FileMode & fileMode::OUTPUT) == fileMode::OUTPUT; }
+			// Is the output position moved to the end
+			inline const bool isEnd() { return (m_FileMode & fileMode::END) == fileMode::END; }
+			// Is the file appending
+			inline const bool isAppend() { return (m_FileMode & fileMode::APPEND) == fileMode::APPEND; }
+			// Is the file truncating
+			inline const bool isTruncate() { return (m_FileMode & fileMode::TRUNCATE) == fileMode::TRUNCATE; }
+			// Is the file in binary
+			inline const bool isBinary() { return (m_FileMode & fileMode::BINARY) == fileMode::BINARY; }
+			#pragma endregion
+
 		protected:
-			void errorHandle(int err);
-			const char* fileModeToString(fileMode fileMode);
+			inline void errorHandle()
+			{
+				// Check if the stream is bad for any reason
+				if (m_Stream.bad())
+					throw Exceptions::IO::ioException("File operation error");
+			}
 		protected:
 			std::string m_FilePath;	// File path
-			fileMode m_FileMode;	// File mode
-			FILE* m_FileHandle;		// File handle when the file is open
+			IO::fileMode m_FileMode;	// File mode
 			bool m_FlushAfterWrite;	// Should the buffer be flushed after every write?
+
+			std::fstream m_Stream;
 		};
 	}
 }

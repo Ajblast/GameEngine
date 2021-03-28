@@ -1,69 +1,29 @@
 #pragma once
-#include <string.h>
-
-// Open file for input operations. Throw exception if it doesn't exist
-#define GRAVEngine_FILE_MODE_READ			0
-// Open a file for update (RW). Throw exception if it doesn't exit
-#define GRAVEngine_FILE_MODE_READ_UPDATE	1
-// Create an empty file for output operations. Discard data if it already exists
-#define GRAVEngine_FILE_MODE_WRITE			2
-// Create and empty file and open it for update (RW). Discard data if it already exists
-#define GRAVEngine_FILE_MODE_WRITE_UPDATE	3
-// Open file for output at the end of a file. Create it if it doesn't exist. All writes appear at end of file. Seeking ignored
-#define GRAVEngine_FILE_MODE_APPEND			4
-// Open file for update (RW). Create it if it doesn't exist. All write appear at end of file.
-// Seeking affects input position. Writing moves position back to end of file.
-#define GRAVEngine_FILE_MODE_APPEND_UPDATE	5
-
-#define GRAVEngine_FILE_MODE_STRING_READ			"READ"
-#define GRAVEngine_FILE_MODE_STRING_READ_UPDATE		"READ_UPDATE"
-#define GRAVEngine_FILE_MODE_STRING_WRITE			"WRITE"
-#define GRAVEngine_FILE_MODE_STRING_WRITE_UPDATE	"WRITE_UPDATE"
-#define GRAVEngine_FILE_MODE_STRING_APPEND			"APPEND"
-#define GRAVEngine_FILE_MODE_STRING_APPEND_UPDATE	"APPEND_UPDATE"
+#include <fstream>
 
 namespace GRAVEngine
 {
 	namespace IO
 	{
-		enum class fileMode
+		// Bitmask file modes to open a file with.
+		enum class fileMode : unsigned
 		{
-			read			= GRAVEngine_FILE_MODE_READ,
-			readUpdate		= GRAVEngine_FILE_MODE_READ_UPDATE,
-			write			= GRAVEngine_FILE_MODE_WRITE,
-			writeUpdate		= GRAVEngine_FILE_MODE_WRITE_UPDATE,
-			append			= GRAVEngine_FILE_MODE_APPEND,
-			appendUpdate	= GRAVEngine_FILE_MODE_APPEND_UPDATE
+			NONE		= 0,
+			INPUT		= std::fstream::in,		// Allow input
+			OUTPUT		= std::fstream::out,	// Allow output
+			END			= std::fstream::ate,	// Move the output position to the end of the file
+			APPEND		= std::fstream::app,	// Output operations happen at the end of the file no matter what
+			TRUNCATE	= std::fstream::trunc,	// Remove existing contents before discarding
+			BINARY		= std::fstream::binary,	// Open the file in binary mode
 		};
 
-		static const char* fileModeStrings[]
-		{
-			GRAVEngine_FILE_MODE_STRING_READ,
-			GRAVEngine_FILE_MODE_STRING_READ_UPDATE,
-			GRAVEngine_FILE_MODE_STRING_WRITE,
-			GRAVEngine_FILE_MODE_STRING_WRITE_UPDATE,
-			GRAVEngine_FILE_MODE_STRING_APPEND,
-			GRAVEngine_FILE_MODE_STRING_APPEND_UPDATE			
-		};
+		fileMode operator |(fileMode lhs, fileMode rhs);
+		fileMode operator &(fileMode lhs, fileMode rhs);
+		fileMode operator ^(fileMode lhs, fileMode rhs);
+		fileMode operator ~(fileMode rhs);
+		fileMode& operator |=(fileMode& lhs, fileMode rhs);
+		fileMode& operator &=(fileMode& lhs, fileMode rhs);
+		fileMode& operator ^=(fileMode& lhs, fileMode rhs);
 
-		inline const char* toString(GRAVEngine::IO::fileMode fileMode)
-		{
-			return fileModeStrings[static_cast<int>(fileMode)];
-		}
-
-		inline GRAVEngine::IO::fileMode fileModeToEnum(const char* name)
-		{
-			int level = 0;
-
-			for (auto levelstr : fileModeStrings)
-			{
-				if (strcmp(levelstr, name))
-					return static_cast<GRAVEngine::IO::fileMode>(level);
-
-				level++;
-			}
-
-			return GRAVEngine::IO::fileMode::read;
-		}
 	}
 }

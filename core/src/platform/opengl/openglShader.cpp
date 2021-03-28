@@ -2,7 +2,7 @@
 #include "platform/opengl/openglShader.h"
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
-#include "io/file.h"
+#include "io/textFile.h"
 #include <array>
 
 namespace GRAVEngine
@@ -164,7 +164,7 @@ std::string GRAVEngine::Rendering::openglShader::readFile(const std::string& fil
 	std::string result;
 	try
 	{
-		IO::file file(filepath.c_str(), IO::fileMode::read, false);
+		IO::textFile file(filepath.c_str(), IO::fileMode::INPUT, false);
 
 		size_t size = file.fileSize();
 

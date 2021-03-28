@@ -2,7 +2,7 @@
 
 #include "common.h"
 #include "baseSink.h"
-#include "io/file.h"
+#include "io/textFile.h"
 
 namespace GRAVEngine
 {
@@ -25,7 +25,7 @@ namespace GRAVEngine
 				virtual void sinkMessage(const Logging::logMessage& message) override;
 				virtual void flush_() override;
 
-				GRAVEngine::IO::file m_File;
+				GRAVEngine::IO::textFile m_File;
 			};
 		}
 	}

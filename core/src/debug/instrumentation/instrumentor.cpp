@@ -18,7 +18,7 @@ void GRAVEngine::instrumentor::startSession(const std::string& sessionName, cons
 	}
 
 	// Start a new session if the file was opened property
-	if (m_OutputFile.tryOpen(filepath, IO::fileMode::write, true))
+	if (m_OutputFile.tryOpen(filepath, IO::fileMode::OUTPUT | IO::fileMode::TRUNCATE, true))
 	{
 		if (Logging::logManager::getInstance())
 			GRAV_LOG_LINE_INFO("Start instrumentation session '%s'", sessionName.c_str());
@@ -57,7 +57,7 @@ void GRAVEngine::instrumentor::writeProfile(const profileResult& result)
 	// Output the file if the current session is a valid one
 	Locks::scopedLock<decltype(m_Lock)> lock(m_Lock);
 	if (m_CurrentSession)
-		m_OutputFile.writeString(json.str());
+		m_OutputFile.write(json.str());
 }
 void GRAVEngine::instrumentor::internalEndSession()
 {
@@ -78,9 +78,9 @@ void GRAVEngine::instrumentor::internalEndSession()
 
 void GRAVEngine::instrumentor::writeSessionHeader()
 {
-	m_OutputFile.writeString("{\"otherData\": {},\"traceEvents\":[{}");
+	m_OutputFile.write("{\"otherData\": {},\"traceEvents\":[{}");
 }
 void GRAVEngine::instrumentor::writeSessionFooter()
 {
-	m_OutputFile.writeString("]}");
+	m_OutputFile.write("]}");
 }

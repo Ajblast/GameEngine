@@ -4,22 +4,12 @@
 GRAVEngine::IO::textFile::textFile() : file()
 {
 }
-
-GRAVEngine::IO::textFile::textFile(const std::string& filePath, fileMode fileMode, bool flushAfterWrite) : file(filePath, fileMode, flushAfterWrite)
+GRAVEngine::IO::textFile::textFile(const std::string& filePath, IO::fileMode fileMode, bool flushAfterWrite) : file(filePath, fileMode, flushAfterWrite)
 {
 }
-
-GRAVEngine::IO::textFile& GRAVEngine::IO::textFile::operator=(const textFile& other)
-{
-	file::operator=(other);
-
-	return *this;
-}
-
 GRAVEngine::IO::textFile::textFile(textFile&& other) noexcept : file(std::move(other))
 {
 }
-
 GRAVEngine::IO::textFile& GRAVEngine::IO::textFile::operator=(textFile&& other) noexcept
 {
 	file::operator=(std::move(other));
@@ -27,56 +17,58 @@ GRAVEngine::IO::textFile& GRAVEngine::IO::textFile::operator=(textFile&& other) 
 	return *this;
 }
 
-bool GRAVEngine::IO::textFile::readString(char* buffer, int maxCharCount)
+void GRAVEngine::IO::textFile::readLine(char* buffer, size_t num)
 {
-	GRAV_ASSERT(isOpen());
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isInput());
 
-	// Blocking read the string
-	void* string = fgets(buffer, maxCharCount, m_FileHandle);
+	// Read a line from the stream
+	m_Stream.getline((char*)buffer, num);
 
-	// Get error code from reading
-	int err = ferror(m_FileHandle); // Get an error if one occurred
-	errorHandle(err);
+	// Check if an error occured
+	errorHandle();
+}
+void GRAVEngine::IO::textFile::readLine(char* buffer, size_t num, char delim)
+{
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isInput());
 
-	// Check if a string was actually read in. (Not end of file)
-	if (string == nullptr)
-		return false;
+	// Read a line from the stream
+	m_Stream.getline((char*)buffer, num, delim);
 
-	return true;
+	// Check if an error occured
+	errorHandle();
+}
+void GRAVEngine::IO::textFile::readLine(std::string& str)
+{
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isInput());
+
+	// Read a line
+	std::getline(m_Stream, str);
+}
+void GRAVEngine::IO::textFile::readLine(std::string& str, char delim)
+{
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isInput());
+
+	// Read a line
+	std::getline(m_Stream, str, delim);
 }
 
-void GRAVEngine::IO::textFile::writeString(const std::string& string)
+void GRAVEngine::IO::textFile::write(const std::string& string)
 {
-	writeString(string.c_str());
-}
-void GRAVEngine::IO::textFile::writeString(const char* string)
-{
-	GRAV_ASSERT(isOpen());
-
-	// Blocking write the string
-	fputs(string, m_FileHandle);
-
-	// Get error code from reading
-	int err = ferror(m_FileHandle); // Get an error if one occurred
-	errorHandle(err);
+	file::write(string.c_str(), string.size());
 }
 void GRAVEngine::IO::textFile::writeLine(const std::string& string)
 {
-	writeLine(string.c_str());
+	writeLine(string.c_str(), string.size());
 }
-void GRAVEngine::IO::textFile::writeLine(const char* string)
+void GRAVEngine::IO::textFile::writeLine(const char* string, size_t size)
 {
-	GRAV_ASSERT(isOpen());
-
 	// Blocking write the string
-	writeString(string);
+	write(string);
 
 	// Blocking write newline character
 	writeChar('\n');
 }
-
-
-
-//void GRAVEngine::IO::textFile::readLine(char*, size_t num)
-//{
-//}

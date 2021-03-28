@@ -1,44 +1,16 @@
 #include "gravpch.h"
 #include "file.h"
 
-GRAVEngine::IO::file::file() : m_FileMode(fileMode::read), m_FileHandle(nullptr), m_FlushAfterWrite(false)
+GRAVEngine::IO::file::file() : m_FileMode(fileMode::NONE), m_FlushAfterWrite(false)
 {}
-GRAVEngine::IO::file::file(const std::string& filePath, GRAVEngine::IO::fileMode fileMode, bool flushAfterWrite) : m_FileHandle(nullptr)
+GRAVEngine::IO::file::file(const std::string& filePath, GRAVEngine::IO::fileMode fileMode, bool flushAfterWrite)
 {
 	// Open the file
 	open(filePath, fileMode, flushAfterWrite);
 }
-GRAVEngine::IO::file::file(const file& other)
+GRAVEngine::IO::file::file(file&& other) noexcept : m_FilePath(std::move(other.m_FilePath)), m_FileMode(other.m_FileMode), m_FlushAfterWrite(other.m_FlushAfterWrite), m_Stream(std::move(other.m_Stream))
 {
-	// Delete current resources
-	close();
-
-	// Copy resources
-	m_FilePath = other.m_FilePath;
-	m_FileHandle = other.m_FileHandle;
-	m_FileMode = other.m_FileMode;
-	m_FlushAfterWrite = other.m_FlushAfterWrite;
-}
-GRAVEngine::IO::file& GRAVEngine::IO::file::operator=(const file& other)
-{
-	if (this != &other)
-	{
-		// Close the current file
-		close();
-
-		// Copy the file handle
-		m_FilePath			= other.m_FilePath;
-		m_FileHandle		= other.m_FileHandle;
-		m_FileMode			= other.m_FileMode;
-		m_FlushAfterWrite	= other.m_FlushAfterWrite;
-	}
-
-	return *this;
-}
-GRAVEngine::IO::file::file(file&& other) noexcept : m_FilePath(std::move(other.m_FilePath)), m_FileMode(other.m_FileMode), m_FileHandle(other.m_FileHandle), m_FlushAfterWrite(other.m_FlushAfterWrite)
-{
-	other.m_FileMode		= fileMode::read;
-	other.m_FileHandle		= nullptr;
+	other.m_FileMode		= fileMode::NONE;
 	other.m_FlushAfterWrite = false;
 }
 GRAVEngine::IO::file& GRAVEngine::IO::file::operator=(file&& other) noexcept
@@ -50,12 +22,9 @@ GRAVEngine::IO::file& GRAVEngine::IO::file::operator=(file&& other) noexcept
 
 		// Steal resources
 		m_FilePath			= std::move(other.m_FilePath);
-		m_FileHandle		= other.m_FileHandle;
+		m_Stream			= std::move(other.m_Stream);
 		m_FileMode			= other.m_FileMode;
 		m_FlushAfterWrite	= other.m_FlushAfterWrite;
-
-		// Release pointers to resources
-		other.m_FileHandle	= nullptr;
 	}
 	
 	return *this;
@@ -68,18 +37,14 @@ GRAVEngine::IO::file::~file()
 	close();
 }
 
-bool GRAVEngine::IO::file::tryOpen(const std::string& filePath, fileMode fileMode, bool flushAfterWrite)
+bool GRAVEngine::IO::file::tryOpen(const std::string& filePath, IO::fileMode fileMode, bool flushAfterWrite)
 {
 	try
 	{
 		open(filePath, fileMode, flushAfterWrite);
 		return true;
 	}
-	catch (Exceptions::IO::ioException)
-	{
-		return false;
-	}
-	catch (Exceptions::unknownErrorException)
+	catch (std::exception)
 	{
 		return false;
 	}
@@ -87,8 +52,7 @@ bool GRAVEngine::IO::file::tryOpen(const std::string& filePath, fileMode fileMod
 	// Unknown exception type
 	return false;
 }
-
-void GRAVEngine::IO::file::open(const std::string& filePath, fileMode fileMode, bool flushAfterWrite)
+void GRAVEngine::IO::file::open(const std::string& filePath, IO::fileMode fileMode, bool flushAfterWrite)
 {
 	// Close the current file if it is open
 	if (isOpen())
@@ -99,78 +63,94 @@ void GRAVEngine::IO::file::open(const std::string& filePath, fileMode fileMode, 
 	m_FileMode = fileMode;
 	m_FlushAfterWrite = flushAfterWrite;
 
-	// Check if the file directory exists, and create it if needed if it is not a read operation
-	if (fileMode != fileMode::read && fileMode != fileMode::readUpdate)
+	// Check if the file directory exists, and create it if needed if it is a write operation
+	if ((fileMode & fileMode::OUTPUT) == fileMode::OUTPUT)
 	{
 		std::filesystem::path path(filePath);
 		if (std::filesystem::exists(path.remove_filename()) == false)
 		{
+			// Create the directories needed
 			std::filesystem::create_directories(path);
 		}
 	}
 
-	// Opening the file
-	m_FileHandle = fopen(m_FilePath.c_str(), fileModeToString(m_FileMode));
 
-	// Error Handling
-	if (!m_FileHandle)
-	{
-		// Get the error code and test it
-		int err = errno;
-		errorHandle(err);
-	}
+	// Opening the file
+	m_Stream.open(filePath, (std::fstream::openmode) fileMode);
+
+	// Check for an error
+	errorHandle();
+
+	// Check if opening the file failed
+	if (failed())
+		throw Exceptions::IO::ioException("Unable to open file.");
 
 	// The file is now open here
 }
-
-void GRAVEngine::IO::file::reopen(fileMode fileMode)
+void GRAVEngine::IO::file::reopen(IO::fileMode fileMode)
 {
-	GRAV_ASSERT(isOpen());
+	GRAV_ASSERT_LOGLESS(isOpen());
+
+	// Close the current file first
+	close();
 
 	// Reopen the file mode
-	m_FileHandle = freopen(m_FilePath.c_str(), fileModeToString(fileMode), m_FileHandle);
-
-	// Error Handling
-	if (!m_FileHandle)
-	{
-		// Get the error code and test it
-		int err = errno;
-		errorHandle(err);
-	}
+	open(m_FilePath, fileMode, m_FlushAfterWrite);
 }
-
 bool GRAVEngine::IO::file::close()
 {
-	if (m_FileHandle)
+	if (isOpen())
 	{
-		// Close the file if it is open
-		int closeVal = fclose(m_FileHandle);
-		m_FileHandle = nullptr;
+		// Close the stream
+		m_Stream.close();
 
-		if (closeVal)
+		// Check for any errors
+		errorHandle();
+
+		// The file was not able to be closed.
+		if (failed())
 			return false;
+
 		return true;
 	}
 
 	return false;
 }
 
-bool GRAVEngine::IO::file::seek(long offset, seekOrigin origin)
+bool GRAVEngine::IO::file::seekWrite(long offset, seekOrigin origin)
 {
 	if (isOpen() == false)
 		return false;
 
-	// Seek into the file
-	int seekVal = fseek(m_FileHandle, offset, static_cast<int>(origin));
+	// Seek the write position
+	m_Stream.seekp(offset, (std::ios_base::seekdir) origin);
 
-	// Check if there was an error
-	int err = ferror(m_FileHandle);
-	errorHandle(err);
+	// Check if there is an error with the stream
+	errorHandle();
 
-	// See if it was successful
-	if (seekVal)
+	// Return false if it could not seek to the position
+	if (failed())
 		return false;
 
+	// Default return true
+	return true;
+}
+bool GRAVEngine::IO::file::seekRead(long offset, seekOrigin origin)
+{
+	if (isOpen() == false)
+		return false;
+
+	// Seek the input position
+	m_Stream.seekg(offset, (std::ios_base::seekdir)origin);
+
+	// Check if there is an error with the stream
+	errorHandle();
+
+	// Return false if it could not seek to the position
+	if (failed())
+		return false;
+
+	// Default return true
 	return true;
 }
 
@@ -179,101 +159,141 @@ bool GRAVEngine::IO::file::flush()
 	if (isOpen() == false)
 		return false;
 
-	size_t eof = fflush(m_FileHandle);
+	// flush the stream
+	m_Stream.flush();
 
-	// Get error code from reading
-	int err = ferror(m_FileHandle); // Get an error if one occurred
-	errorHandle(err);
+	// Check if an error occured
+	errorHandle();
 
-	// Was the flush successful
-	if (eof == 0)
-		return true;
-	return false;
+	// Check if the flush failed
+	if (failed())
+		return false;
+
+	// Default return tue
+	return true;
 }
 
-size_t GRAVEngine::IO::file::offset()
+const size_t GRAVEngine::IO::file::offsetWrite()
 {
-	GRAV_ASSERT(isOpen());
+	// The file must be open
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isOutput());
 
-	// Get the size
-	size_t curOffset = ftell(m_FileHandle);
+	size_t position = m_Stream.tellp();
 
-	// Check if there was an error
-	int err = ferror(m_FileHandle);
-	errorHandle(err);
+	errorHandle();
 
-	return curOffset;
+	return position;
 }
-
-int GRAVEngine::IO::file::eof()
+const size_t GRAVEngine::IO::file::offsetRead()
 {
-	GRAV_ASSERT(isOpen());
+	// The file must be open
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isInput());
 
-	return feof(m_FileHandle);
+	size_t position = m_Stream.tellg();
+
+	errorHandle();
+
+	return position;
 }
-
-bool GRAVEngine::IO::file::endOfFile()
+const size_t GRAVEngine::IO::file::fileSize()
 {
-	GRAV_ASSERT(isOpen());
+	// File must be open
+	GRAV_ASSERT_LOGLESS(isOpen());
+	// File must be open in read or output
+	GRAV_ASSERT_LOGLESS(isInput() || isOutput());
 
-	if(eof())
-			return true;
+	size_t fileSize;
 
-	return false;
-}
+	if (isInput())
+	{
+		// Cache the current offset
+		size_t currentPosition = offsetRead();
 
-size_t GRAVEngine::IO::file::fileSize()
-{
-	// Cache the current offset
-	size_t currentPosition = offset();
+		// Go the end of the file
+		seekRead(0, seekOrigin::end);
+		fileSize = offsetRead();
 
-	// Go the end of the file
-	seek(0, seekOrigin::end);
-	size_t fileSize = offset();
+		// Return back to the cached position
+		seekRead(currentPosition, seekOrigin::beg);
+	}
+	else
+	{
+		// Cache the current offset
+		size_t currentPosition = offsetWrite();
 
-	// Return back to the cached position
-	seek(currentPosition, seekOrigin::set);
+		// Go the end of the file
+		seekWrite(0, seekOrigin::end);
+		fileSize = offsetWrite();
+
+		// Return back to the cached position
+		seekWrite(currentPosition, seekOrigin::beg);
+	}
+
 
 	return fileSize;
 }
 
-size_t GRAVEngine::IO::file::read(void* buffer, size_t bufferSize)
+size_t GRAVEngine::IO::file::readCount()
 {
-	GRAV_ASSERT(buffer != nullptr);
-	GRAV_ASSERT(isOpen());
+	// The file must be open for input
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isInput());
 
-	// Do nothing if nowhere to put data
-	if (bufferSize == 0)
-		return 0;
-
-	// Block here until all data has been read
-	size_t bytesRead = fread(buffer, 1, bufferSize, m_FileHandle);
-
-	// Get error code from reading
-	int err = ferror(m_FileHandle); // Get an error if one occurred
-	errorHandle(err);
-								 
-	// Return the amount of bytes read if successful
-	return bytesRead;
+	// Get the number of characters read
+	return m_Stream.gcount();
 }
-
-int GRAVEngine::IO::file::readChar()
+int GRAVEngine::IO::file::peek()
 {
-	GRAV_ASSERT(isOpen());
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isInput());
 
-	// Get a character
-	int character = fgetc(m_FileHandle);
+	// Peek the character
+	int character = m_Stream.peek();
 
-	// Get error code from reading
-	int err = ferror(m_FileHandle); // Get an error if one occurred
-	errorHandle(err);
+	// Check for an error
+	errorHandle();
 
 	return character;
 }
-
-void GRAVEngine::IO::file::readAll(void*& buffer, size_t& bufferSize)
+void GRAVEngine::IO::file::read(char* buffer, size_t bufferSize)
 {
-	GRAV_ASSERT(isOpen());
+	GRAV_ASSERT_LOGLESS(buffer != nullptr);
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isInput());
+
+	// Do nothing if nowhere to put data
+	if (bufferSize == 0)
+	{
+		// Reset the readcount to 0
+		peek();
+		return;
+	}
+
+	// Read into the buffer bufferSize of characters
+	m_Stream.read(buffer, bufferSize);
+
+	// Check if an error occured
+	errorHandle();
+}
+int GRAVEngine::IO::file::readChar()
+{
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isInput());
+
+	// Get a character
+	int character = m_Stream.get();
+
+	// Get error code from reading
+	errorHandle();
+
+	return character;
+}
+void GRAVEngine::IO::file::readAll(char*& buffer, size_t& bufferSize)
+{
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isInput());
 
 	// Set the buffer size
 	bufferSize = fileSize();
@@ -282,7 +302,7 @@ void GRAVEngine::IO::file::readAll(void*& buffer, size_t& bufferSize)
 	try
 	{
 		// TODO: override new to use custom allocation for memory tracking
-		buffer = new void* [bufferSize];
+		buffer = (char*) new void* [bufferSize];
 	}
 	catch (std::bad_alloc)
 	{
@@ -290,90 +310,41 @@ void GRAVEngine::IO::file::readAll(void*& buffer, size_t& bufferSize)
 	}
 
 	// Seek to the beginning of the file
-	seek(0, seekOrigin::set);
+	seekRead(0, seekOrigin::beg);
 
 	// Read into the buffer
 	read(buffer, bufferSize);
 }
 
-size_t GRAVEngine::IO::file::write(void* buffer, size_t bufferSize)
+
+void GRAVEngine::IO::file::write(const char* buffer, size_t bufferSize)
 {
-	GRAV_ASSERT(buffer != nullptr);
-	GRAV_ASSERT(isOpen());
+	GRAV_ASSERT_LOGLESS(buffer != nullptr);
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isOutput());
 
-	// Do nothing if there is no data to write
-	if (bufferSize == 0)
-		return 0;
+	// Write to the stream
+	m_Stream.write(buffer, bufferSize);
 
-	// Block here until all data has been written
-	size_t bytesWritten = fwrite(buffer, 1, bufferSize, m_FileHandle);
+	// Check if an error occured
+	errorHandle();
 
-	// Get error code from reading
-	int err = ferror(m_FileHandle); // Get an error if one occurred
-	errorHandle(err);
-
+	// Flush if it should flush after every write
 	if (m_FlushAfterWrite)
 		flush();
-
-	return bytesWritten;
 }
-
 void GRAVEngine::IO::file::writeChar(char character)
 {
-	GRAV_ASSERT(isOpen());
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isOutput());
 
-	// Block here until all data has been written
-	size_t bytesWritten = fputc(character, m_FileHandle);
+	// Write to the stream
+	m_Stream.put(character);
 
-	// Get error code from reading
-	int err = ferror(m_FileHandle); // Get an error if one occurred
-	errorHandle(err);
+	// Check if an error occured
+	errorHandle();
 
+	// Flush if it should flush after every write
 	if (m_FlushAfterWrite)
 		flush();
-}
-
-void GRAVEngine::IO::file::errorHandle(int err)
-{
-	if (err == 0)
-		return;
-
-	if (err == GRAVEngine_ERROR_FILE_NOT_FOUND)
-		throw Exceptions::IO::fileNotFoundException(m_FilePath, "Unable to open file.");
-	if (err == GRAVEngine_ERROR_IO)
-		throw Exceptions::IO::ioException("IO Exception");
-	if (err == GRAVEngine_ERROR_PERMISSION_DENIED)
-		throw Exceptions::IO::unauthorizedAccessException(m_FilePath, "Unable to access file.");
-	
-	throw Exceptions::unknownErrorException("Unknown file error");
-}
-
-const char* GRAVEngine::IO::file::fileModeToString(fileMode fileMode)
-{
-	switch (fileMode)
-	{
-	case GRAVEngine::IO::fileMode::read:
-		return "rb";
-		break;
-	case GRAVEngine::IO::fileMode::readUpdate:
-		return "rb+";
-		break;
-	case GRAVEngine::IO::fileMode::write:
-		return "wb";
-		break;
-	case GRAVEngine::IO::fileMode::writeUpdate:
-		return "wb+";
-		break;
-	case GRAVEngine::IO::fileMode::append:
-		return "ab";
-		break;
-	case GRAVEngine::IO::fileMode::appendUpdate:
-		return "ab+";
-		break;
-	default:
-		return "rb";
-		break;
-	}
-
-	return "rb";
 }

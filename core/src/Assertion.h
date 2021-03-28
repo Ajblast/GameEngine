@@ -22,7 +22,12 @@
 				__FILE__, __LINE__) ; \
 			debugBreak(); \
 	}
-
+#define GRAV_ASSERT_LOGLESS(expr) \
+	if (expr) {} \
+	else \
+	{ \
+			debugBreak(); \
+	}
 // Check if this a debug build
 #ifdef GRAVCORE_DEBUG
 #define GRAV_SLOW_ASSERT(expr) \
@@ -33,8 +38,15 @@
 			__FILE__, __LINE__); \
 		debugBreak(); \
 	}
+#define GRAV_SLOW_ASSERT_LOGLESS(expr) \
+	if (expr) {} \
+	else \
+	{ \
+		debugBreak(); \
+	}
 #else
 #define GRAV_SLOW_ASSERT(expr)
+#define GRAV_SLOW_ASSERT_LOGLESS(expr)
 #endif
 
 #define GRAV_STATIC_ASSERT(expr) static_assert(expr);
@@ -43,7 +55,8 @@
 
 // Evaluate to nothing
 #define GRAV_ASSERT(expr)
-#define GRAV_SLOW_ASSERT(expr)
+#define GRAV_ASSERT_LOGLESS(expr)
+#define GRAV_SLOW_ASSERT_LOGLESS(expr)
 
 #endif
 
