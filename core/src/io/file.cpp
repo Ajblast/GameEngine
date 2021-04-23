@@ -1,5 +1,6 @@
 #include "gravpch.h"
 #include "file.h"
+#include "io.h"
 
 GRAVEngine::IO::file::file() : m_FileMode(fileMode::NONE), m_FlushAfterWrite(false)
 {}
@@ -64,16 +65,8 @@ void GRAVEngine::IO::file::open(const std::string& filePath, IO::fileMode fileMo
 	m_FlushAfterWrite = flushAfterWrite;
 
 	// Check if the file directory exists, and create it if needed if it is a write operation
-	if ((fileMode & fileMode::OUTPUT) == fileMode::OUTPUT)
-	{
-		std::filesystem::path path(filePath);
-		if (std::filesystem::exists(path.remove_filename()) == false)
-		{
-			// Create the directories needed
-			std::filesystem::create_directories(path);
-		}
-	}
-
+	if ((fileMode & fileMode::OUTPUT) == fileMode::OUTPUT && IO::exists(filePath) == false)
+		IO::createDirectory(std::filesystem::path(filePath).remove_filename());
 
 	// Opening the file
 	m_Stream.open(filePath, (std::fstream::openmode) fileMode);
@@ -257,7 +250,7 @@ int GRAVEngine::IO::file::peek()
 
 	return character;
 }
-void GRAVEngine::IO::file::read(char* buffer, size_t bufferSize)
+bool GRAVEngine::IO::file::read(char* buffer, size_t bufferSize)
 {
 	GRAV_ASSERT_LOGLESS(buffer != nullptr);
 	GRAV_ASSERT_LOGLESS(isOpen());
@@ -268,7 +261,8 @@ void GRAVEngine::IO::file::read(char* buffer, size_t bufferSize)
 	{
 		// Reset the readcount to 0
 		peek();
-		return;
+		// This is not a failure
+		return true;
 	}
 
 	// Read into the buffer bufferSize of characters
@@ -276,6 +270,11 @@ void GRAVEngine::IO::file::read(char* buffer, size_t bufferSize)
 
 	// Check if an error occured
 	errorHandle();
+
+	if (failed())
+		return false;
+
+	return true;
 }
 int GRAVEngine::IO::file::readChar()
 {
@@ -290,7 +289,7 @@ int GRAVEngine::IO::file::readChar()
 
 	return character;
 }
-void GRAVEngine::IO::file::readAll(char*& buffer, size_t& bufferSize)
+bool GRAVEngine::IO::file::readAll(char*& buffer, size_t& bufferSize)
 {
 	GRAV_ASSERT_LOGLESS(isOpen());
 	GRAV_ASSERT_LOGLESS(isInput());
@@ -313,7 +312,7 @@ void GRAVEngine::IO::file::readAll(char*& buffer, size_t& bufferSize)
 	seekRead(0, seekOrigin::beg);
 
 	// Read into the buffer
-	read(buffer, bufferSize);
+	return read(buffer, bufferSize);
 }
 
 

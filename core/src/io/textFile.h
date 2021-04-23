@@ -20,13 +20,13 @@ namespace GRAVEngine
 			textFile& operator= (textFile&& other) noexcept;
 
 			// Read a string into buffer. A null character is automatically appended.
-			void readLine(char* buffer, size_t num);
+			bool readLine(char* buffer, size_t num);
 			// Read a string into buffer spliting by delim. A null character is automatically appended.
-			void readLine(char* buffer, size_t num, char delim);
+			bool readLine(char* buffer, size_t num, char delim);
 			// Read a string into buffer. A null character is automatically appended.
-			void readLine(std::string& str);
+			bool readLine(std::string& str);
 			// Read a string into buffer spliting by delim. A null character is automatically appended.
-			void readLine(std::string& str, char delim);
+			bool readLine(std::string& str, char delim);
 
 			// Write a string to the file
 			void write(const std::string& string);
@@ -34,6 +34,9 @@ namespace GRAVEngine
 			void writeLine(const std::string& string);
 			// Write a string and append a newline character to the end of the string
 			void writeLine(const char* string, size_t size);
+
+			// Search the header of the file for a specific token.
+			bool searchForToken(const std::string* tokens, size_t tokencount, size_t byteSearchDepth = 200);
 		};
 	}
 }

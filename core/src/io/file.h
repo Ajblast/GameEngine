@@ -8,6 +8,7 @@
 #include "common.h"
 #include "fileModes.h"
 #include "seekOrigin.h"
+#include "io.h"
 
 #include "exceptions/exceptions.h"
 
@@ -64,11 +65,11 @@ namespace GRAVEngine
 			// Peek the next read character
 			int peek();
 			// Read bufferSize bytes into a buffer
-			void read(char* buffer, size_t bufferSize);
+			bool read(char* buffer, size_t bufferSize);
 			// Read a character. Returns eof if it was the end of the file
 			int readChar();
 			// Read the entire file into a buffer. Memory allocated
-			void readAll(char*& buffer, size_t& bufferSize);
+			bool readAll(char*& buffer, size_t& bufferSize);
 			#pragma endregion
 
 			#pragma region Output
@@ -83,6 +84,8 @@ namespace GRAVEngine
 			inline const fileMode fileMode() const { return m_FileMode; }
 			// Get the file path
 			inline const std::string& filePath() { return m_FilePath; }
+			// Get the file extension
+			inline const std::string& fileExtension() { return IO::fileExtension(filePath()); }
 
 			// Is the file open
 			inline const bool isOpen() const { return m_Stream.is_open(); }
