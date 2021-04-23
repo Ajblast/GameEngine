@@ -16,7 +16,7 @@
 
 
 #include "memory/pointers/pointers.h"
-#include "dataPrimitives.h"
+#include "types/dataPrimitives.h"
 #include "assertion.h"
 #include "errorCodes.h"
 #include "logging/logging.h"
