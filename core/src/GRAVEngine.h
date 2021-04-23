@@ -36,3 +36,6 @@
 #include "rendering/textures/texture2D.h"
 
 #include "rendering/cameras/orthographicCamera.h"
+
+// Utilities
+#include "utils/utils.h"
