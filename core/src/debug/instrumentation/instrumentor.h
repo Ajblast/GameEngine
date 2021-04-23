@@ -103,7 +103,7 @@ namespace GRAVEngine
 }
 
 #define GRAV_PROFILE_LOG_CONSOLE 0
-#define GRAV_PROFILE 1
+#define GRAV_PROFILE 0
 #if GRAV_PROFILE
 	#define GRAV_PROFILE_START_SESSION(name, filepath) GRAVEngine::instrumentor::getInstance()->startSession(name, filepath)
 	#define GRAV_PROFILE_END_SESSION() GRAVEngine::instrumentor::getInstance()->endSession()
@@ -118,7 +118,7 @@ namespace GRAVEngine
 	#define GRAV_PROFILE_SCOPE(name) GRAV_PROFILE_SCOPE_LINE(name, __LINE__)
 	#define GRAV_PROFILE_FUNCTION() GRAV_PROFILE_SCOPE(GRAV_CLEAN_FUNC_SIG)
 #else
-	#define GRAV_PROFILE_BEGIN_SESSION(name, filepath)
+	#define GRAV_PROFILE_START_SESSION(name, filepath)
 	#define GRAV_PROFILE_END_SESSION()
 	#define GRAV_PROFILE_SCOPE(name)
 	#define GRAV_PROFILE_FUNCTION()
