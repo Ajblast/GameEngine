@@ -25,6 +25,7 @@
 // Renderer
 #include "rendering/renderer/renderer.h"
 #include "rendering/renderer/renderer2D.h"
+#include "rendering/renderer/renderer3D.h"
 #include "rendering/renderer/rendererCommand.h"
 
 #include "rendering/vertexArray.h"
