@@ -42,3 +42,7 @@ GRAVEngine::scope<GRAVEngine::Tools::Importing::scene> GRAVEngine::Tools::Import
 
 	return sc;
 }
+
+void GRAVEngine::Tools::Importing::importer::updateImporterScale(const ref<importer>& importer)
+{
+}

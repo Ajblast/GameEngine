@@ -37,7 +37,7 @@ namespace GRAVEngine
 				scope<scene> readFile(const std::string& path);
 
 				// Is an extension supported
-				inline const bool isExtentensionSupported(const std::string& extenstion) const { return getExtensionList().find(extenstion) != getExtensionList().end(); }
+				inline const bool isExtentensionSupported(const std::string& extenstion) const { auto ext = getExtensionList(); return ext.find(extenstion) != ext.end(); }
 				// Get the list of extensions
 				inline std::set<std::string> getExtensionList() const { return m_FileExtensions; }
 

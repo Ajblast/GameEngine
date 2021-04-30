@@ -14,7 +14,7 @@ namespace GRAVEngine
 			{
 			public:
 				objImporter();
-				~objImporter();
+				~objImporter() {};
 
 				bool canRead(const std::string& path, bool checkSig) const override;
 
@@ -26,11 +26,11 @@ namespace GRAVEngine
 				// Create the scene from an import
 				void createDataFromImport(const ref<objModel>& model, scope<scene>& scene);
 				// Create a node and its subnodes
-				ref<node> createNode(const ref<objModel>& model, const ref<objObject>& object, ref<node>& parent, scope<scene>& scene, std::vector<scope<mesh>>& meshArray);
+				ref<node> createNode(const ref<objModel>& model, const ref<objObject>& object, ref<node>& parent, scope<scene>& scene, std::vector<ref<mesh>>& meshArray);
 				// Create the topology for a specific mesh
-				scope<mesh> createTopology(const ref<objModel>& model, const ref<objObject>& object, meshIndex meshIndex);
+				ref<mesh> createTopology(const ref<objModel>& model, const ref<objObject>& object, meshIndex meshIndex);
 
-				void createVertexArray(const ref<objModel>& model, const ref<objObject>& object, meshIndex meshIndex, scope<mesh>& newMesh, vertexIndex vertCount);
+				void createVertexArray(const ref<objModel>& model, const ref<objObject>& object, meshIndex meshIndex, ref<mesh>& newMesh, vertexIndex vertCount);
 
 				////! \brief  Creates vertices from model.
 				//void createVertexArray(const ObjFile::Model* pModel, const ObjFile::Object* pCurrentObject,

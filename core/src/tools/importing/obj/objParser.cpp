@@ -187,6 +187,7 @@ void GRAVEngine::Tools::Importing::objParser::getFace(primitiveType type, tokenA
 	for (auto it = tokens.begin(); it != tokens.end(); it++)
 	{
 		// Split the entire vertex by the '/' character
+		vertexTokens.clear();
 		Utils::trimSplit((*it), "/", vertexTokens);
 
 		if (vertexTokens.size() > 3)
@@ -229,10 +230,12 @@ void GRAVEngine::Tools::Importing::objParser::getFace(primitiveType type, tokenA
 
 		// Add the optional normal index
 		if (normIndex != 0)
+		{
 			newFace->m_Normals.push_back(
 				(normIndex > 0) ? normIndex - 1 : m_Model->normalCount() + normIndex
 			);
-
+			hasNormal = true;
+		}
 	}
 
 
@@ -263,7 +266,7 @@ void GRAVEngine::Tools::Importing::objParser::getFace(primitiveType type, tokenA
 	// Increase the vertex and texture count
 	m_Model->m_CurrentMesh->m_VertexCount += (vertexIndex) newFace->m_Vertices.size();
 	m_Model->m_CurrentMesh->m_TextureCount += (textureIndex) newFace->m_TextureCoords.size();
-	if (!m_Model->m_CurrentMesh->m_HasNormals && hasNormal) {
+	if (m_Model->m_CurrentMesh->m_HasNormals == false && hasNormal) {
 		m_Model->m_CurrentMesh->m_HasNormals = true;
 	}
 }
@@ -276,16 +279,20 @@ GRAVEngine::uint8 GRAVEngine::Tools::Importing::objParser::getTextureCoordinate(
 	if (textDim == 2)
 	{
 		// Get a 2d texture coordinate
-		textureCoordinate.x = std::atof(tokens[0].c_str());
-		textureCoordinate.y = std::atof(tokens[1].c_str());
-		textureCoordinate.z = 0;
+		textureCoordinate = {
+			std::atof(tokens[0].c_str()), 
+			std::atof(tokens[1].c_str()), 
+			0
+		};
 	}
 	else if (textDim == 3)
 	{
 		// Get a 3d texture coordinate
-		textureCoordinate.x = std::atof(tokens[0].c_str());
-		textureCoordinate.y = std::atof(tokens[1].c_str());
-		textureCoordinate.z = std::atof(tokens[2].c_str());
+		textureCoordinate = { 
+			std::atof(tokens[0].c_str()),
+			std::atof(tokens[1].c_str()),
+			std::atof(tokens[2].c_str())
+		};
 	}
 	else
 	{

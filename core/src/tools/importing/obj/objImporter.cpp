@@ -16,10 +16,16 @@ static const GRAVEngine::Tools::Importing::importerDescription s_Desc = {
 };
 static const size_t s_MinOBJFileSize = 16;
 
+GRAVEngine::Tools::Importing::objImporter::objImporter()
+{
+    m_FileExtensions = std::set < std::string>();
+    m_FileExtensions.insert(".obj");
+}
+
 bool GRAVEngine::Tools::Importing::objImporter::canRead(const std::string& path, bool checkSig) const
 {
     if (checkSig)
-        return isExtentensionSupported(path);
+        return isExtentensionSupported(IO::fileExtension(path));
     else
     {
         // Check the file header for tokens
@@ -95,15 +101,72 @@ void GRAVEngine::Tools::Importing::objImporter::createDataFromImport(const ref<o
         scene->m_RootNode->m_Children = createScope<ref<node>[]>(childCount);
 
         // Create nodes for the scene
-        std::vector<scope<mesh>> meshes;
+        std::vector<ref<mesh>> meshes;
         meshes.reserve(meshCount);
         for (size_t i = 0; i < model->objectCount(); i++)
             createNode(model, model->m_Objects[i], scene->m_RootNode, scene, meshes);
 
+        // Make sure all of the children were made
+        GRAV_ASSERT(scene->m_RootNode->m_ChildCount == childCount);
+
+        // Create mesh pointer buffer for this cene
+        if (scene->m_MeshCount > 0)
+        {
+            scene->m_Meshes = createScope<ref<mesh>[]>(meshes.size());
+            for (size_t i = 0; i < meshes.size(); i++)
+                scene->m_Meshes[i] = meshes[i];
+        }
+
+        // Create the materials
+    }
+    else
+    {
+        // Not a single object was referenced in the file
+
+        // No Vertices read
+        if (model->vertexCount() == 0)
+            return;
+
+        // Create a single mesh for all of the vertices
+        ref<mesh> newMesh = createRef<mesh>();
+        newMesh->m_PrimitiveTypes = (uint32) primitiveType::POINT;
+        newMesh->m_VertexCount = model->vertexCount();
+
+        // Create the vertex array on the mesh and copy the data
+        newMesh->m_Vertices = createScope<vec3[]>(newMesh->m_VertexCount);
+        memcpy(&newMesh->m_Vertices, model->m_Vertices.data(), newMesh->m_VertexCount * sizeof(vec3));
+
+        // Copy the normals
+        if (model->normalCount() > 0)
+        {
+            newMesh->m_Normals = createScope<vec3[]>(newMesh->vertexCount());
+            if (model->normalCount() < newMesh->vertexCount())
+                throw Exceptions::importException("OBJ: Too few normals.");
+            memcpy(&newMesh->m_Normals, model->m_Normals.data(), newMesh->vertexCount() * sizeof(vec3));
+        }
+
+        // Copy the colors
+        if (model->colorCount() > 0)
+        {
+            newMesh->m_Colors = createScope<RGBA[]>(newMesh->vertexCount());
+            if (model->colorCount() < newMesh->vertexCount())
+                throw Exceptions::importException("OBJ: Too few colors.");
+            memcpy(&newMesh->m_Colors, model->m_TextCoords.data(), newMesh->vertexCount() * sizeof(RGBA));
+        }
+
+        // Create the root nodes mesh array
+        scene->m_RootNode->m_MeshCount = 1;
+        scene->m_RootNode->m_Meshes = createScope<meshIndex[]>(1);
+        scene->m_RootNode->m_Meshes[0] = 0;
+
+        // Create the scene's single mesh
+        scene->m_Meshes = createScope<ref<mesh>[]>(1);
+        scene->m_MeshCount = 1;
+        scene->m_Meshes[0] = newMesh;
     }
 }
 
-GRAVEngine::ref<GRAVEngine::Tools::Importing::node> GRAVEngine::Tools::Importing::objImporter::createNode(const ref<objModel>& model, const ref<objObject>& object, ref<node>& parent, scope<scene>& scene, std::vector<scope<mesh>>& meshArray)
+GRAVEngine::ref<GRAVEngine::Tools::Importing::node> GRAVEngine::Tools::Importing::objImporter::createNode(const ref<objModel>& model, const ref<objObject>& object, ref<node>& parent, scope<scene>& scene, std::vector<ref<mesh>>& meshArray)
 {
     GRAV_ASSERT(model != nullptr);
     if (object == nullptr)
@@ -121,11 +184,11 @@ GRAVEngine::ref<GRAVEngine::Tools::Importing::node> GRAVEngine::Tools::Importing
 
     for (auto it = object->m_Meshes.begin(); it != object->m_Meshes.end(); it++)
     {
-        scope<mesh> mesh = createTopology(model, object, *it);
+        ref<mesh> mesh = createTopology(model, object, *it);
 
         // Add the mesh if it was created and has at least 1 face
         if (mesh && mesh->faceCount() > 0)
-            meshArray.push_back(std::move(mesh));
+            meshArray.push_back(mesh);
     }
 
     //// Create all nodes for subobjects
@@ -160,7 +223,7 @@ GRAVEngine::ref<GRAVEngine::Tools::Importing::node> GRAVEngine::Tools::Importing
     return newNode;
 }
 
-GRAVEngine::scope<GRAVEngine::mesh> GRAVEngine::Tools::Importing::objImporter::createTopology(const ref<objModel>& model, const ref<objObject>& object, meshIndex meshIndex)
+GRAVEngine::ref<GRAVEngine::mesh> GRAVEngine::Tools::Importing::objImporter::createTopology(const ref<objModel>& model, const ref<objObject>& object, meshIndex meshIndex)
 {
     GRAV_ASSERT(model != nullptr);
     
@@ -180,7 +243,7 @@ GRAVEngine::scope<GRAVEngine::mesh> GRAVEngine::Tools::Importing::objImporter::c
         return nullptr;
 
     // Create the new mesh
-    scope<mesh> newMesh = createScope<mesh>();
+    ref<mesh> newMesh = createRef<mesh>();
     if (meshData->m_Name.empty() == false)
         newMesh->m_Name = meshData->m_Name;
 
@@ -274,7 +337,7 @@ GRAVEngine::scope<GRAVEngine::mesh> GRAVEngine::Tools::Importing::objImporter::c
     return newMesh;
 }
 
-void GRAVEngine::Tools::Importing::objImporter::createVertexArray(const ref<objModel>& model, const ref<objObject>& object, meshIndex meshIndex, scope<mesh>& newMesh, vertexIndex vertCount)
+void GRAVEngine::Tools::Importing::objImporter::createVertexArray(const ref<objModel>& model, const ref<objObject>& object, meshIndex meshIndex, ref<mesh>& newMesh, vertexIndex vertCount)
 {
     // TODO: Simplify this function
 

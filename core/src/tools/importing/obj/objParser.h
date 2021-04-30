@@ -20,12 +20,15 @@ namespace GRAVEngine
 			public:
 				objParser(IO::textFile& file, const std::string& modelName, const std::string& folderName) : m_File(file), m_ModelName(modelName), m_FolderName(folderName)
 				{
+					m_Model = createRef<objModel>();
+					m_Model->m_ModelName = modelName;
+
 					parseFile();
 				}
 				objParser(const objParser& other) = delete;
 				objParser& operator=(const objParser&) = delete;
 
-				~objParser();
+				~objParser() {};
 
 				inline const ref<objModel>& getModel() const { return m_Model; }
 
