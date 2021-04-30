@@ -4,6 +4,7 @@
 #include "rendering/renderer/rendererAPI.h"
 #include "rendering/renderer/rendererCommand.h"
 #include "rendering/renderer/renderer2D.h"
+#include "rendering/renderer/renderer3D.h"
 #include "rendering/shaders/shader.h"
 #include "rendering/cameras/camera.h"
 #include <glm/mat4x4.hpp>

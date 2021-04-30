@@ -14,6 +14,7 @@ void GRAVEngine::Rendering::renderer::startup()
 	// TODO: Allow picking which renderer is being used. Explicity, allowing 2D and 3D renderers
 	// Startup a 2D renderer
 	renderer2D::startup();
+	renderer3D::startup();
 }
 
 void GRAVEngine::Rendering::renderer::shutdown()
@@ -23,6 +24,7 @@ void GRAVEngine::Rendering::renderer::shutdown()
 	// TODO: Allow picking which renderer is being used. Explicity, allowing 2D and 3D renderers
 	// Shutdown a 2D renderer
 	renderer2D::shutdown();
+	renderer3D::shutdown();
 }
 
 void GRAVEngine::Rendering::renderer::onWindowResize(uint32 width, uint32 height)
