@@ -1,6 +1,9 @@
 #pragma once
 
 #include "GRAVEngine.h"
+#include "rendering/cameras/editorCamera.h"
+#include "tools/importing/obj/objImporter.h"
+
 
 class Test : public GRAVEngine::Layers::layer
 {
@@ -17,7 +20,8 @@ public:
 private:
 	//GRAVEngine::Rendering::orthographicCameraController m_CameraController;
 
-	GRAVEngine::Rendering::orthographicCamera orthoCam;
+	//GRAVEngine::Rendering::orthographicCamera orthoCam;
+	GRAVEngine::Rendering::editorCamera orthoCam;
 
 	// Temp
 	//Hazel::Ref<Hazel::VertexArray> m_SquareVA;
@@ -26,6 +30,8 @@ private:
 	//Hazel::Ref<Hazel::Texture2D> m_CheckerboardTexture;
 
 	//glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
+
+	GRAVEngine::scope<GRAVEngine::Tools::Importing::scene> sc;
 
 
 };

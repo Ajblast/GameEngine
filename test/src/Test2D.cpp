@@ -3,7 +3,7 @@
 
 Test2D::Test2D() : layer("Test2D"), orthoCam(-1.778, 1.778, -1, 1)
 {
-	orthoCam.setPosition({ 0,0,0 });
+	orthoCam.setPosition({ 0,3,0 });
 	orthoCam.setRotation(0);
 }
 
