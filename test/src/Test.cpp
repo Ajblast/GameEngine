@@ -7,7 +7,7 @@ Test::Test() : layer("Test"), orthoCam(90.0f, 1.778, 0.1f, 1000.0f)
 //Test::Test() : layer("Test"), orthoCam(1.778, 1.778, -1, 1)
 {
 	orthoCam.setPosition({ 0,3,10 });
-	orthoCam.setRotation(0);
+	orthoCam.setRotation({ 0, 0, 0 });
 }
 
 void Test::onAttach()

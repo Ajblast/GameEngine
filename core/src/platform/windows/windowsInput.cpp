@@ -23,7 +23,7 @@ namespace GRAVEngine
 
 			return state == GLFW_PRESS;
 		}
-		std::pair<float, float> Input::getMousePosition()
+		vec2 Input::getMousePosition()
 		{
 			auto* window = static_cast<GLFWwindow*>(application::getInstance().getWindow().getNativeWindow());
 			double xpos, ypos;
@@ -33,11 +33,11 @@ namespace GRAVEngine
 		}
 		float Input::getMouseX()
 		{
-			return getMousePosition().first;
+			return getMousePosition().x;
 		}
 		float Input::getMouseY()
 		{
-			return getMousePosition().second;
+			return getMousePosition().y;
 		}
 	}
 }

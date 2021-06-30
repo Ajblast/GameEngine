@@ -2,6 +2,7 @@
 
 #include "keyCodes.h"
 #include "mouseCodes.h"
+#include "types/vecs/vec2.h"
 
 namespace GRAVEngine
 {
@@ -13,7 +14,7 @@ namespace GRAVEngine
 			static bool isKeyPressed(Keys::keyCode key);
 
 			static bool isMouseButtonPressed(Mouse::mouseCode button);
-			static std::pair<float, float> getMousePosition();
+			static GRAVEngine::vec2 getMousePosition();
 			static float getMouseX();
 			static float getMouseY();
 		};
