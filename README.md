@@ -14,9 +14,9 @@
 [Coding Convetions](https://github.com/Ajblast/GameEngine#coding-conventions)
 # Installation
 Due to GitHub's file size limit and large file storage limit, PyTorch's binary and lib files must be downloaded separately.
-Download both the debug and release version of the *Stable Window's LibTorch c++ CPU* from https://pytorch.org/get-started/locally/
-Create a bin and lib folder in core/vendor/pytorch-*config*
-Place all lib files into the lib folder and all binary files into the bin folder for each configuration
+Download both the debug and release version of the *Stable Window's LibTorch c++ CPU* from https://pytorch.org/get-started/locally/.
+Create a bin and lib folder in core/vendor/pytorch-*config*.
+Place all lib files into the lib folder and all binary files into the bin folder for each configuration.
 
 # Usage
 # Contributing
