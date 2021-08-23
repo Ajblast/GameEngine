@@ -62,8 +62,8 @@ namespace GRAVEngine
 			void waitForCounter(ref<counter> counter, counterTarget target, bool blocking = true);
 
 
-			counter* allocCounter();
-			void freeCounter(counter* counter);
+			//counter* allocCounter();
+			//void freeCounter(counter* counter);
 
 		public:
 			inline const uint8 getNumThreads() const{ return m_ThreadCount; }
