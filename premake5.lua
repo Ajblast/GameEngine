@@ -19,11 +19,21 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- Include directories relative to OpenGL-Core
 IncludeDir = {}
-IncludeDir["GLFW"]	=		"vendor/glfw/include"
-IncludeDir["GLAD"]	=		"vendor/glad/include"
-IncludeDir["ImGui"] =		"vendor/imgui"
-IncludeDir["glm"]	=		"vendor/glm"
-IncludeDir["stb_image"] =	"vendor/stb_image"
+IncludeDir["GLFW"]	=				"vendor/glfw/include"
+IncludeDir["GLAD"]	=				"vendor/glad/include"
+IncludeDir["ImGui"] =				"vendor/imgui"
+IncludeDir["glm"]	=				"vendor/glm"
+IncludeDir["stb_image"] =			"vendor/stb_image"
+IncludeDir["pytorch_debug"]	=		"vendor\\pytorch-debug\\include"
+IncludeDir["pytorch2_debug"]	=	"vendor\\pytorch-debug\\include\\torch\\csrc\\api\\include"
+IncludeDir["pytorch_release"]	=	"vendor\\pytorch-release\\include"
+IncludeDir["pytorch2_release"]	=	"vendor\\pytorch-release\\include\\torch\\csrc\\api\\include"
+
+LibDir = {}
+LibDir["pytorchlib_debug"] = 		"vendor\\pytorch-debug\\lib"
+LibDir["pytorchbin_debug"] = 		"vendor\\pytorch-debug\\bin"
+LibDir["pytorchlib_release"] = 		"vendor\\pytorch-release\\lib"
+LibDir["pytorchbin_release"] = 		"vendor\\pytorch-release\\bin"
 
 
 --Projects
@@ -39,43 +49,3 @@ group ""
 
 include "core"
 include "test"
-
-
-
-
---OpenGL Examples
---workspace "OpenGL-Examples"
---	startproject "OpenGL-Examples"
---	architecture "x64"
---	startproject "OpenGL-Examples"
---	   
---	configurations
---	{
---		"Debug",
---		"Release"
---	}
---
---	flags
---	{
---		"MultiProcessorCompile"
---	}
---
---outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
---
----- Include directories relative to OpenGL-Core
---IncludeDir = {}
---IncludeDir["GLFW"]	=		"vendor/GLFW/include"
---IncludeDir["Glad"]	=		"vendor/Glad/include"
---IncludeDir["ImGui"] =		"vendor/imgui"
---IncludeDir["glm"]	=		"vendor/glm"
---IncludeDir["stb_image"] =	"vendor/stb_image"
---
----- Projects
---group "Dependencies"
---	includeexternal "OpenGL-Core/vendor/GLFW"
---	includeexternal "OpenGL-Core/vendor/Glad"
---	includeexternal "OpenGL-Core/vendor/imgui"
---group ""
---
---includeexternal "OpenGL-Core"
---include "OpenGL-Examples"

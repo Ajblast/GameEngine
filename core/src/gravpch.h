@@ -23,6 +23,8 @@
 // Include common items
 #include "common.h"
 
+#include <torch/torch.h>
+
 // Include the instrumentor
 #include "debug/instrumentation/instrumentor.h"
 
