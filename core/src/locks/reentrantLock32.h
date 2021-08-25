@@ -15,12 +15,12 @@ namespace GRAVEngine
 			reentrantLock32() : m_atomic(0), m_refCount(0) {}
 
 			// Acquire the lock
-			void acquire();
+			void lock();
 			// Release the lock
-			void release();
+			void unlock();
 
 			// attempt to acquire the lock
-			bool tryAcquire();
+			bool try_lock();
 		};
 	}
 }

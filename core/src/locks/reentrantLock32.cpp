@@ -1,7 +1,7 @@
 #include "gravpch.h"
 #include "reentrantLock32.h"
 
-void GRAVEngine::Locks::reentrantLock32::acquire()
+void GRAVEngine::Locks::reentrantLock32::lock()
 {
 	std::hash<std::thread::id> hasher;
 	std::size_t tid = hasher(std::this_thread::get_id());
@@ -25,7 +25,7 @@ void GRAVEngine::Locks::reentrantLock32::acquire()
 	std::atomic_thread_fence(std::memory_order_acquire);
 }
 
-void GRAVEngine::Locks::reentrantLock32::release()
+void GRAVEngine::Locks::reentrantLock32::unlock()
 {
 	// Use release semantics to ensure that all prior write have been fully committed before we unlock
 	std::atomic_thread_fence(std::memory_order_release);
@@ -43,7 +43,7 @@ void GRAVEngine::Locks::reentrantLock32::release()
 	}
 }
 
-bool GRAVEngine::Locks::reentrantLock32::tryAcquire()
+bool GRAVEngine::Locks::reentrantLock32::try_lock()
 {
 	std::hash<std::thread::id> hasher;
 	std::size_t tid = hasher(std::this_thread::get_id());

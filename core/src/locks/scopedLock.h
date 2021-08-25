@@ -15,11 +15,11 @@ namespace GRAVEngine
 		public:
 			explicit scopedLock(lock_t& lock) : m_pLock(&lock)
 			{
-				m_pLock->acquire();
+				m_pLock->lock();
 			}
 			~scopedLock()
 			{
-				m_pLock->release();
+				m_pLock->unlock();
 			}
 		};
 	}

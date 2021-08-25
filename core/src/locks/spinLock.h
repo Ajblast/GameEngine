@@ -15,12 +15,12 @@ namespace GRAVEngine
 			spinLock() {}
 
 			// Try acquire the lock
-			bool tryAcquire();
+			bool try_lock();
 
 			// Acquire the lock
-			void acquire();
+			void lock();
 			// Release the lock
-			void release();
+			void unlock();
 		};
 	}
 }

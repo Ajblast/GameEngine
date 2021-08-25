@@ -12,9 +12,9 @@ namespace GRAVEngine
 
 		public:
 			// Acquire the lock
-			void acquire();
+			void lock();
 			// Release the lock
-			void release();
+			void unlock();
 
 #ifdef ASSERTIONS_ENABLED
 #define BEGIN_ASSERT_LOCK_NOT_NECESSARY(L) (L).acquire()
@@ -32,11 +32,11 @@ namespace GRAVEngine
 
 			explicit unnecessaryLockJanitor(unnecessaryLock& lock) : m_pLock(&lock)
 			{
-				m_pLock->acquire();
+				m_pLock->lock();
 			}
 			~unnecessaryLockJanitor()
 			{
-				m_pLock->release();
+				m_pLock->unlock();
 			}
 
 		};
