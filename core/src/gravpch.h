@@ -8,6 +8,7 @@
 #include <thread>
 #include <cstdarg>
 #include <condition_variable>
+#include <tuple>
 
 // String and output
 #include <iostream>
