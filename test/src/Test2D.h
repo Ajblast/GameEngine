@@ -18,6 +18,7 @@ private:
 	//GRAVEngine::Rendering::orthographicCameraController m_CameraController;
 
 	GRAVEngine::Rendering::orthographicCamera orthoCam;
+	//GRAVEngine::Rendering::editorCamera orthoCam;
 
 	// Temp
 	//Hazel::Ref<Hazel::VertexArray> m_SquareVA;

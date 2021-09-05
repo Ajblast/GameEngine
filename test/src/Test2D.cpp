@@ -3,7 +3,7 @@
 
 Test2D::Test2D() : layer("Test2D"), orthoCam(-1.778, 1.778, -1, 1)
 {
-	orthoCam.setPosition({ 0,3,0 });
+	orthoCam.setPosition({ 0,0,0 });
 	orthoCam.setRotation({ 0, 0, 0 });
 }
 
@@ -17,6 +17,8 @@ void Test2D::onDetach()
 
 void Test2D::onUpdate(GRAVEngine::Time::timestep ts)
 {
+	//orthoCam.OnUpdate(ts);
+	
 	GRAVEngine::Rendering::renderer2D::resetStats();
 
 	GRAVEngine::Rendering::rendererCommand::setClearColor({ 0.2f, 0.3f, 0.3f, 1.0f });
@@ -35,7 +37,6 @@ void Test2D::onUpdate(GRAVEngine::Time::timestep ts)
 		GRAVEngine::Rendering::renderer2D::beginScene(orthoCam);
 		GRAVEngine::Rendering::renderer2D::drawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
 		GRAVEngine::Rendering::renderer2D::drawRotatedQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, rotation, { 0.8f, 0.2f, 1.0f, 1.0f });
-
 		GRAVEngine::Rendering::renderer2D::endScene();
 
 		GRAVEngine::Rendering::renderer2D::beginScene(orthoCam);
@@ -47,9 +48,9 @@ void Test2D::onUpdate(GRAVEngine::Time::timestep ts)
 				GRAVEngine::Rendering::renderer2D::drawQuad({ x, y }, { 0.45f, 0.45f }, color);
 			}
 		}		
+		GRAVEngine::Rendering::renderer2D::drawQuad({ 0,0 }, { 100, 100 }, { 1, 1, 1, 1 });
 		GRAVEngine::Rendering::renderer2D::endScene();
 	}
-//	Rendering::renderer2D::drawQuad({ 0,0 }, { 100, 100 }, { 1, 1, 1, 1 });
 
 }
 

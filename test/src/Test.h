@@ -33,5 +33,8 @@ private:
 
 	GRAVEngine::scope<GRAVEngine::Tools::Importing::scene> sc;
 
+	GRAVEngine::AI::Models::ActorCritic::actorCritic ac;
+
+
 
 };
