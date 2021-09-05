@@ -5,6 +5,7 @@
 #include "jobs/jobManager.h"
 #include "logging/sinks/sinks.h"
 #include "rendering/renderer/rendererCommand.h"
+#include "ai/environmentManager.h"
 #include <iostream>
 
 #include "debug/instrumentation/instrumentor.h"
@@ -17,6 +18,8 @@ int main(int argc, char** argv)
 	GRAVEngine::Logging::logManager logManager;
 	GRAVEngine::Jobs::jobManager jobManager;
 	GRAVEngine::instrumentor instrumentor;
+	//GRAVEngine::AI::trainer trainer;
+
 
 	GRAV_PROFILE_START_SESSION("Manager Startup", "debug/profiles/GRAVEngineProfile-ManagerStartup.json");
 #pragma region SettingUpLogging
@@ -62,6 +65,9 @@ int main(int argc, char** argv)
 
 #pragma region ShuttingDownManagers
 	GRAV_PROFILE_START_SESSION("Manager Shutdown", "debug/profiles/GRAVEngineProfile-ManagerShutdown.json");
+	// Deinitialize the trainer
+	GRAVEngine::AI::environmentManager::instance().deinitialize();
+
 	jobManager.startShutdown();
 	jobManager.shutDown();
 	logManager.shutDown();

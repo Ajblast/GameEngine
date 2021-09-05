@@ -25,6 +25,8 @@ GRAVEngine::application::application(const std::string& name)
 
 	 m_ImGuiLayer = new Layers::imguiLayer();
 	 pushOverlay(m_ImGuiLayer);
+
+	 // Start the AI trainer
 }
 
 GRAVEngine::application::~application()

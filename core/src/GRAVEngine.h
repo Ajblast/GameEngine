@@ -38,5 +38,39 @@
 
 #include "rendering/cameras/orthographicCamera.h"
 
+// AI
+#include "ai/agent.h"
+#include "ai/agentParams.h"
+#include "ai/agentEpisodeId.h"
+#include "ai/programParams.h"
+#include "ai/inferenceDevice.h"
+
+#include "ai/actions/actionBuffer.h"
+#include "ai/actions/IActuator.h"
+
+#include "ai/agentPrograms/IAgentProgram.h"
+
+#include "ai/sensors/ISensor.h"
+#include "ai/sensors/bufferSensor.h"
+#include "ai/sensors/vectorSensor.h"
+#include "ai/sensors/observationParams.h"
+#include "ai/sensors/observationWriter.h"
+
+#include "ai/environmentManager.h"
+#include "ai/training/trainerController.h"
+#include "ai/training/trainer.h"
+#include "ai/training/algorithmFactory.h"
+#include "ai/training/algorithmType.h"
+#include "ai/training/hyperparameters.h"
+#include "ai/training/ITrainingAlgorithm.h"
+#include "ai/training/networkSettings.h"
+
+#include "ai/training/algorithms/PPO.h"
+#include "ai/training/defaultFactory.h"
+
+#include "ai/models/model.h"
+#include "ai/models/actorcritic/actorCritic.h"
+
+
 // Utilities
 #include "utils/utils.h"

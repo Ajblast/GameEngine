@@ -11,3 +11,5 @@
 
 #include "exceptions/counterWaitListFullException.h"
 #include "exceptions/jobQueueFullException.h"
+
+#include "exceptions/agentException.h"
