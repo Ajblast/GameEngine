@@ -25,6 +25,7 @@ namespace GRAVEngine
 
 			void spawn(threadCallbackFunction callback);
 			void setAffinity(size_t affinity);
+			void setName(const std::wstring& name);
 
 			void join();
 			// Get the handle and id from the currently running thread

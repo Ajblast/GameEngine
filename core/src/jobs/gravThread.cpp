@@ -27,6 +27,16 @@ void GRAVEngine::Jobs::gravThread::setAffinity(size_t affinity)
 	SetThreadAffinityMask(m_ThreadHandle, mask);
 #endif
 }
+void GRAVEngine::Jobs::gravThread::setName(const std::wstring& name)
+{
+	if (isValid() == false)
+		return;
+
+#ifdef GRAV_PLATFORM_WINDOWS
+	PCWSTR threadName = (PCWSTR) name.c_str();
+	SetThreadDescription(m_ThreadHandle, threadName);
+#endif
+}
 
 void GRAVEngine::Jobs::gravThread::join()
 {
