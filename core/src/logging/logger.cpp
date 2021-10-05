@@ -100,7 +100,7 @@ int GRAVEngine::Logging::logger::logLine(Logging::verbosity verbosity, const cha
 	ss << format << "\n";
 
 	charsWritten = log(verbosity, logEnabled, ss.str().c_str(), argList);
-
+	
 	va_end(argList);
 
 	return charsWritten;
