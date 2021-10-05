@@ -11,6 +11,8 @@
 #include "layers/layerStack.h"
 #include "layers/imgui/imguiLayer.h"
 
+#include "jobs/jobs.h"
+
 int main(int argc, char** argv);
 
 namespace GRAVEngine
