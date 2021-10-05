@@ -1,10 +1,17 @@
 #include "gravpch.h"
 #include "camera.h"
+#include "io/input.h"
+#include "io/keyCodes.h"
+#include "io/mouseCodes.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
+GRAVEngine::Rendering::camera::camera(const glm::mat4& projection, const glm::mat4& view, float aspectRatio, float nearClip, float farClip)
+	: m_ProjectionMatrix(projection), m_ViewMatrix(view), m_ViewProjectionMatrix(projection* view), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip)
+{}
 
 void GRAVEngine::Rendering::camera::recalculateViewMatrix()
 {
@@ -45,6 +52,7 @@ glm::quat GRAVEngine::Rendering::camera::getOrientation() const
 }
 
 
+
 void GRAVEngine::Rendering::camera::onEvent(Events::event& event)
 {
 	Events::eventDispatcher dispatcher(event);
@@ -58,6 +66,29 @@ bool GRAVEngine::Rendering::camera::onMouseScroll(Events::mouseScrolledEvent& ev
 	mouseZoom(delta);
 	recalculateViewMatrix();
 	return false;
+}
+void GRAVEngine::Rendering::camera::OnUpdate(Time::timestep timestep)
+{
+	GRAV_PROFILE_FUNCTION();
+
+	if (IO::Input::isKeyPressed(Keys::LeftAlt))
+	{
+		// Get the mouse delta
+		const glm::vec2& mouse{ IO::Input::getMouseX(), IO::Input::getMouseY() };
+		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
+		m_InitialMousePosition = mouse;
+
+		// Check what type of operation needs to be done
+		if (IO::Input::isMouseButtonPressed(Mouse::ButtonMiddle))
+			mousePan(delta);
+		else if (IO::Input::isMouseButtonPressed(Mouse::ButtonLeft))
+			mouseRotate(delta);
+		else if (IO::Input::isMouseButtonPressed(Mouse::ButtonRight))
+			mouseZoom(delta.y);
+	}
+
+	// Update the view matrix
+	recalculateViewMatrix();
 }
 
 
@@ -93,7 +124,6 @@ void GRAVEngine::Rendering::camera::mouseZoom(float delta)
 glm::vec3 GRAVEngine::Rendering::camera::calculatePosition() const
 {
 	return m_FocalPoint - forward() * m_Distance;
-
 }
 
 std::pair<float, float> GRAVEngine::Rendering::camera::panSpeed() const

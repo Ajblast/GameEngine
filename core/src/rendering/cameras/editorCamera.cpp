@@ -1,9 +1,6 @@
 #include "gravpch.h"
 #include "editorCamera.h"
 
-#include "io/input.h"
-#include "io/keyCodes.h"
-#include "io/mouseCodes.h"
 
 #include <GLFW/glfw3.h>
 
@@ -16,31 +13,6 @@ GRAVEngine::Rendering::editorCamera::editorCamera(float fov, float aspectRatio, 
 {
 	recalculateViewMatrix();
 }
-
-void GRAVEngine::Rendering::editorCamera::OnUpdate(Time::timestep timestep)
-{
-	GRAV_PROFILE_FUNCTION();
-
-	if (IO::Input::isKeyPressed(Keys::LeftAlt))
-	{
-		// Get the mouse delta
-		const glm::vec2& mouse{ IO::Input::getMouseX(), IO::Input::getMouseY() };
-		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
-		m_InitialMousePosition = mouse;
-
-		// Check what type of operation needs to be done
-		if (IO::Input::isMouseButtonPressed(Mouse::ButtonMiddle))
-			mousePan(delta);
-		else if (IO::Input::isMouseButtonPressed(Mouse::ButtonLeft))
-			mouseRotate(delta);
-		else if (IO::Input::isMouseButtonPressed(Mouse::ButtonRight))
-			mouseZoom(delta.y);
-	}
-
-	// Update the view matrix
-	recalculateViewMatrix();
-}
-
 
 void GRAVEngine::Rendering::editorCamera::recalculateProjectionMatrix()
 {

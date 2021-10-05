@@ -15,8 +15,6 @@ namespace GRAVEngine
 			editorCamera() = default;
 			editorCamera(float fov, float aspectRatio, float nearClip, float farClip);
 
-			void OnUpdate(Time::timestep timestep);
-
 			inline void setViewportSize(float width, float height) { m_ViewportWidth = width, m_ViewportHeight = height; recalculateProjectionMatrix(); }
 
 

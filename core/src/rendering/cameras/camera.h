@@ -4,6 +4,7 @@
 #include "events/event.h"
 #include "events/eventDispatcher.h"
 #include "events/mouseEvents.h"
+#include "time/timestep.h"
 #include <glm/glm.hpp>
 
 namespace GRAVEngine
@@ -14,13 +15,16 @@ namespace GRAVEngine
 		{
 		public:
 			camera() = default;
-			camera(const glm::mat4& projection, const glm::mat4& view, float aspectRatio, float nearClip, float farClip) : m_ProjectionMatrix(projection), m_ViewMatrix(view), m_ViewProjectionMatrix(projection * view), m_AspectRatio(aspectRatio), m_NearClip(nearClip), m_FarClip(farClip) {}
+			camera(const glm::mat4& projection, const glm::mat4& view, float aspectRatio, float nearClip, float farClip);
 			virtual ~camera() = default;
 
 			void onEvent(Events::event& event);
+			void OnUpdate(Time::timestep timestep);
 
 			const glm::vec3& getPosition() const { return m_Position; }
-			void setPosition(const glm::vec3& position) { m_Position = position; recalculateViewMatrix(); }
+			void setPosition(const glm::vec3& position) { m_FocalPoint = position; recalculateViewMatrix(); }
+
+			const glm::vec3& getFocalPoint() const { return m_FocalPoint; }
 
 			const glm::vec3& getRotation() const { return m_Rotation; }
 			void setRotation(const glm::vec3& rotation) { m_Rotation = rotation; recalculateViewMatrix(); }
