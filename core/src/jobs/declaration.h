@@ -3,12 +3,16 @@
 
 #include "jobPriorities.h"
 #include "counter.h"
+#include <functional>
 
 namespace GRAVEngine
 {
 	namespace Jobs
 	{
-		typedef void (*entryPoint)(uintptr_t param);
+		//typedef void (*entryPoint)(uintptr_t param);
+
+		typedef std::function<void(uintptr_t)> entryPoint;
+
 
 		struct declaration
 		{
