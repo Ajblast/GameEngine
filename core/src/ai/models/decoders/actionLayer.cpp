@@ -31,8 +31,8 @@ GRAVEngine::AI::Models::Decoders::actionLayerImpl::actionLayerImpl(int64 numInpu
 
 std::tuple<GRAVEngine::AI::Models::ActorCritic::agentAction, GRAVEngine::AI::Models::ActorCritic::agentLogProbs, torch::Tensor> GRAVEngine::AI::Models::Decoders::actionLayerImpl::forward(torch::Tensor hidden)
 {
-	torch::Tensor sampledContinuous;
-	torch::Tensor logProbContinuous;
+	torch::Tensor sampledContinuous = torch::Tensor();
+	torch::Tensor logProbContinuous = torch::Tensor();
 	std::vector<torch::Tensor> sampledDiscrete;
 	std::vector<torch::Tensor> logProbDiscrete;
 	std::vector<torch::Tensor> entropies;
@@ -44,7 +44,7 @@ std::tuple<GRAVEngine::AI::Models::ActorCritic::agentAction, GRAVEngine::AI::Mod
 		auto continuousDist = m_ContinuousLayer->forward(hidden);
 
 		// Sample it
-		sampledContinuous = continuousDist->sample({ 1 });
+		sampledContinuous = continuousDist->sample({});
 
 		// Get the log prob of the sample
 		logProbContinuous = continuousDist->logProb(sampledContinuous);
@@ -62,7 +62,10 @@ std::tuple<GRAVEngine::AI::Models::ActorCritic::agentAction, GRAVEngine::AI::Mod
 
 		// Sample the discrete action space
 		for (auto it = discreteDist.begin(); it != discreteDist.end(); it++)
-			sampledDiscrete.push_back((*it)->sample({ 1 }));
+		{
+			auto sample = (*it)->sample({ 1 });
+			sampledDiscrete.push_back(sample);
+		}
 
 		// Get the log probs and entropies of the discrete actions
 		for (size_t i = 0; i < discreteDist.size(); i++)
@@ -89,7 +92,7 @@ std::tuple<GRAVEngine::AI::Models::ActorCritic::agentAction, GRAVEngine::AI::Mod
 
 GRAVEngine::AI::Models::ActorCritic::agentLogProbs GRAVEngine::AI::Models::Decoders::actionLayerImpl::logProbs(torch::Tensor hidden, ActorCritic::agentAction action)
 {
-	torch::Tensor logProbContinuous;
+	torch::Tensor logProbContinuous = torch::Tensor();
 	std::vector<torch::Tensor> logProbDiscrete;
 
 	// If there are continuous actions

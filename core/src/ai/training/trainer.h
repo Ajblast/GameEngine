@@ -10,6 +10,7 @@
 #include "trainerSettings.h"
 #include "locks/scopedLock.h"
 #include "locks/spinLock.h"
+#include "jobs/jobs.h"
 #include <map>
 #include <vector>
 #include <torch/torch.h>

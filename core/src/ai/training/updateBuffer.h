@@ -27,7 +27,7 @@ namespace GRAVEngine
 				void append(const updateBuffer& other);
 
 				// How many items are in the buffer. Based on observation counts, but all vectors should have the same amount of items in each
-				inline const size_t size() const { return m_Observations.size(); }
+				inline const size_t size() const { return m_Observations.size() == 0 ? 0 : m_Observations.at(0).size(); }
 
 				// Turn the observation map into a single observation
 				std::vector<std::vector<torch::Tensor>> toObservation() const;

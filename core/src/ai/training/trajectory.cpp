@@ -5,8 +5,9 @@ GRAVEngine::AI::Training::updateBuffer GRAVEngine::AI::Training::trajectory::toU
 {
     updateBuffer buffer;
 
-	// Iterate over each observation
-	for (auto it = m_Experiences.begin(); it != m_Experiences.end(); it++)
+	// Iterate over each observation and add the parts except for the last one.
+	// The last one is reserved as the terminal state
+	for (auto it = m_Experiences.begin(); it != m_Experiences.end() - 1; it++)
 	{
 		// Add each individual subpart of the observation. Struct of arrays, not array of structs
 		for (size_t i = 0; i < it->m_Observation.size(); i++)
@@ -18,5 +19,5 @@ GRAVEngine::AI::Training::updateBuffer GRAVEngine::AI::Training::trajectory::toU
 		//buffer.m_Rewards.push_back(it->m_Reward);
 		//buffer.m_Dones.push_back(it->m_Done);
 	}
-    return updateBuffer();
+    return buffer;
 }

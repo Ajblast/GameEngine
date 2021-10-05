@@ -31,6 +31,8 @@ GRAVEngine::AI::Training::trainer& GRAVEngine::AI::Training::trainer::operator=(
 
 void GRAVEngine::AI::Training::trainer::addObservation(agentEpisodeId agentId, agentInfo info, std::vector<torch::Tensor> observation)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Lock the trainer so the observation can be created
 	Locks::scopedLock<decltype(m_SpinLock)> lock(m_SpinLock);
 
@@ -52,7 +54,7 @@ void GRAVEngine::AI::Training::trainer::addObservation(agentEpisodeId agentId, a
 		agentExperience experience = agentExperience(
 			lastObservation,				// Last observation taken to get the reward
 			torch::tensor(info.m_Reward),	// The reward cause from the last observation and actions
-			torch::tensor(terminal),		// Did the last observation and actions result in a terminal state
+			torch::tensor(terminal ? 1 : 0),// Did the last observation and actions result in a terminal state
 			lastActionInfo					// Information about the previous action. Actions, LogProbs, Entropy
 		);
 
@@ -151,3 +153,10 @@ void GRAVEngine::AI::Training::trainer::sendToDevice(inferenceDevice device) con
 	// Send the algorithm to a device
 	m_Algorithm->sendToDevice(device);
 }
+
+//void GRAVEngine::AI::Training::trainer::addObservationJob(uintptr_t params)
+//{
+//}
+//void GRAVEngine::AI::Training::trainer::stepJob(uintptr_t params)
+//{
+//}

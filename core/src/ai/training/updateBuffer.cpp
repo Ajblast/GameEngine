@@ -59,10 +59,13 @@ GRAVEngine::AI::Models::ActorCritic::agentAction GRAVEngine::AI::Training::updat
 	// Get all of the continuous actions
 	std::vector<torch::Tensor> continuousActions;
 	for (auto it = m_Actions.begin(); it != m_Actions.end(); it++)
-		continuousActions.push_back(it->m_ContinuousActions);
+		if (it->m_ContinuousActions.defined())
+			continuousActions.push_back(it->m_ContinuousActions);
 
 	// Combine the continous actions into a single tensor
-	torch::Tensor continuous = torch::cat(continuousActions);
+	torch::Tensor continuous = torch::Tensor();
+	if (continuousActions.size() > 0)
+		continuous = torch::cat(continuousActions);
 
 	// For each action, store each branch based on its index into the orignal vector (branch)
 	// This is so that each item in the map will be a part of each discrete action so we can concatonate each one
@@ -85,10 +88,13 @@ GRAVEngine::AI::Models::ActorCritic::agentLogProbs GRAVEngine::AI::Training::upd
 	// Get all of the continuous log probs
 	std::vector<torch::Tensor> continousLogProbs;
 	for (auto it = m_LogProbs.begin(); it != m_LogProbs.end(); it++)
-		continousLogProbs.push_back(it->m_ContinuousActions);
+		if (it->m_ContinuousActions.defined())
+			continousLogProbs.push_back(it->m_ContinuousActions);
 
 	// Combine the continous logProbs into a single tensor
-	torch::Tensor continuous = torch::cat(continousLogProbs);
+	torch::Tensor continuous = torch::Tensor();
+	if (continousLogProbs.size() > 0)
+		continuous = torch::cat(continousLogProbs);
 
 	// For each logProb, store each branch based on its index into the orignal vector (branch)
 	// This is so that each item in the map will be a part of each discrete logProb so we can concatonate each one
@@ -111,7 +117,7 @@ GRAVEngine::AI::Training::updateBuffer GRAVEngine::AI::Training::updateBuffer::m
 	updateBuffer buffer;
 
 	// Get the indices that will be copied
-	std::vector<size_t> indices = randomInt((size_t) 0, size(), batchSize);
+	std::vector<size_t> indices = randomInt((size_t) 0, size() - 1, batchSize);
 
 	for (auto it = indices.begin(); it != indices.end(); it++)
 	{
@@ -127,5 +133,5 @@ GRAVEngine::AI::Training::updateBuffer GRAVEngine::AI::Training::updateBuffer::m
 		buffer.m_Returns.push_back(m_Returns[*it]);
 	}
 
-	return updateBuffer();
+	return buffer;
 }

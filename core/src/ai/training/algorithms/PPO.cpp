@@ -53,7 +53,6 @@ void GRAVEngine::AI::Training::Algorithms::PPO::print() const
     GRAV_LOG_LINE_INFO("\nPrint Model:\n%s", ss.str().c_str());
 
 }
-
 void GRAVEngine::AI::Training::Algorithms::PPO::update()
 {
     // Cheeck if there are enough update experiences to be able to update
@@ -90,10 +89,22 @@ void GRAVEngine::AI::Training::Algorithms::PPO::update()
             torch::Tensor advantage = torch::cat(miniBatch.m_Advantages);
             torch::Tensor returns = torch::cat(miniBatch.m_Returns);
 
+            //GRAV_LOG_LINE_INFO("Advantage");
+            //advantage.print();
+            //GRAV_LOG_LINE_INFO("Returns");
+            //returns.print();
+
             // Run through the model
             Models::ActorCritic::actorCriticOputput output = m_Model->operator->()->forward(observation);
             torch::Tensor value = std::get<1>(output);
             torch::Tensor entropy = std::get<2>(std::get<0>(output));
+
+            //GRAV_LOG_LINE_INFO("Critic Value");
+            //value.print();
+            //GRAV_LOG_LINE_INFO("Distribution Entropy");
+            //torch::print(entropy);
+            //GRAV_LOG_LINE_INFO("");
+
             Models::ActorCritic::agentLogProbs newLogProbs = m_Model->operator->()->logProbs(observation, actions);
 
 
@@ -102,16 +113,38 @@ void GRAVEngine::AI::Training::Algorithms::PPO::update()
             torch::Tensor surr1 = ratio * advantage;
             torch::Tensor surr2 = torch::clamp(ratio, 1.0 - clip, 1.0 + clip) * advantage;
 
+            //GRAV_LOG_LINE_INFO("Policy Ratio");
+            //ratio.print();
+            //GRAV_LOG_LINE_INFO("Unclamped Surrogate");
+            //surr1.print();
+            ////torch::print(surr1);
+            ////GRAV_LOG_LINE_INFO("");
+            //GRAV_LOG_LINE_INFO("Clamped Surrogate");
+            //surr2.print();
+            ////torch::print(surr2);
+            ////GRAV_LOG_LINE_INFO("");
+
             // Claculate the actor and critic loss
             torch::Tensor actorLoss = -torch::min(surr1, surr2).mean();
             torch::Tensor criticLoss = (returns - value).pow(2).mean();
 
-            // Calculate the overall loss
-            torch::Tensor loss = 0.5 * criticLoss + actorLoss = 0.001 * entropy;
+            //GRAV_LOG_LINE_INFO("Actor Loss");
+            //torch::print(actorLoss);
+            //GRAV_LOG_LINE_INFO("");
+            //GRAV_LOG_LINE_INFO("Critic Loss");
+            //torch::print(criticLoss);
+            //GRAV_LOG_LINE_INFO("");
 
+            // Calculate the overall loss
+            torch::Tensor loss = 0.5 * criticLoss + actorLoss - 0.001 * entropy;
+
+            //GRAV_LOG_LINE_INFO("Total Loss");
+            //torch::print(loss.sum());
+            //GRAV_LOG_LINE_INFO("");
+            
             // Take a step through the optimization
             m_Optimizer.zero_grad();
-            loss.backward();
+            loss.sum().backward();
             m_Optimizer.step();
         }
     }
@@ -143,7 +176,8 @@ void GRAVEngine::AI::Training::Algorithms::PPO::addTrajectory(trajectory traject
     for (auto it = buffer.m_LogProbs.begin(); it != buffer.m_LogProbs.end(); it++)
     {
         // Detach the continuous log probs
-        it->m_ContinuousActions = it->m_ContinuousActions.detach();
+        if (it->m_ContinuousActions.defined())
+            it->m_ContinuousActions = it->m_ContinuousActions.detach();
 
         // Detach each discrete log prob
         for (auto dis = it->m_DiscreteActions.begin(); dis != it->m_DiscreteActions.end(); dis++)
@@ -163,6 +197,9 @@ void GRAVEngine::AI::Training::Algorithms::PPO::addTrajectory(trajectory traject
         // Have to push back as the assignment operator will not work because the item doesn't exist yet
         buffer.m_Advantages.push_back(buffer.m_Returns[i] - std::get<1>(trajectory.m_Experiences[i].m_ActionInformation));
     }
+
+    // Add to the update buffer the trajectory
+    m_UpdateBuffer.append(buffer);
 }
 
 void GRAVEngine::AI::Training::Algorithms::PPO::sendToDevice(inferenceDevice device)

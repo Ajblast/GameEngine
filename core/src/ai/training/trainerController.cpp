@@ -64,3 +64,9 @@ void GRAVEngine::AI::Training::trainerController::createTrainer(const std::strin
 	// Add the trainer
 	m_Trainers.emplace(programName, t);
 }
+
+void GRAVEngine::AI::Training::trainerController::step()
+{
+	for (auto it = m_Trainers.begin(); it != m_Trainers.end(); it++)
+		it->second->step();
+}

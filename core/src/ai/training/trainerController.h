@@ -25,6 +25,9 @@ namespace GRAVEngine
 				void createTrainer(trainerSettings settings);
 				// Create a trainer for the program and the desired algorithm. Takes ownership of the algorithm
 				void createTrainer(const std::string& programName, scope<ITrainingAlgorithm> algorithm);
+
+				// Step through every trainer
+				void step();
 			private:
 				std::map<std::string, ref<trainer>> m_Trainers;	// List of trainer
 				scope<algorithmFactory> m_AlgorithmFactory;		// The algorithm factory for creating trainers

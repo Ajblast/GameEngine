@@ -322,7 +322,7 @@ void GRAVEngine::AI::agent::step()
 void GRAVEngine::AI::agent::decideAction()
 {
     // Get the actions from the brain or use a default action buffer
-    Actions::actionBuffer actions = m_Brain == nullptr ? m_Brain->decideAction() : Actions::actionBuffer();
+    Actions::actionBuffer actions = m_Brain == nullptr ? Actions::actionBuffer() : m_Brain->decideAction();
 
     // Copy the created actions into the buffer, and pass the new information to the actuators
     m_Info.copyActions(actions);

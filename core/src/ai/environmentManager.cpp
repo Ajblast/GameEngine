@@ -17,11 +17,11 @@ void GRAVEngine::AI::environmentManager::step()
 
 	//GRAV_LOG_LINE_DEBUG("%s: Step environmentManager", GRAV_CLEAN_FUNC_SIG);
 
-	// Increase the stesps
+	// Increase the steps
 	m_StepCount++;
 	m_TotalStepCount++;
 
-	// Increment the agent steps
+	// Increment the agent Steps
 	m_AgentIncrementStepEvent.execute();
 
 	// Send all the agent infos
@@ -32,8 +32,11 @@ void GRAVEngine::AI::environmentManager::step()
 
 	// Act on decided actions
 	m_AgentActEvent.execute();
-}
 
+	// Tell the trainer controller to update all of the algorithms
+	m_TrainerController->step();
+
+}
 void GRAVEngine::AI::environmentManager::reset()
 {
 	Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
@@ -48,7 +51,6 @@ void GRAVEngine::AI::environmentManager::reset()
 
 	// Reset the environment
 	m_OnEnvironmentReset.execute();
-
 	// Reset the agents
 	m_AgentResetEvent.execute();
 }
@@ -56,7 +58,6 @@ void GRAVEngine::AI::environmentManager::reset()
 GRAVEngine::AI::environmentManager::environmentManager() : m_Initialized(false), m_EpisodeCount(0), m_StepCount(0), m_TotalStepCount(0), m_TrainerController(nullptr)
 {
 }
-
 GRAVEngine::AI::environmentManager::~environmentManager()
 {
 	// Guarantee that the trainer deinitializes 
@@ -85,7 +86,6 @@ void GRAVEngine::AI::environmentManager::initialize(scope<Training::algorithmFac
 	//s_Instance = this;
 
 }
-
 void GRAVEngine::AI::environmentManager::deinitialize()
 {
 	Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);

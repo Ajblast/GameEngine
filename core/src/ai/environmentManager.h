@@ -6,6 +6,8 @@
 #include "locks/scopedLock.h"
 #include "ai/training/trainerController.h"
 
+#include "jobs/jobs.h"
+
 namespace GRAVEngine
 {
 	namespace AI
