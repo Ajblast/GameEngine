@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "snakeAgent.h"
 
 snakeAgent::snakeAgent(int wallWidth, int wallHeight, GRAVEngine::AI::programParams params) : 

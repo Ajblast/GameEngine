@@ -21,14 +21,19 @@ public:
 	void onEvent(GRAVEngine::Events::event& event) override;
 private:
 	GRAVEngine::Rendering::editorCamera orthoCam;
+	//GRAVEngine::Rendering::orthographicCamera orthoCam;
 
-	glm::vec4 m_SnakeColor = { 0.2f, 0.3f, 0.8f, 1.0f };
+	glm::vec4 m_WallColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glm::vec4 m_FruitColor = { 1.0f, 0.0f, 0.0f, 1.0f };
+	glm::vec4 m_SnakeColor = { 1.0f, 1.0f, 0.0f, 1.0f };
 
 	GRAVEngine::AI::Models::ActorCritic::actorCritic ac;
 
 	GRAVEngine::ref<snakeAgent> m_Agent;
 	int m_WallWidth = 20, m_WallHeight = 20;
 
-	float fps = 1;
+	float fps = 60;
 	float elapsedTime = 0;
+	float m_TotalTime = 0;
+	float m_DeltaTime = 0;
 };

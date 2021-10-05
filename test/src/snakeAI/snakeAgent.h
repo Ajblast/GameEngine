@@ -33,6 +33,11 @@ public:
 	bodyPosition m_FruitPosition;
 
 	int m_WallWidth = 20, m_WallHeight = 20;
+
+	int fruitsCaptured = 0;
+	int timesMovingBackwards = 0;
+	int wallsHit = 0;
+	int bodyHit = 0;
 };
 
 

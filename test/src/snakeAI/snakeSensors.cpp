@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "snakeSensors.h"
 
 directionSensor::directionSensor(GRAVEngine::ref<snakeAgent> agent) : agent(agent)
