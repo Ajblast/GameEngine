@@ -143,6 +143,9 @@ void GRAVEngine::Rendering::renderer3D::flush()
 		s_Data.m_TextureSlots[i]->bind(i);
 
 	// Draw the quads
+	s_Data.m_TriangleVertexArray->bind();
+	s_Data.m_TextureShader->bind();
+
 	rendererCommand::drawIndexed(s_Data.m_TriangleVertexArray, s_Data.m_TriangleIndexCount);
 	s_Data.m_Stats.m_DrawCalls++;
 }

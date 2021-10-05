@@ -160,6 +160,9 @@ void GRAVEngine::Rendering::renderer2D::flush()
 		s_Data.m_TextureSlots[i]->bind(i);
 
 	// Draw the quads
+	s_Data.m_QuadVertexArray->bind();
+	s_Data.m_TextureShader->bind();
+
 	rendererCommand::drawIndexed(s_Data.m_QuadVertexArray, s_Data.m_QuadIndexCount);
 	s_Data.m_Stats.m_DrawCalls++;
 }
