@@ -41,23 +41,26 @@ void GRAVEngine::instrumentor::endSession()
 }
 void GRAVEngine::instrumentor::writeProfile(const profileResult& result)
 {
-	std::stringstream json;
-
-	json << std::setprecision(3) << std::fixed;
-	json << ",{";
-	json << "\"cat\":\"function\",";
-	json << "\"dur\":" << (result.m_ElapsedDuration.count()) << ',';
-	json << "\"name\":\"" << result.m_ProfileName << "\",";
-	json << "\"ph\":\"X\",";
-	json << "\"pid\":0,";
-	json << "\"tid\":" << result.m_ThreadID << ",";
-	json << "\"ts\":" << result.m_StartPoint.count();
-	json << "}";
-
-	// Output the file if the current session is a valid one
 	Locks::scopedLock<decltype(m_Lock)> lock(m_Lock);
+
 	if (m_CurrentSession)
-		m_OutputFile.write(json.str());
+	{
+		std::stringstream json;
+
+		//json << std::setprecision(3) << std::fixed;
+		//json << ",{";
+		//json << "\"cat\":\"function\",";
+		//json << "\"dur\":" << (result.m_ElapsedDuration.count()) << ',';
+		//json << "\"name\":\"" << result.m_ProfileName << "\",";
+		//json << "\"ph\":\"X\",";
+		//json << "\"pid\":0,";
+		//json << "\"tid\":" << result.m_ThreadID << ",";
+		//json << "\"ts\":" << result.m_StartPoint.count();
+		//json << "}";
+
+		// Output the file if the current session is a valid one
+		//m_OutputFile.write(json.str());
+	}
 }
 void GRAVEngine::instrumentor::internalEndSession()
 {
