@@ -1,7 +1,8 @@
+#include "pch.h"
 #include "Test2D.h"
 #include <imgui/imgui.h>
 
-Test2D::Test2D() : layer("Test2D"), orthoCam(-1.778, 1.778, -1, 1)
+Test2D::Test2D() : layer("Test2D"), orthoCam(-1.778, 1.778, -1, 1, 0.1f, 100.0f)
 {
 	orthoCam.setPosition({ 0,0,0 });
 	orthoCam.setRotation({ 0, 0, 0 });
@@ -17,7 +18,7 @@ void Test2D::onDetach()
 
 void Test2D::onUpdate(GRAVEngine::Time::timestep ts)
 {
-	//orthoCam.OnUpdate(ts);
+	orthoCam.OnUpdate(ts);
 	
 	GRAVEngine::Rendering::renderer2D::resetStats();
 

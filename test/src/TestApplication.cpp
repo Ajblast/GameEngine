@@ -1,3 +1,4 @@
+#include "pch.h"
 #include <GRAVEngine.h>
 #include <entryPoint.h>
 
@@ -12,8 +13,8 @@ public:
 	{
 		GRAV_LOG_LINE_INFO("%s: Test App Constructor", __FUNCTION__);
 		//pushLayer(new Test());
-		pushLayer(new Test2D());
-		//pushLayer(new Snake());
+		//pushLayer(new Test2D());
+		pushLayer(new Snake());
 	}
 
 	~testApp()
