@@ -9,11 +9,11 @@
 #define GRAV_JOB_ENTRY_POINT(jobName) void jobName(uintptr_t param)
 #define GRAV_KICK_JOB(declaration)					GRAVEngine::Jobs::jobManager::getInstance()->kickJob(declaration)
 #define GRAV_KICK_JOBS(declarations, count)			GRAVEngine::Jobs::jobManager::getInstance()->kickJobs(declarations, count)
-#define GRAV_KICK_JOB_WAIT(declatation)				GRAVEngine::Jobs::jobManager::getInstance()->kickJobAndWait(declaration)
+#define GRAV_KICK_JOB_WAIT(declaration)				GRAVEngine::Jobs::jobManager::getInstance()->kickJobAndWait(declaration)
 #define GRAV_KICK_JOBS_WAIT(declarations, count)	GRAVEngine::Jobs::jobManager::getInstance()->kickJobsAndWait(declarations, count)
 
 #define GRAV_WAIT_COUNTER(counter, target)			GRAVEngine::Jobs::jobManager::getInstance()->waitForCounter(counter, target)
-#define GRAV_WAIT_COUNTER_FREE(counter, target)		GRAV_WAIT_COUNTER(counter, target); delete counter
+#define GRAV_WAIT_COUNTER_FREE(counter, target)		GRAV_WAIT_COUNTER(counter, target); //delete counter
 
 // TODO: Fix GRAV_WAIT_COUNTER_FREE for memory management
 
