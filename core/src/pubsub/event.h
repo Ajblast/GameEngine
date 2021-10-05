@@ -3,6 +3,7 @@
 #include "common.h"
 #include "locks/scopedLock.h"
 #include "locks/spinLock.h"
+#include "jobs/jobs.h"
 #include <functional>
 #include <vector>
 
@@ -66,23 +67,20 @@ namespace GRAVEngine
 			{
 				Locks::scopedLock<decltype(m_VectorLock)> lock(m_VectorLock);
 
+				ref<Jobs::counter> counter = createRef<Jobs::counter>();
+
 				for (auto it = m_Events.begin(); it != m_Events.end(); it++)
 				{
-					it->m_CallbackFunction(args...);
-					//(*it)(args...);
+					Jobs::declaration decl = Jobs::declaration([it](uintptr_t) {it->m_CallbackFunction(args...); }, 0, Jobs::jobPriority::NORMAL, counter);
+
+					GRAV_KICK_JOB(decl);
+
+					//it->m_CallbackFunction(args...);
 				}
+
+				// Wait for all of the jobs
+				GRAV_WAIT_COUNTER(counter, 0);
 			}
-
-			//// Execute with zero arguments
-			//void execute()
-			//{
-			//	Locks::scopedLock<decltype(m_VectorLock)> lock(m_VectorLock);
-
-			//	for (auto it = m_Events.begin(); it != m_Events.end(); it++)
-			//	{
-			//		(*it)();
-			//	}
-			//}
 
 			// Reset the event
 			void clear()
