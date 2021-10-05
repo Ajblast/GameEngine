@@ -114,9 +114,6 @@ void GRAVEngine::application::run()
 			}
 			// End updating the ImGuiLayer
 			m_ImGuiLayer->end();
-
-
-			// TODO: Critical test time to make sure it is actually working
 		}
 
 		// TODO: Update the window
