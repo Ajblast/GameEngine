@@ -1,4 +1,6 @@
 #pragma once
 
-#include <torch/torch.h>
 #include <GRAVEngine.h>
+#include "snakeAI/snakeAgent.h"
+#include "snakeAI/snakeSensors.h"
+#include "snakeAI/snakeActuators.h"
