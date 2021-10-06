@@ -141,7 +141,7 @@ void GRAVEngine::AI::agent::sendInfoToBrain()
 void GRAVEngine::AI::agent::sortSensors()
 {
     // Sort the actuators by name
-    std::sort(m_Sensors.begin(), m_Sensors.end(), [](ref<Sensors::ISensor> lhs, ref<Sensors::ISensor> rhs) {return lhs->getName().compare(rhs->getName()); });
+    std::sort(m_Sensors.begin(), m_Sensors.end(), [](ref<Sensors::ISensor> lhs, ref<Sensors::ISensor> rhs) {return lhs->getName() < rhs->getName(); });
 }
 void GRAVEngine::AI::agent::validateSensors()
 {
