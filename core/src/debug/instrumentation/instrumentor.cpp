@@ -47,19 +47,22 @@ void GRAVEngine::instrumentor::writeProfile(const profileResult& result)
 	{
 		std::stringstream json;
 
-		//json << std::setprecision(3) << std::fixed;
-		//json << ",{";
-		//json << "\"cat\":\"function\",";
-		//json << "\"dur\":" << (result.m_ElapsedDuration.count()) << ',';
-		//json << "\"name\":\"" << result.m_ProfileName << "\",";
-		//json << "\"ph\":\"X\",";
-		//json << "\"pid\":0,";
-		//json << "\"tid\":" << result.m_ThreadID << ",";
-		//json << "\"ts\":" << result.m_StartPoint.count();
-		//json << "}";
+		auto elapsedDurationCount = result.m_ElapsedDuration.count();
+		auto startPoint = result.m_StartPoint.count();
+
+		json << std::setprecision(3) << std::fixed;
+		json << ",{";
+		json << "\"cat\":\"function\",";
+		json << "\"dur\":" << elapsedDurationCount << ',';
+		json << "\"name\":\"" << result.m_ProfileName << "\",";
+		json << "\"ph\":\"X\",";
+		json << "\"pid\":0,";
+		json << "\"tid\":" << result.m_ThreadID << ",";
+		json << "\"ts\":" << startPoint;
+		json << "}";
 
 		// Output the file if the current session is a valid one
-		//m_OutputFile.write(json.str());
+		m_OutputFile.write(json.str());
 	}
 }
 void GRAVEngine::instrumentor::internalEndSession()
