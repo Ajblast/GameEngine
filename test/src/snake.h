@@ -27,8 +27,6 @@ private:
 	glm::vec4 m_FruitColor = { 1.0f, 0.0f, 0.0f, 1.0f };
 	glm::vec4 m_SnakeColor = { 1.0f, 1.0f, 0.0f, 1.0f };
 
-	GRAVEngine::AI::Models::ActorCritic::actorCritic ac;
-
 	GRAVEngine::ref<snakeAgent> m_Agent;
 	int m_WallWidth = 20, m_WallHeight = 20;
 
