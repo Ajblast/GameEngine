@@ -10,7 +10,7 @@ namespace GRAVEngine
 		namespace Sensors
 		{
 			// Sensor that uses an internal buffer to hold multiple observations
-			class bufferSensor : public ISensor
+			class GRAVAPI bufferSensor : public ISensor
 			{
 			public:
 				bufferSensor(size_t obsCapacity, size_t obsSize, std::string name);

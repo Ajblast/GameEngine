@@ -10,7 +10,7 @@ namespace GRAVEngine
 {
 	namespace AI
 	{
-		class inferenceProgram : public IAgentProgram
+		class GRAVAPI inferenceProgram : public IAgentProgram
 		{
 		public:
 			inferenceProgram(ref<Models::model> model);

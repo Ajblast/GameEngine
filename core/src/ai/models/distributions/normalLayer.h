@@ -13,7 +13,7 @@ namespace GRAVEngine
 			namespace Decoders
 			{
 				// A normal layer that creates a distribution for a continuous action space
-				class normalLayerImpl : public torch::nn::Module
+				class GRAVAPI normalLayerImpl : public torch::nn::Module
 				{
 				public:
 					// Default Constructor

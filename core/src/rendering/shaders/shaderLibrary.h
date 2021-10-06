@@ -11,7 +11,7 @@ namespace GRAVEngine
 	namespace Rendering
 	{
 		// Simple library to hold shaders
-		class shaderLibrary
+		class GRAVAPI shaderLibrary
 		{
 		public:
 			// Add a shader to this library

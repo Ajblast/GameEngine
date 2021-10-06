@@ -7,7 +7,7 @@ namespace GRAVEngine
 	namespace Locks
 	{
 		template<class LOCK>
-		class scopedLock
+		class GRAVAPI scopedLock
 		{
 			typedef LOCK lock_t;
 			lock_t* m_pLock;

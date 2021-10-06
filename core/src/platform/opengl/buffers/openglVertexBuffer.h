@@ -6,7 +6,7 @@ namespace GRAVEngine
 {
 	namespace Rendering
 	{
-		class openglVertexBuffer : public vertexBuffer
+		class GRAVAPI openglVertexBuffer : public vertexBuffer
 		{
 		public:
 			// Create a vertex buffer with dynamic data

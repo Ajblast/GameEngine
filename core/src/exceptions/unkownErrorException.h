@@ -6,7 +6,7 @@ namespace GRAVEngine
 {
 	namespace Exceptions
 	{
-		class unknownErrorException : public std::exception
+		class GRAVAPI unknownErrorException : public std::exception
 		{
 		public:
 			unknownErrorException(const std::string& description) : std::exception(description.c_str()) {}

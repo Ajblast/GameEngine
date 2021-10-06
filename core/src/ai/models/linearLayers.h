@@ -10,7 +10,7 @@ namespace GRAVEngine
 		namespace Models
 		{
 			// A module that represents the body to a network body. All of the linear layers
-			class linearLayersImpl : public torch::nn::Module
+			class GRAVAPI linearLayersImpl : public torch::nn::Module
 			{
 			public:
 				// Default linear layers. Empty sequential module

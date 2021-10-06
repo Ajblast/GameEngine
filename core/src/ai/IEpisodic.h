@@ -7,7 +7,7 @@ namespace GRAVEngine
 {
 	namespace AI
 	{
-		class IEpisodic
+		class GRAVAPI IEpisodic
 		{
 		public:
 			IEpisodic() = default;

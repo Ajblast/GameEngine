@@ -10,7 +10,7 @@ namespace GRAVEngine
 		namespace Tensors
 		{
 			// Interface on how to store tensor data
-			class ITensorData
+			class GRAVAPI ITensorData
 			{
 			public:
 				ITensorData() {}

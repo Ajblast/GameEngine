@@ -14,7 +14,7 @@ namespace GRAVEngine
 			namespace ActorCritic
 			{
 				// The actor of an actor-critic network
-				class actorImpl : public torch::nn::Module
+				class GRAVAPI actorImpl : public torch::nn::Module
 				{
 				public:
 					// Required default constructor

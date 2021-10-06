@@ -9,7 +9,7 @@ namespace GRAVEngine
 	namespace Rendering
 	{
 		// Abstract Renderer Command
-		class rendererCommand
+		class GRAVAPI rendererCommand
 		{
 		public:
 			// Startup the rendering command system. Creates the renderer API

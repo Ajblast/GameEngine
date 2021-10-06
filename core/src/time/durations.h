@@ -17,7 +17,7 @@ namespace GRAVEngine
 		typedef std::chrono::duration<float, std::ratio<60>>		minutes;
 		typedef std::chrono::duration<float, std::ratio<3600>>		hours;
 
-		constexpr timeDurationCount clockFrequency()
+		GRAVAPI constexpr timeDurationCount clockFrequency()
 		{
 			return std::chrono::steady_clock::period::den;
 		}

@@ -17,7 +17,7 @@ namespace GRAVEngine
 		typedef uint16 fiberIndex;
 		typedef void* fiberHandle;
 
-		class fiber
+		class GRAVAPI fiber
 		{
 		public:
 			// Callback for fiber function

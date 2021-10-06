@@ -46,12 +46,12 @@ namespace GRAVEngine
 			GRAVEngine_VERBOSITY_STRING_TRACE
 		};
 
-		inline const char* toString(GRAVEngine::Logging::verbosity verbosity)
+		GRAVAPI inline const char* toString(GRAVEngine::Logging::verbosity verbosity)
 		{
 			return verbosityNames[static_cast<int>(verbosity)];
 		}
 
-		inline GRAVEngine::Logging::verbosity logVerbosityToEnum(const char* name)
+		GRAVAPI inline GRAVEngine::Logging::verbosity logVerbosityToEnum(const char* name)
 		{
 			int level = 0;
 

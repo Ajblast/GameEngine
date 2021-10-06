@@ -10,7 +10,7 @@ namespace GRAVEngine
 		namespace Sensors
 		{
 			// Abstract writer for an observation
-			class observationWriter
+			class GRAVAPI observationWriter
 			{
 			public:
 				observationWriter(observationParams params);

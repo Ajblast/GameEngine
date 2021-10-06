@@ -8,7 +8,7 @@ namespace GRAVEngine
 {
 	namespace Exceptions
 	{
-		class invalidArgumentException : public std::invalid_argument
+		class GRAVAPI invalidArgumentException : public std::invalid_argument
 		{
 		public:
 			invalidArgumentException(const std::string& description) : std::invalid_argument(description) {}

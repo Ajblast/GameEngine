@@ -13,7 +13,7 @@ namespace GRAVEngine
 		namespace Training
 		{
 			// Factory to create algorithms and hyperparameters for a training algorithm
-			class algorithmFactory
+			class GRAVAPI algorithmFactory
 			{
 			public:
 				algorithmFactory() = default;

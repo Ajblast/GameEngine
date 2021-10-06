@@ -16,7 +16,7 @@ namespace GRAVEngine
 		namespace Training
 		{
 			// Interface for a training algorithm
-			class ITrainingAlgorithm
+			class GRAVAPI ITrainingAlgorithm
 			{
 			public:
 				ITrainingAlgorithm() = default;

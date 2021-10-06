@@ -23,7 +23,7 @@ namespace GRAVEngine
 		// TODO: Allow asynchronous logging
 		// TODO: Allow flushing of the sinks in interval time
 
-		class logManager
+		class GRAVAPI logManager
 		{
 		public:
 			explicit logManager() {}

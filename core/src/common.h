@@ -15,6 +15,15 @@
 #define GRAV_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
 
 
+#ifdef GRAV_PLATFORM_WINDOWS
+#ifdef GRAV_DLL
+#define GRAVAPI __declspec(dllexport)
+#else
+#define GRAVAPI __declspec(dllimport)
+#endif
+#endif
+
+
 #include "memory/pointers/pointers.h"
 #include "types/dataPrimitives.h"
 #include "assertion.h"

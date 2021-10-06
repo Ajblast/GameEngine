@@ -11,7 +11,7 @@ namespace GRAVEngine
 {
 	namespace Rendering
 	{
-		class camera
+		class GRAVAPI camera
 		{
 		public:
 			camera() = default;

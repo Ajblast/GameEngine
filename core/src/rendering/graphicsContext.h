@@ -6,7 +6,7 @@ namespace GRAVEngine
 {
 	namespace Rendering
 	{
-		class graphicsContext
+		class GRAVAPI graphicsContext
 		{
 		public:
 			// Startup a context

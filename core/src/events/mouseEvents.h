@@ -9,7 +9,7 @@ namespace GRAVEngine
 {
 	namespace Events
 	{
-		class mouseMovedEvent : public event
+		class GRAVAPI mouseMovedEvent : public event
 		{
 		public:
 			mouseMovedEvent(const float x, const float y)
@@ -31,7 +31,7 @@ namespace GRAVEngine
 			float m_MouseX, m_MouseY;
 		};
 
-		class mouseScrolledEvent : public event
+		class GRAVAPI mouseScrolledEvent : public event
 		{
 		public:
 			mouseScrolledEvent(const float xOffset, const float yOffset)
@@ -53,7 +53,7 @@ namespace GRAVEngine
 			float m_XOffset, m_YOffset;
 		};
 
-		class mouseButtonEvent : public event
+		class GRAVAPI mouseButtonEvent : public event
 		{
 		public:
 			Mouse::mouseCode getMouseButton() const { return m_Button; }
@@ -66,7 +66,7 @@ namespace GRAVEngine
 			Mouse::mouseCode m_Button;
 		};
 
-		class mouseButtonPressedEvent : public mouseButtonEvent
+		class GRAVAPI mouseButtonPressedEvent : public mouseButtonEvent
 		{
 		public:
 			mouseButtonPressedEvent(const Mouse::mouseCode button)
@@ -82,7 +82,7 @@ namespace GRAVEngine
 			EVENT_CLASS_TYPE(mouseButtonPressed)
 		};
 
-		class mouseButtonReleasedEvent : public mouseButtonEvent
+		class GRAVAPI mouseButtonReleasedEvent : public mouseButtonEvent
 		{
 		public:
 			mouseButtonReleasedEvent(const Mouse::mouseCode button)

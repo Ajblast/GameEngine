@@ -16,7 +16,7 @@
 
 namespace GRAVEngine
 {
-	struct profileResult
+	struct GRAVAPI profileResult
 	{
 		std::string m_ProfileName;
 
@@ -28,14 +28,14 @@ namespace GRAVEngine
 		// TODO: Memory allocated
 		// TODO: Memory deallocated
 	};
-	struct instrumentationSession
+	struct GRAVAPI instrumentationSession
 	{
 		// TODO: Track memory allocations/deallocations
 		// TODO: Potentially stop/pause a profiling session when a job is taken off and waiting for other 
 		std::string m_SessionName;
 	};
 
-	class instrumentor
+	class GRAVAPI instrumentor
 	{
 	public:
 		instrumentor() : m_CurrentSession(nullptr) {}	// Private default constructor
@@ -66,7 +66,7 @@ namespace GRAVEngine
 		IO::textFile m_OutputFile;
 	};
 
-	class instrumentorStopwatch
+	class GRAVAPI instrumentorStopwatch
 	{
 	public:
 		instrumentorStopwatch(const char* name) : m_Name(name)
@@ -92,7 +92,7 @@ namespace GRAVEngine
 				m_Name,
 				Time::microseconds(stopwatch.startTick().time_since_epoch()),
 				stopwatch.elapsedMicrosecondsDuration(),
-				GRAVEngine::Jobs::jobManager::getInstance() == nullptr ? UINT32_MAX : GRAVEngine::Jobs::jobManager::getInstance()->getCurrentThreadID()
+				GRAVEngine::Jobs::jobManager::getInstance() == nullptr ? UINT8_MAX : GRAVEngine::Jobs::jobManager::getInstance()->getCurrentThreadIndex()
 				});
 		}
 	private:
@@ -102,7 +102,7 @@ namespace GRAVEngine
 
 }
 
-#define GRAV_PROFILE_LOG_CONSOLE 0
+#define GRAV_PROFILE_LOG_CONSOLE 1
 #define GRAV_PROFILE 1
 #if GRAV_PROFILE
 	#define GRAV_PROFILE_START_SESSION(name, filepath) GRAVEngine::instrumentor::getInstance()->startSession(name, filepath)

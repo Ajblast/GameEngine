@@ -6,7 +6,7 @@ namespace GRAVEngine
 {
 	namespace Exceptions
 	{
-		class counterWaitListFullException : public std::runtime_error
+		class GRAVAPI counterWaitListFullException : public std::runtime_error
 		{
 		public:
 			explicit counterWaitListFullException(const std::string& description) : std::runtime_error(description) {}

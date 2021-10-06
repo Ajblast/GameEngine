@@ -16,7 +16,7 @@ namespace GRAVEngine
 		{
 			enum class importerUnits{ M, MM, CM, INCHES, FEET };
 
-			class importer
+			class GRAVAPI importer
 			{
 			public:
 				importer() : m_ImporterScale(1), m_FileScale(1) {}

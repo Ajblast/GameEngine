@@ -8,7 +8,7 @@ namespace GRAVEngine
 	{
 		// Buffer to store indexes. Only 32-bit max number of 32-bit indexes are supported.
 		// Tells which vertexes should be rendered in a vertex buffer
-		class indexBuffer
+		class GRAVAPI indexBuffer
 		{
 		public:
 			virtual ~indexBuffer() = default;

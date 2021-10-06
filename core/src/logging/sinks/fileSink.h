@@ -12,7 +12,7 @@ namespace GRAVEngine
 		{
 			// TODO: Opening/Writing/Closing files
 
-			class fileSink final : public baseSink
+			class GRAVAPI fileSink final : public baseSink
 			{
 			public:
 				explicit fileSink(const std::string& filePath, bool truncate = false);

@@ -17,13 +17,13 @@ namespace GRAVEngine
 			BINARY		= std::fstream::binary,	// Open the file in binary mode
 		};
 
-		fileMode operator |(fileMode lhs, fileMode rhs);
-		fileMode operator &(fileMode lhs, fileMode rhs);
-		fileMode operator ^(fileMode lhs, fileMode rhs);
-		fileMode operator ~(fileMode rhs);
-		fileMode& operator |=(fileMode& lhs, fileMode rhs);
-		fileMode& operator &=(fileMode& lhs, fileMode rhs);
-		fileMode& operator ^=(fileMode& lhs, fileMode rhs);
+		GRAVAPI fileMode operator |(fileMode lhs, fileMode rhs);
+		GRAVAPI fileMode operator &(fileMode lhs, fileMode rhs);
+		GRAVAPI fileMode operator ^(fileMode lhs, fileMode rhs);
+		GRAVAPI fileMode operator ~(fileMode rhs);
+		GRAVAPI fileMode& operator |=(fileMode& lhs, fileMode rhs);
+		GRAVAPI fileMode& operator &=(fileMode& lhs, fileMode rhs);
+		GRAVAPI fileMode& operator ^=(fileMode& lhs, fileMode rhs);
 
 	}
 }

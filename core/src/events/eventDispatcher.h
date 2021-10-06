@@ -11,7 +11,7 @@ namespace GRAVEngine
 		// Events are currently blocking. Events are immediately dispatched and must be dealt with then and there.
 		// For future, a better strategy migh be to buffer events in an event bus and process them during the "event" part of the update stage
 
-		class eventDispatcher
+		class GRAVAPI eventDispatcher
 		{
 		public:
 			eventDispatcher(event& event) : m_Event(event) {}

@@ -15,7 +15,7 @@ namespace GRAVEngine
 		{
 			namespace ActorCritic
 			{
-				class valueNetworkImpl : public criticImpl
+				class GRAVAPI valueNetworkImpl : public criticImpl
 				{
 				public:
 					// Required default constructor

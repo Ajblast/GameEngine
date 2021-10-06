@@ -9,7 +9,7 @@ namespace GRAVEngine
 	{
 		namespace Actions
 		{
-			class IActionReciever
+			class GRAVAPI IActionReciever
 			{
 			public:
 				IActionReciever() {}

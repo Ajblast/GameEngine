@@ -8,29 +8,19 @@ namespace GRAVEngine
 	namespace Time
 	{
 		// Simple representation of a step in time
-		class timestep
+		class GRAVAPI timestep
 		{
 		public:
 			// Clock start and stop points
-			timestep(timePoint startTick, timePoint endTick) : m_Time(endTick - startTick) {}
+			timestep(timePoint startTick, timePoint endTick);
 			// The amount of time in nanoseconds
-			timestep(timeDurationCount time = 0) : m_Time(time) {}
+			timestep(timeDurationCount time);
 			// The amount of time in seconds
-			timestep(float time = 0.0f) : m_Time(std::chrono::duration_cast<nanoseconds>(seconds(time))) {}
+			timestep(float time = 0.0f);
 
-			operator float() const
-			{
-				return std::chrono::duration_cast<seconds>(m_Time).count();
-			}
-
-			double getSeconds() const
-			{
-				return std::chrono::duration_cast<seconds>(m_Time).count();
-			}
-			double getMilliseconds() const
-			{
-				return std::chrono::duration_cast<milliseconds>(m_Time).count();
-			}
+			operator float() const;
+			double getSeconds() const;
+			double getMilliseconds() const;
 
 		private:
 			// The elapsed duration in nanoseconds

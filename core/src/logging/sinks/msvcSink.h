@@ -11,7 +11,7 @@ namespace GRAVEngine
 		namespace Sinks
 		{
 
-			class msvcSink : public baseSink
+			class GRAVAPI msvcSink : public baseSink
 			{
 			public:
 				msvcSink() = default;

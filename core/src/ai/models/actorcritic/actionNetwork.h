@@ -17,7 +17,7 @@ namespace GRAVEngine
 			namespace ActorCritic
 			{
 				// Module that represents a simple actor
-				class actionNetworkImpl : public actorImpl
+				class GRAVAPI actionNetworkImpl : public actorImpl
 				{
 				public:
 					// Required default constructor

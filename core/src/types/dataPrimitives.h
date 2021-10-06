@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include "common.h"
 
 namespace GRAVEngine
 {
@@ -59,7 +60,7 @@ namespace GRAVEngine
 	/// </summary>
 	/// <param name="value">The Value.</param>
 	/// <returns></returns>
-	inline uint16 swapU16(uint16 value)
+	GRAVAPI inline uint16 swapU16(uint16 value)
 	{
 		return	((value & 0x00FF) << 8) 
 			|	((value & 0xFF00) >> 8);
@@ -70,7 +71,7 @@ namespace GRAVEngine
 	/// </summary>
 	/// <param name="value">The Value.</param>
 	/// <returns></returns>
-	inline uint32 swapU32(uint32 value)
+	GRAVAPI inline uint32 swapU32(uint32 value)
 	{
 		return	((value & 0x000000FF) << 24) 
 			|	((value & 0x0000FF00) << 8)
@@ -83,7 +84,7 @@ namespace GRAVEngine
 	/// </summary>
 	/// <param name="value">The Value.</param>
 	/// <returns></returns>
-	inline uint64 swapU64(uint64 value)
+	GRAVAPI inline uint64 swapU64(uint64 value)
 	{
 		return	((value & 0x00000000000000FF) << 56) 
 			|	((value & 0x000000000000FF00) << 40)

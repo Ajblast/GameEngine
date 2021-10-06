@@ -7,7 +7,7 @@ namespace GRAVEngine
 {
 	namespace Rendering
 	{
-		class texture2D : public texture
+		class GRAVAPI texture2D : public texture
 		{
 		public:
 			texture2D(uint32 width, uint32 height) : m_Width(width), m_Height(height), m_RendererID(0) {}

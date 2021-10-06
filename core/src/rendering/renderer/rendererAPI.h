@@ -14,7 +14,7 @@ namespace GRAVEngine
 	namespace Rendering
 	{
 		// Generic interface for a rendering API
-		class rendererAPI
+		class GRAVAPI rendererAPI
 		{
 		public:
 			enum class API

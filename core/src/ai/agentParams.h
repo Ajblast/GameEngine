@@ -7,7 +7,7 @@ namespace GRAVEngine
 	namespace AI
 	{
 		// Parameters about an agent
-		struct agentParams
+		struct GRAVAPI agentParams
 		{
 		public:
 			uint32 m_EpisodeCount;	// Number of episodes the agent has completed

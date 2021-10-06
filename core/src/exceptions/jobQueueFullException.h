@@ -6,7 +6,7 @@ namespace GRAVEngine
 {
 	namespace Exceptions
 	{
-		class jobQueueFullException : public std::runtime_error
+		class GRAVAPI jobQueueFullException : public std::runtime_error
 		{
 		public:
 			explicit jobQueueFullException(const std::string& description) : std::runtime_error(description) {}

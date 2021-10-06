@@ -22,15 +22,15 @@ namespace GRAVEngine
 	namespace AI
 	{
 		// Agent used for
-		class agent : public IRewardable, IEpisodic
+		class GRAVAPI agent : public IRewardable, IEpisodic
 		{
 		public:
 			// Default agent that can only use collectObservations
 			agent(programParams programParams);
 			// Agent with premade sensors. Will initialize
 			agent(std::vector<ref<Sensors::ISensor>>& sensors, std::vector<ref<Actions::IActuator>>& actuators, programParams programParams);
-			agent(agent&& other) noexcept;
-			agent& operator=(agent&& other) noexcept;
+			//agent(agent&& other) noexcept;
+			//agent& operator=(agent&& other) noexcept;
 
 			virtual ~agent();
 

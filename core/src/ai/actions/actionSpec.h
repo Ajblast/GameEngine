@@ -8,7 +8,7 @@ namespace GRAVEngine
 	{
 		namespace Actions
 		{
-			struct actionSpec
+			struct GRAVAPI actionSpec
 			{
 			public:
 				// Default constructor

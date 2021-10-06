@@ -17,7 +17,7 @@ namespace GRAVEngine
 
 		// Genertic interface for a renderer. A Renderer uses a rendering API
 		// Examples include 2D renderers, 3D renderers, wireframe renderers
-		class renderer
+		class GRAVAPI renderer
 		{
 		public:
 			// Statup the renderer

@@ -8,7 +8,7 @@ namespace GRAVEngine
 {
 	namespace Events
 	{
-		class keyEvent : public event
+		class GRAVAPI keyEvent : public event
 		{
 		public:
 			Keys::keyCode getKeyCode() const { return m_KeyCode; }
@@ -20,7 +20,7 @@ namespace GRAVEngine
 			Keys::keyCode m_KeyCode;
 		};
 
-		class keyPressedEvent : public keyEvent
+		class GRAVAPI keyPressedEvent : public keyEvent
 		{
 		public:
 			keyPressedEvent(const Keys::keyCode keycode, const uint16 repeatCount)
@@ -41,7 +41,7 @@ namespace GRAVEngine
 			uint16 m_RepeatCount;
 		};
 
-		class keyReleasedEvent : public keyEvent
+		class GRAVAPI keyReleasedEvent : public keyEvent
 		{
 		public:
 			keyReleasedEvent(const Keys::keyCode keycode)
@@ -57,7 +57,7 @@ namespace GRAVEngine
 			EVENT_CLASS_TYPE(keyReleased)
 		};
 
-		class KeyTypedEvent : public keyEvent
+		class GRAVAPI KeyTypedEvent : public keyEvent
 		{
 		public:
 			KeyTypedEvent(const Keys::keyCode keycode)

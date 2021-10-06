@@ -6,7 +6,7 @@ namespace GRAVEngine
 {
 	namespace Rendering
 	{
-		class openglIndexBuffer : public indexBuffer
+		class GRAVAPI openglIndexBuffer : public indexBuffer
 		{
 		public:
 			// Create an index buffer with that has the current indices

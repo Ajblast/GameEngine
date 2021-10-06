@@ -14,7 +14,7 @@ namespace GRAVEngine
 			namespace Decoders
 			{
 				// A categorical layer that creates distributions for different discrete action branches
-				class multicategoricalLayerImpl : public torch::nn::Module
+				class GRAVAPI multicategoricalLayerImpl : public torch::nn::Module
 				{
 				public:
 					// Default Constructor

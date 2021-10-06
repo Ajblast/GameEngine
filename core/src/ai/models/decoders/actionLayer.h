@@ -16,7 +16,7 @@ namespace GRAVEngine
 			namespace Decoders
 			{
 				// An action layer will take the hidden outputs from a network and generate the actions, log probabilities, and entropy
-				class actionLayerImpl : public torch::nn::Module
+				class GRAVAPI actionLayerImpl : public torch::nn::Module
 				{
 				public:
 					// Required default constructor

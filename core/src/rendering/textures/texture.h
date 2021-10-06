@@ -7,7 +7,7 @@ namespace GRAVEngine
 {
 	namespace Rendering
 	{
-		class texture
+		class GRAVAPI texture
 		{
 		public:
 			virtual ~texture() = default;

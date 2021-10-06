@@ -16,7 +16,7 @@ namespace GRAVEngine
 			namespace ActorCritic
 			{
 				// A module that represents both the actor and critic in an actor critic model
-				class actorCriticImpl : public modelImpl
+				class GRAVAPI actorCriticImpl : public modelImpl
 				{
 				public:
 					// Required default constructor

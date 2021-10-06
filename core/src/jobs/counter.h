@@ -11,7 +11,7 @@ namespace GRAVEngine
 	{
 		typedef uint32 counterTarget;
 
-		class counter
+		class GRAVAPI counter
 		{
 		public:
 			counter();

@@ -6,7 +6,7 @@ namespace GRAVEngine
 {
 	namespace Exceptions
 	{
-		class threadCreationException : public std::runtime_error
+		class GRAVAPI threadCreationException : public std::runtime_error
 		{
 		public:
 			explicit threadCreationException(const std::string& description) : std::runtime_error(description) {}

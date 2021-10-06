@@ -9,7 +9,7 @@ namespace GRAVEngine
 		namespace Training
 		{
 			// Hyperparameters for all training algorithms
-			struct hyperparameters
+			struct GRAVAPI hyperparameters
 			{
 			public:
 				hyperparameters() = default;

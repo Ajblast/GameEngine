@@ -3,14 +3,14 @@ project "GLAD"
     language "C"
     staticruntime "on"    
 
-    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
-    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+    targetdir ("bin\\" .. outputdir .. "\\%{prj.name}")
+    objdir ("bin-int\\" .. outputdir .. "\\%{prj.name}")
 
     files
     {
-        "include/glad/glad.h",
-        "include/KHR/khrplatform.h",
-        "src/glad.c"
+        "include\\glad\\glad.h",
+        "include\\KHR\\khrplatform.h",
+        "src\\glad.c"
     }
 
     includedirs
@@ -20,6 +20,11 @@ project "GLAD"
 
     filter "system:windows"
         systemversion "latest"
+
+        --postbuildcommands
+		--{
+		--	"{COPYDIR} %{cfg.buildtarget.bundlepath} ../bin/" .. outputdir
+		--}
 
     filter "configurations:Debug"
         runtime "Debug"

@@ -13,7 +13,7 @@ namespace GRAVEngine
 			namespace Decoders
 			{
 				// A value layer will take the output from the network and get the values from it. e.g.., for the critic
-				class valueLayerImpl : public torch::nn::Module
+				class GRAVAPI valueLayerImpl : public torch::nn::Module
 				{
 				public:
 					// Required default constructor

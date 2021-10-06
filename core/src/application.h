@@ -17,7 +17,7 @@ int main(int argc, char** argv);
 
 namespace GRAVEngine
 {
-	class application
+	class GRAVAPI application
 	{
 	public:
 		application(const std::string& name = "GRAVEngine Application");
@@ -67,5 +67,5 @@ namespace GRAVEngine
 	};
 
 	// Defined in the client
-	application* createApplication();
+	GRAVAPI application* createApplication();
 }

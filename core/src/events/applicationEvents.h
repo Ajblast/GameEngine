@@ -7,7 +7,7 @@ namespace GRAVEngine
 {
 	namespace Events
 	{
-		class windowResizeEvent : public event
+		class GRAVAPI windowResizeEvent : public event
 		{
 		public:
 			windowResizeEvent(unsigned int width, unsigned int height)
@@ -29,7 +29,7 @@ namespace GRAVEngine
 			unsigned int m_Width, m_Height;
 		};
 
-		class windowCloseEvent : public event
+		class GRAVAPI windowCloseEvent : public event
 		{
 		public:
 			windowCloseEvent() = default;
@@ -38,7 +38,7 @@ namespace GRAVEngine
 			EVENT_CLASS_CATEGORY(eventCategoryApplication)
 		};
 
-		class appTickEvent : public event
+		class GRAVAPI appTickEvent : public event
 		{
 		public:
 			appTickEvent() = default;
@@ -47,7 +47,7 @@ namespace GRAVEngine
 			EVENT_CLASS_CATEGORY(eventCategoryApplication)
 		};
 
-		class appUpdateEvent : public event
+		class GRAVAPI appUpdateEvent : public event
 		{
 		public:
 			appUpdateEvent() = default;
@@ -56,7 +56,7 @@ namespace GRAVEngine
 			EVENT_CLASS_CATEGORY(eventCategoryApplication)
 		};
 
-		class appRenderEvent : public event
+		class GRAVAPI appRenderEvent : public event
 		{
 		public:
 			appRenderEvent() = default;

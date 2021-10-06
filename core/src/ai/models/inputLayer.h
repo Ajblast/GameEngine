@@ -13,7 +13,7 @@ namespace GRAVEngine
 		namespace Models
 		{
 			// A module that represents the input to a network body
-			class inputLayerImpl : public torch::nn::Module
+			class GRAVAPI inputLayerImpl : public torch::nn::Module
 			{
 			public:
 				inputLayerImpl() = default;

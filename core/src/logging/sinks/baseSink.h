@@ -11,7 +11,7 @@ namespace GRAVEngine
 		namespace Sinks
 		{
 			// Base sink class which handles locking. Implementations do not need to worry about locking
-			class baseSink : public sink
+			class GRAVAPI baseSink : public sink
 			{
 			public:
 				baseSink() {}

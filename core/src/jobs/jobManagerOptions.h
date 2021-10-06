@@ -7,7 +7,7 @@ namespace GRAVEngine
 {
 	namespace Jobs
 	{
-		struct jobManagerOptions
+		struct GRAVAPI jobManagerOptions
 		{
 			jobManagerOptions() : m_NumThreads(std::thread::hardware_concurrency()) {}
 			~jobManagerOptions() = default;

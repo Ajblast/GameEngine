@@ -14,7 +14,7 @@ namespace GRAVEngine
 		namespace Models
 		{
 			// A general neural network that will take a list of observations and translate them into vlaues
-			class networkImpl : public torch::nn::Module
+			class GRAVAPI networkImpl : public torch::nn::Module
 			{
 			public:
 				// Required default constructor

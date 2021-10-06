@@ -8,7 +8,7 @@ namespace GRAVEngine
 	{
 		namespace Sinks
 		{
-			class ostreamSink final : public baseSink
+			class GRAVAPI ostreamSink final : public baseSink
 			{
 			public:
 				explicit ostreamSink(std::ostream& os, bool forceFlush = false) : m_ostream(os), m_ForceFlush(forceFlush) {}

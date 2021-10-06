@@ -7,7 +7,7 @@ namespace GRAVEngine
 	namespace AI
 	{
 		// Something that has rewards
-		class IRewardable
+		class GRAVAPI IRewardable
 		{
 		public:
 			IRewardable() = default;

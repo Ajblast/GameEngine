@@ -9,7 +9,7 @@ namespace GRAVEngine
 	namespace AI
 	{
 		// Information about an agent
-		struct agentInfo
+		struct GRAVAPI agentInfo
 		{
 		public:
 			agentInfo();

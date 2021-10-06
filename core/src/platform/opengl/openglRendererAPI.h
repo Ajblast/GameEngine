@@ -9,9 +9,9 @@ namespace GRAVEngine
 	namespace Rendering
 	{
 		// Message callback for opengl when anything occurs
-		void openglMessageCallback(unsigned source, unsigned type, unsigned id, unsigned severity, int length, const char* message, const void* userParam);
+		GRAVAPI void openglMessageCallback(unsigned source, unsigned type, unsigned id, unsigned severity, int length, const char* message, const void* userParam);
 
-		class openglRendererAPI : public rendererAPI
+		class GRAVAPI openglRendererAPI : public rendererAPI
 		{
 			// Startup the API
 			virtual void startup() override;

@@ -10,7 +10,7 @@ namespace GRAVEngine
 		// A buffer that has multiple elements that can be of different types and sizes.
 		// Describes the layout of a buffer of memory
 		// Tied directly to a vertex buffer
-		class bufferLayout
+		class GRAVAPI bufferLayout
 		{
 		public:
 			bufferLayout() {}

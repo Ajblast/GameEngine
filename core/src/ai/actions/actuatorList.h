@@ -10,7 +10,7 @@ namespace GRAVEngine
 		namespace Actions
 		{
 			// Grouping of actuators
-			class actuatorList
+			class GRAVAPI actuatorList
 			{
 			public:
 				inline const bool executable() const { return m_Executable; }

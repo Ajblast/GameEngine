@@ -8,7 +8,7 @@ namespace GRAVEngine
 {
 	namespace IO
 	{
-		class Input
+		class GRAVAPI Input
 		{
 		public:
 			static bool isKeyPressed(Keys::keyCode key);

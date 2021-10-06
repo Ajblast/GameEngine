@@ -8,7 +8,7 @@ namespace GRAVEngine
 	namespace Rendering
 	{
 		// OpenGL version of a vertex array
-		class openglVertexArray : public vertexArray
+		class GRAVAPI openglVertexArray : public vertexArray
 		{
 		public:
 			openglVertexArray();

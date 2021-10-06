@@ -11,7 +11,7 @@ namespace GRAVEngine
 	namespace Layers
 	{
 		// A layer represents a collection of items, whether that be rendering, entities, or anything else
-		class layer
+		class GRAVAPI layer
 		{
 		public:
 			layer(const std::string& name = "Layer");

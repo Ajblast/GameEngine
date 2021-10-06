@@ -16,7 +16,7 @@ namespace GRAVEngine
 {
 	namespace IO
 	{
-		class file
+		class GRAVAPI file
 		{
 		public:
 			file();

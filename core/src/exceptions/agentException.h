@@ -8,7 +8,7 @@ namespace GRAVEngine
 {
 	namespace Exceptions
 	{
-		class agentException : public std::runtime_error
+		class GRAVAPI agentException : public std::runtime_error
 		{
 		public:
 			agentException(const std::string& description) : std::runtime_error(description) {}

@@ -8,7 +8,7 @@ namespace GRAVEngine
 	{
 		namespace Actions
 		{
-			class IHeuristicProvider
+			class GRAVAPI IHeuristicProvider
 			{
 			public:
 				IHeuristicProvider() {}

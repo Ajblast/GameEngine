@@ -13,7 +13,7 @@ namespace GRAVEngine
 		namespace Training
 		{
 			// Settings for how to construct a network
-			struct networkSettings
+			struct GRAVAPI networkSettings
 			{
 			public:
 				networkSettings() {}

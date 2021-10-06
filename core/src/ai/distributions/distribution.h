@@ -9,7 +9,7 @@ namespace GRAVEngine
 	{
 		namespace Distributions
 		{
-			class distribution
+			class GRAVAPI distribution
 			{
 			public:
 				distribution(c10::IntArrayRef batchShape) : m_BatchShape(batchShape.begin(), batchShape.end()) {}

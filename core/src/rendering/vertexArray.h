@@ -10,7 +10,7 @@ namespace GRAVEngine
 	{
 		// Stores vertex attribute configutations and which vertex buffers to use
 		// Has a vertex buffer (VBO) and an index buffer (EBO)
-		class vertexArray
+		class GRAVAPI vertexArray
 		{
 		public:
 			virtual ~vertexArray() = default;

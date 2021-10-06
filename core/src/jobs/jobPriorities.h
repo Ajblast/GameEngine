@@ -32,12 +32,12 @@ namespace GRAVEngine
 			GRAVEngine_JOB_PRIORITY_STRING_CRITICAL
 		};
 
-		inline const char* toString(GRAVEngine::Jobs::jobPriority priority)
+		GRAVAPI inline const char* toString(GRAVEngine::Jobs::jobPriority priority)
 		{
 			return jobPriorityStrings[static_cast<int>(priority)];
 		}
 
-		inline GRAVEngine::Jobs::jobPriority jobPriorityToEnum(const char* name)
+		GRAVAPI inline GRAVEngine::Jobs::jobPriority jobPriorityToEnum(const char* name)
 		{
 			int level = 0;
 

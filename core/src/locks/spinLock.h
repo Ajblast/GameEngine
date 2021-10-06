@@ -7,7 +7,7 @@ namespace GRAVEngine
 {
 	namespace Locks
 	{
-		class spinLock
+		class GRAVAPI spinLock
 		{
 			std::atomic_flag m_atomic = ATOMIC_FLAG_INIT;
 

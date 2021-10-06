@@ -27,7 +27,7 @@ namespace GRAVEngine
 
 		// An event that can be used to store multiple callbacks to functions.
 		template<typename... T>
-		class event
+		class GRAVAPI event
 		{
 			typedef std::function<void(T...)> callback;
 

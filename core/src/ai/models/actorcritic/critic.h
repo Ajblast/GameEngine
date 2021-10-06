@@ -14,7 +14,7 @@ namespace GRAVEngine
 			namespace ActorCritic
 			{
 				// An abstract critic needed for an actor-acritic setup
-				class criticImpl : public torch::nn::Module
+				class GRAVAPI criticImpl : public torch::nn::Module
 				{
 				public:
 					// Required default constructor

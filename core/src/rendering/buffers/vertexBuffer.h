@@ -8,7 +8,7 @@ namespace GRAVEngine
 	namespace Rendering
 	{
 		// Buffer for vertex information
-		class vertexBuffer
+		class GRAVAPI vertexBuffer
 		{
 		public:
 			virtual ~vertexBuffer() = default;

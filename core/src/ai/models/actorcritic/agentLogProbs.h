@@ -12,7 +12,7 @@ namespace GRAVEngine
 			namespace ActorCritic
 			{
 				// A small struct that holds all of the discrete and continuous actions
-				struct agentLogProbs
+				struct GRAVAPI agentLogProbs
 				{
 				public:
 					torch::Tensor flatten();

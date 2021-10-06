@@ -2,30 +2,32 @@ project "GRAVTest"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "off"
 
-	targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
-	objdir ("../bin-int/" .. outputdir .. "/%{prj.name}")
+	targetdir ("..\\bin\\" .. outputdir .. "\\%{prj.name}")
+	objdir ("..\\bin-int\\" .. outputdir .. "\\%{prj.name}")
 
 	pchheader "pch.h"
 	pchsource "src/pch.cpp"
 
 	files
 	{
-		"src/**.h",
-		"src/**.cpp"
+		"src\\**.h",
+		"src\\**.cpp"
 	}
 
 	includedirs
 	{
-		"../core/src",
-		"../core/vendor",
-		"../core/%{IncludeDir.glm}"
+		"..\\core\\src",
+		"..\\core\\vendor",
+		"..\\core\\%{IncludeDir.glm}",
+		"..\\core\\%{IncludeDir.ImGui}"
 	}
 
 	links
 	{
-		"GRAVCore"
+		"GRAVCore",
+		"ImGui"
 	}
 
 	filter "system:windows"
@@ -34,6 +36,12 @@ project "GRAVTest"
 		defines
 		{
 			"GRAVCORE_PLATFORM_WINDOWS"
+		}
+
+		postbuildcommands
+		{
+			"{COPYDIR} ..\\bin\\" .. outputdir .. "\\" .. coreName .. " ..\\bin\\" .. outputdir .. "\\%{prj.name}"
+			--"{COPY} ..\\bin\\" .. outputdir .. "\\" .. coreName .. ".dll ..\\bin\\" .. outputdir .. "\\%{prj.name}"
 		}
 
 	filter "configurations:Debug"
@@ -48,7 +56,7 @@ project "GRAVTest"
 		}
 		
 		links 
-		{ 
+		{
 			-- PyTorch lib files
 			"%{LibDir.pytorchlib_debug}\\asmjit",
 			"%{LibDir.pytorchlib_debug}\\c10",
@@ -77,7 +85,7 @@ project "GRAVTest"
 		
 		postbuildcommands
 		{
-			"xcopy %{LibDir.pytorchbin_debug} " .. targ .. " /y /i"
+			"{COPYDIR} %{LibDir.pytorchbin_debug} " .. "..\\bin\\" .. outputdir .. "\\%{prj.name}"
 		}
 		
 	filter "configurations:Release"
@@ -92,7 +100,7 @@ project "GRAVTest"
 		}
 		
 		links 
-		{ 
+		{
 			-- PyTorch lib files
 			"%{LibDir.pytorchlib_release}\\asmjit",
 			"%{LibDir.pytorchlib_release}\\c10",
@@ -121,5 +129,5 @@ project "GRAVTest"
 		
 		postbuildcommands
 		{
-			"xcopy %{LibDir.pytorchbin_release} " .. targ .. " /y /i"
+			"{COPYDIR} %{LibDir.pytorchbin_release} " .. "..\\bin\\" .. outputdir .. "\\%{prj.name}"
 		}

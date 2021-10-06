@@ -13,7 +13,7 @@ namespace GRAVEngine
 	{
 		// Parameters for agent behavior and brain properties
 		// Used mostly for debugging and holding the actual nn model that is passed around
-		struct programParams
+		struct GRAVAPI programParams
 		{
 		public:
 			programParams(inferenceDevice device, const std::string& name, ref<Models::model> model = nullptr);

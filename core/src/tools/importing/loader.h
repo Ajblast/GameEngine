@@ -13,7 +13,7 @@ namespace GRAVEngine
 	{
 		namespace Importing
 		{
-			class loader
+			class GRAVAPI loader
 			{
 			public:
 				loader();

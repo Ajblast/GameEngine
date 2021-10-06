@@ -21,7 +21,7 @@ namespace GRAVEngine
 	{
 		namespace Training
 		{
-			class trainer
+			class GRAVAPI trainer
 			{
 			public:
 				trainer(trainerSettings settings, scope<ITrainingAlgorithm> algorithm);

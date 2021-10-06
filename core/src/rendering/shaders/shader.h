@@ -8,7 +8,7 @@ namespace GRAVEngine
 	namespace Rendering
 	{
 		// Generic shader interface
-		class shader
+		class GRAVAPI shader
 		{
 		public:
 			virtual ~shader() = default;

@@ -14,7 +14,7 @@ namespace GRAVEngine
 		typedef std::function<void(uintptr_t)> entryPoint;
 
 
-		struct declaration
+		struct GRAVAPI declaration
 		{
 			entryPoint m_EntryPoint;
 			uintptr_t m_Param;

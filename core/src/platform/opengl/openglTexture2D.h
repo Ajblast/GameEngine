@@ -9,7 +9,7 @@ namespace GRAVEngine
 {
 	namespace Rendering
 	{
-		class openglTexture2D : public texture2D
+		class GRAVAPI openglTexture2D : public texture2D
 		{
 		public:
 			openglTexture2D(uint32 width, uint32 height);

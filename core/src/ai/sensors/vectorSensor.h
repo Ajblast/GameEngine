@@ -10,7 +10,7 @@ namespace GRAVEngine
 		namespace Sensors
 		{
 			// Sensor with dynamic vector for storing observations
-			class vectorSensor : public ISensor
+			class GRAVAPI vectorSensor : public ISensor
 			{
 			public:
 				vectorSensor(uint32 obsSize, std::string name = "");

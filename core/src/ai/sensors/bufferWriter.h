@@ -10,7 +10,7 @@ namespace GRAVEngine
 		namespace Sensors
 		{
 			// Writes to a buffer
-			class bufferWriter : public observationWriter
+			class GRAVAPI bufferWriter : public observationWriter
 			{
 			public:
 				bufferWriter(float* data, size_t size);

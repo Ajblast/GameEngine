@@ -7,7 +7,7 @@ namespace GRAVEngine
 {
 	namespace Logging
 	{
-		struct logMessage
+		struct GRAVAPI logMessage
 		{
 			std::string m_LoggerName;
 			Logging::verbosity m_Verbosity{ GRAVEngine::Logging::verbosity::off };

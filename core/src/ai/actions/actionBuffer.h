@@ -10,7 +10,7 @@ namespace GRAVEngine
 		namespace Actions
 		{
 			// Class that holds the continuous and discrete actions for an IActionReciever
-			class actionBuffer
+			class GRAVAPI actionBuffer
 			{
 			public:
 				actionBuffer();

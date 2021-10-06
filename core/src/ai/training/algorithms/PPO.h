@@ -17,7 +17,7 @@ namespace GRAVEngine
 			namespace Algorithms
 			{
 				// The PPO training algorithm
-				class PPO : public ITrainingAlgorithm
+				class GRAVAPI PPO : public ITrainingAlgorithm
 				{
 				public:
 					PPO(networkSettings settings, ref<ppoHyperparameters> hyperparameters);

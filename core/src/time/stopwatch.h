@@ -11,7 +11,7 @@ namespace GRAVEngine
 	{
 		// TODO: Allow stopwatches to use custom clocks. Maybe
 
-		class stopwatch
+		class GRAVAPI stopwatch
 		{
 		public:
 			stopwatch();

@@ -12,7 +12,7 @@ namespace GRAVEngine
 		namespace Training
 		{
 			// A trajectory is an ordered list of agent experiences that describe a set of realated N+H actions
-			class trajectory
+			class GRAVAPI trajectory
 			{
 			public:
 				trajectory(const std::vector<agentExperience>& experiences/*, torch::Tensor nextObservation*/) :

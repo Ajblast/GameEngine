@@ -11,7 +11,7 @@ namespace GRAVEngine
 	{
 		namespace Actions
 		{
-			class IActuator : public IHeuristicProvider, public IActionReciever
+			class GRAVAPI IActuator : public IHeuristicProvider, public IActionReciever
 			{
 			public:
 				IActuator() {}

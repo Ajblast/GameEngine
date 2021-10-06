@@ -12,7 +12,7 @@ namespace GRAVEngine
 			namespace Encoders
 			{
 				// A default encoder
-				class encoderImpl : public torch::nn::Module
+				class GRAVAPI encoderImpl : public torch::nn::Module
 				{
 				public:
 					encoderImpl() = default;
@@ -24,7 +24,7 @@ namespace GRAVEngine
 				TORCH_MODULE(encoder);
 
 				// An encoder for a vector of inputs
-				class vectorEncoderImpl : public encoderImpl
+				class GRAVAPI vectorEncoderImpl : public encoderImpl
 				{
 				public:
 					vectorEncoderImpl() = default;

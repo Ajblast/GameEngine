@@ -13,7 +13,7 @@ namespace GRAVEngine
 		typedef unsigned int GLenum;
 
 		// An OpenGL Shader
-		class openglShader : public shader
+		class GRAVAPI openglShader : public shader
 		{
 		public:
 			openglShader(const std::string& filepath);

@@ -8,7 +8,7 @@ namespace GRAVEngine
 	{
 		namespace IO
 		{
-			class ioException : public std::runtime_error
+			class GRAVAPI ioException : public std::runtime_error
 			{
 			public:
 				explicit ioException(const std::string& description) : std::runtime_error(description) {}

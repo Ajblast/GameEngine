@@ -6,7 +6,7 @@ namespace GRAVEngine
 {
 	namespace Rendering
 	{
-		struct windowProperties
+		struct GRAVAPI windowProperties
 		{
 		public:
 

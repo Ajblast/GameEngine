@@ -14,7 +14,7 @@ namespace GRAVEngine
 		// TODO: Finish implementation of the 2D rendering
 
 		// A renderer for 2D graphics
-		class renderer2D
+		class GRAVAPI renderer2D
 		{
 		public:
 			// Startup the 2D renderer

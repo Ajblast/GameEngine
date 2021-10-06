@@ -35,7 +35,7 @@ namespace GRAVEngine
 	typedef vec4 plane;
 
 	// A ray
-	struct ray
+	struct GRAVAPI ray
 	{
 		ray() : m_Pos(), m_Dir() {}
 		ray(const vec3& pos, const vec3 dir) : m_Pos(pos), m_Dir(dir) {}
@@ -67,7 +67,7 @@ namespace GRAVEngine
 	};
 
 	// The face of an object
-	struct face
+	struct GRAVAPI face
 	{
 	public:
 		scope<vertexIndex[]> m_Vertices;	// Vertex indices
@@ -140,7 +140,7 @@ namespace GRAVEngine
 	//
 	//};
 
-	struct mesh
+	struct GRAVAPI mesh
 	{
 	public:
 		std::string m_Name;				// name of the mesh

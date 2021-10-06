@@ -11,7 +11,7 @@ namespace GRAVEngine
 	namespace Rendering
 	{
 		// Interface representing a desktop system based window
-		class window
+		class GRAVAPI window
 		{
 		public:
 			using eventCallbackFunction = std::function<void(Events::event&)>;

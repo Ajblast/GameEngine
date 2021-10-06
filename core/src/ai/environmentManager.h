@@ -13,7 +13,7 @@ namespace GRAVEngine
 	namespace AI
 	{
 		// Trainer used to train agents in an environment
-		class environmentManager
+		class GRAVAPI environmentManager
 		{
 		public:
 			environmentManager(const environmentManager&) = delete;				// Delete copy constructor

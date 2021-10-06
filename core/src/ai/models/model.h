@@ -12,7 +12,7 @@ namespace GRAVEngine
 		namespace Models
 		{
 			// An abstract model for AI
-			class modelImpl : public torch::nn::Module
+			class GRAVAPI modelImpl : public torch::nn::Module
 			{
 			public:
 				// Required default constructor

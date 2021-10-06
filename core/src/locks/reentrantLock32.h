@@ -6,7 +6,7 @@ namespace GRAVEngine
 {
 	namespace Locks
 	{
-		class reentrantLock32
+		class GRAVAPI reentrantLock32
 		{
 			std::atomic<std::size_t> m_atomic;
 			int32 m_refCount;

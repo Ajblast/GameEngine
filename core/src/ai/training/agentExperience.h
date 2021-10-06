@@ -11,7 +11,7 @@ namespace GRAVEngine
 		namespace Training
 		{
 			// An experience of a single agent
-			struct agentExperience
+			struct GRAVAPI agentExperience
 			{
 			public:
 				agentExperience(std::vector<torch::Tensor> observation, torch::Tensor reward, torch::Tensor done, Models::ActorCritic::actorCriticOputput actionInfo /*, torch::Tensor prevAction*/) :

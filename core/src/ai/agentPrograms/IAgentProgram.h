@@ -11,7 +11,7 @@ namespace GRAVEngine
 	namespace AI
 	{ 
 		// Program for controlling an agent's actions
-		class IAgentProgram
+		class GRAVAPI IAgentProgram
 		{
 		public:
 			IAgentProgram() = default;

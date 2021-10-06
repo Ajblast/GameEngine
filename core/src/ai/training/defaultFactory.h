@@ -12,7 +12,7 @@ namespace GRAVEngine
 		namespace Training
 		{
 			// Default algorithm factory.
-			class defaultFactory : public algorithmFactory
+			class GRAVAPI defaultFactory : public algorithmFactory
 			{
 			public:
 				defaultFactory() = default;

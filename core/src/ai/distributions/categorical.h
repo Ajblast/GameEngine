@@ -9,7 +9,7 @@ namespace GRAVEngine
 	{
 		namespace Distributions
 		{
-			class categorical : public distribution
+			class GRAVAPI categorical : public distribution
 			{
 			public:
 				categorical(torch::Tensor logits);

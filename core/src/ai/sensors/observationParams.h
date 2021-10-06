@@ -10,7 +10,7 @@ namespace GRAVEngine
 		namespace Sensors
 		{
 			// Paramaters about an observation
-			struct observationParams
+			struct GRAVAPI observationParams
 			{
 			public:
 				observationParams(size_t length);

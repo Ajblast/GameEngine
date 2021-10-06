@@ -11,7 +11,7 @@ namespace GRAVEngine
 		namespace Sensors
 		{
 			// Abstract sensor
-			class ISensor
+			class GRAVAPI ISensor
 			{
 			public:
 				ISensor() = default;

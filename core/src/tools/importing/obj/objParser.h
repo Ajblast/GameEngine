@@ -13,7 +13,7 @@ namespace GRAVEngine
 	{
 		namespace Importing
 		{
-			class objParser
+			class GRAVAPI objParser
 			{
 				typedef std::vector<std::string> tokenArray;
 

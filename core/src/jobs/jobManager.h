@@ -22,7 +22,7 @@ namespace GRAVEngine
 {
 	namespace Jobs
 	{
-		struct waitingFiberSlot
+		struct GRAVAPI waitingFiberSlot
 		{
 			fiberIndex m_FiberIndex = UINT16_MAX;
 			counterTarget m_TargetValue = 0;
@@ -30,7 +30,7 @@ namespace GRAVEngine
 		};
 
 
-		class jobManager
+		class GRAVAPI jobManager
 		{
 			friend counter;
 
@@ -73,6 +73,8 @@ namespace GRAVEngine
 
 			gravThread* getThread(uint8 index);
 			threadID getCurrentThreadID() const;
+			threadIndex getCurrentThreadIndex() const;
+			std::string getCurrentThreadName() const;
 
 			// Statically get the job instance
 			inline static jobManager* getInstance() { return s_Instance; }
@@ -84,7 +86,6 @@ namespace GRAVEngine
 			//void waitForCounterProxy(waitForCounterProxyArgs args);
 
 			// Thread
-			threadIndex getCurrentThreadIndex() const;
 			gravThread* getCurrentThread() const;
 			tls* getCurrentTLS() const;
 

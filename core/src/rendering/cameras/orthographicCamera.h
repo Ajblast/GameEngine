@@ -9,7 +9,7 @@ namespace GRAVEngine
 {
 	namespace Rendering
 	{
-		class orthographicCamera : public camera
+		class GRAVAPI orthographicCamera : public camera
 		{
 		public:
 			orthographicCamera(float left, float right, float bottom, float top, float nearClip, float farClip);

@@ -13,7 +13,7 @@ namespace GRAVEngine
 		namespace Importing
 		{
 			// OBJ object
-			struct objObject
+			struct GRAVAPI objObject
 			{
 			public:
 				std::string m_Name;
@@ -29,7 +29,7 @@ namespace GRAVEngine
 			};
 
 			// OBJ face
-			struct objFace
+			struct GRAVAPI objFace
 			{
 			public:
 				primitiveType m_PrimitiveType;				// Face primitive type
@@ -50,7 +50,7 @@ namespace GRAVEngine
 			};
 
 			// OBJ Mesh
-			struct objMesh
+			struct GRAVAPI objMesh
 			{
 			public:
 				std::string m_Name;					// Name of the mesh
@@ -74,7 +74,7 @@ namespace GRAVEngine
 			};
 
 
-			struct objModel
+			struct GRAVAPI objModel
 			{
 			public:
 				std::string m_ModelName;				// Name of the model

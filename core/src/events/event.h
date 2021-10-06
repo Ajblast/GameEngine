@@ -14,7 +14,7 @@ namespace GRAVEngine
 
 #define EVENT_CLASS_CATEGORY(category) virtual int getCategoryFlags() const override {return category;}
 
-		class event
+		class GRAVAPI event
 		{
 		public:
 			virtual ~event() = default;

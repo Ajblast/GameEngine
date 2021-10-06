@@ -9,7 +9,7 @@ namespace GRAVEngine
 {
 	namespace Rendering
 	{
-		class editorCamera : public camera
+		class GRAVAPI editorCamera : public camera
 		{
 		public:
 			editorCamera() = default;

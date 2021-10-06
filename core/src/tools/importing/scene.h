@@ -11,7 +11,7 @@ namespace GRAVEngine
 		namespace Importing
 		{
 			// A node in an imported hierarchy
-			struct node
+			struct GRAVAPI node
 			{
 				std::string m_Name;
 				mat4x4 m_Transformation;
@@ -31,7 +31,7 @@ namespace GRAVEngine
 				//void addChildren()
 			};
 
-			class scene
+			class GRAVAPI scene
 			{
 			public:
 				std::string m_Name;

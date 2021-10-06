@@ -1,6 +1,7 @@
 #include "pch.h"
 #include <GRAVEngine.h>
 #include <entryPoint.h>
+#include "imgui/imgui.h"
 
 #include "Test2D.h"
 #include "Test.h"
@@ -24,5 +25,10 @@ public:
 
 GRAVEngine::application* GRAVEngine::createApplication()
 {
-	return new testApp();
+	auto app = new testApp();
+
+	// Set the ImGui context because the core is a dll
+	ImGui::SetCurrentContext(app->getImGuiLayer()->context());
+
+	return app;
 }

@@ -12,7 +12,7 @@ namespace GRAVEngine
 		namespace Training
 		{
 			// An update buffer takes a list of trajectories
-			class updateBuffer
+			class GRAVAPI updateBuffer
 			{
 			public:
 				updateBuffer() = default;

@@ -8,7 +8,7 @@ namespace GRAVEngine
 	namespace AI
 	{
 		// Static class that holds the current episode id.
-		class episodeCounter
+		class GRAVAPI episodeCounter
 		{
 		public:
 			// Get the current episode ID. Increases the id by 1

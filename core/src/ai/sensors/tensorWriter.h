@@ -11,7 +11,7 @@ namespace GRAVEngine
 		namespace Sensors
 		{
 			// Writes to a tensor
-			class tensorWriter : public observationWriter
+			class GRAVAPI tensorWriter : public observationWriter
 			{
 			public:
 				tensorWriter(Tensors::tensor tensor);

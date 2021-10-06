@@ -10,7 +10,7 @@ namespace GRAVEngine
 	{
 		namespace Importing
 		{
-			class objImporter : public importer
+			class GRAVAPI objImporter : public importer
 			{
 			public:
 				objImporter();

@@ -6,7 +6,7 @@ namespace GRAVEngine
 {
 	namespace Logging
 	{
-		void reportAssertionFailure(const char* expression, const char* file, size_t line);
+		GRAVAPI void reportAssertionFailure(const char* expression, const char* file, size_t line);
 	}
 }
 

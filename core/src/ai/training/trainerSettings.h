@@ -12,7 +12,7 @@ namespace GRAVEngine
 		namespace Training
 		{
 			// Settings for when creating a trainer
-			struct trainerSettings
+			struct GRAVAPI trainerSettings
 			{
 			public:
 				trainerSettings() {}

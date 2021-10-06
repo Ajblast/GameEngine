@@ -6,7 +6,7 @@ namespace GRAVEngine
 {
 	namespace Locks
 	{
-		class unnecessaryLock
+		class GRAVAPI unnecessaryLock
 		{
 			volatile bool m_locked;
 
@@ -25,7 +25,7 @@ namespace GRAVEngine
 #endif
 		};
 
-		class unnecessaryLockJanitor
+		class GRAVAPI unnecessaryLockJanitor
 		{
 			unnecessaryLock* m_pLock;
 		public:

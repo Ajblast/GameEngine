@@ -9,7 +9,7 @@ namespace GRAVEngine
 {
 	namespace AI
 	{
-		class trainingProgram : public IAgentProgram
+		class GRAVAPI trainingProgram : public IAgentProgram
 		{
 		public:
 			trainingProgram(std::string name, const std::vector<ref<Sensors::ISensor>>& sensors, Actions::actuatorList& actuators);

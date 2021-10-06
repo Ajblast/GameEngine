@@ -9,7 +9,7 @@ namespace GRAVEngine
 {
 	namespace Rendering
 	{
-		class openglContext : public graphicsContext
+		class GRAVAPI openglContext : public graphicsContext
 		{
 		public:
 			openglContext(GLFWwindow* windowHandle);

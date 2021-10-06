@@ -9,7 +9,7 @@ namespace GRAVEngine
 	{
 		namespace Tensors
 		{
-			class arrayTensorData : public ITensorData
+			class GRAVAPI arrayTensorData : public ITensorData
 			{
 			public:
 				arrayTensorData(size_t count);

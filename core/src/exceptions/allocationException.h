@@ -7,7 +7,7 @@ namespace GRAVEngine
 {
 	namespace Exceptions
 	{
-		class allocationException : public std::bad_alloc
+		class GRAVAPI allocationException : public std::bad_alloc
 		{
 		public:
 			explicit allocationException(const char* message) : allocationException(std::string(message)) {}

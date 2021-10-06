@@ -10,7 +10,7 @@ namespace GRAVEngine
 	{
 		namespace IO
 		{
-			class unauthorizedAccessException : public ioException
+			class GRAVAPI unauthorizedAccessException : public ioException
 			{
 			public:
 				explicit unauthorizedAccessException(const char* fileName, const char* description) : unauthorizedAccessException(std::string(fileName), std::string(description)) {}

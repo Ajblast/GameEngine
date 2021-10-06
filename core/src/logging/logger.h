@@ -25,7 +25,7 @@ namespace GRAVEngine
 		//	1. Check if verbosity is enough
 		//	2. Call sinks to handle logging
 		//	3. Each sink has its own sink formatting
-		class logger
+		class GRAVAPI logger
 		{
 		public:
 			explicit logger(std::string name);

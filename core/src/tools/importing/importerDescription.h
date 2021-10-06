@@ -9,7 +9,7 @@ namespace GRAVEngine
 		namespace Importing
 		{
 			// Description of an importer
-			struct importerDescription
+			struct GRAVAPI importerDescription
 			{			
 				const char* m_Name;			// Name of the importer
 				const char* m_Notes;		// Name of the importer

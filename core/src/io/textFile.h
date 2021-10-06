@@ -8,7 +8,7 @@ namespace GRAVEngine
 {
 	namespace IO
 	{
-		class textFile : public file
+		class GRAVAPI textFile : public file
 		{
 		public:
 			textFile();

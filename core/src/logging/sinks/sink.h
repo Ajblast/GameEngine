@@ -10,7 +10,7 @@ namespace GRAVEngine
 	{
 		namespace Sinks
 		{
-			class sink
+			class GRAVAPI sink
 			{
 			public:
 				virtual ~sink() = default;

@@ -10,7 +10,7 @@ namespace GRAVEngine
 	{
 		namespace IO
 		{
-			class fileNotFoundException : public ioException
+			class GRAVAPI fileNotFoundException : public ioException
 			{
 			public:
 				explicit fileNotFoundException(const char* fileName, const char* description) : fileNotFoundException(std::string(fileName), std::string(description)) {}

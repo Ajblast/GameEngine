@@ -12,7 +12,7 @@ namespace GRAVEngine
 		namespace Importing
 		{
 			// Tracks all known importers
-			class importerManager
+			class GRAVAPI importerManager
 			{
 			private:
 

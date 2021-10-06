@@ -10,7 +10,7 @@ namespace GRAVEngine
 	{
 		namespace Tensors
 		{
-			class tensor
+			class GRAVAPI tensor
 			{
 			public:
 				tensor(tensorShape shape, std::string name = "");

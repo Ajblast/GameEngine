@@ -12,7 +12,7 @@ namespace GRAVEngine
 {
 	namespace Time
 	{
-		class timer
+		class GRAVAPI timer
 		{
 		public:
 			void start() noexcept;

@@ -10,7 +10,7 @@ namespace GRAVEngine
 		namespace Distributions
 		{
 			// A normal distribution
-			class normal : public distribution
+			class GRAVAPI normal : public distribution
 			{
 			public:
 				// Get a normal distribution from the location and scale

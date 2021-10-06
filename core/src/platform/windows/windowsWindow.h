@@ -14,7 +14,7 @@ namespace GRAVEngine
 {
 	namespace Rendering
 	{
-		class windowsWindow : public window
+		class GRAVAPI windowsWindow : public window
 		{
 		public:
 			windowsWindow(const windowProperties& properties);

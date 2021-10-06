@@ -11,7 +11,7 @@ namespace GRAVEngine
 			// Shape of a tensor.
 			// In BHWC romat
 			// TODO: Change to BCHW format
-			struct tensorShape
+			struct GRAVAPI tensorShape
 			{
 			public:
 				tensorShape(size_t n);

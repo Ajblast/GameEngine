@@ -11,7 +11,7 @@ namespace GRAVEngine
 			namespace Algorithms
 			{
 				// Hyperparameters for the PPO algorithm
-				struct ppoHyperparameters : public hyperparameters
+				struct GRAVAPI ppoHyperparameters : public hyperparameters
 				{
 				public:
 					ppoHyperparameters() = default;
