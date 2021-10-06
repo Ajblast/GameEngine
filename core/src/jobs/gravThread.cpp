@@ -38,6 +38,11 @@ void GRAVEngine::Jobs::gravThread::setName(const std::wstring& name)
 #endif
 }
 
+void GRAVEngine::Jobs::gravThread::setIndex(const threadID index)
+{
+	m_ThreadIndex = index;
+}
+
 void GRAVEngine::Jobs::gravThread::join()
 {
 	if (isValid() == false)

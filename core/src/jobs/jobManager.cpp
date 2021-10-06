@@ -117,6 +117,8 @@ void GRAVEngine::Jobs::jobManager::startUp(jobManagerOptions& options)
 
 		tls->m_HasAffinity = m_ThreadAffinity;
 
+		m_Threads[i].setIndex(i);
+
 		// Only spawn threads for not the main thread
 		if (i != GRAV_MAIN_THREAD_INDEX && m_AutoInitializeThreads)
 		{
@@ -414,19 +416,18 @@ void GRAVEngine::Jobs::jobManager::checkWaitingFibers()
 
 GRAVEngine::Jobs::threadIndex GRAVEngine::Jobs::jobManager::getCurrentThreadIndex() const
 {
-#ifdef GRAV_PLATFORM_WINDOWS
-	threadID id = GetCurrentThreadId();
-	for (threadIndex i = 0; i < m_ThreadCount; i++)
-		if (m_Threads[i].getID() == id)
-			return i;
-#endif
-
-	return UINT8_MAX;
+	gravThread* thread = getCurrentThread();
+	return (thread == nullptr) ? UINT8_MAX : thread->getIndex();
 }
 GRAVEngine::Jobs::threadID GRAVEngine::Jobs::jobManager::getCurrentThreadID() const
 {
 	gravThread* thread = getCurrentThread();
 	return (thread == nullptr) ? UINT32_MAX : thread->getID();
+}
+std::string GRAVEngine::Jobs::jobManager::getCurrentThreadName() const
+{
+	gravThread* thread = getCurrentThread();
+	return (thread == nullptr) ? "" : thread->getName();
 }
 GRAVEngine::Jobs::gravThread* GRAVEngine::Jobs::jobManager::getCurrentThread() const
 {
@@ -528,7 +529,7 @@ GRAVEngine::Jobs::jobQueue& GRAVEngine::Jobs::jobManager::getQueue(jobPriority p
 }
 bool GRAVEngine::Jobs::jobManager::getNextJob(declaration& declaration, tls* tls)
 {
-	GRAV_PROFILE_FUNCTION();
+	//GRAV_PROFILE_FUNCTION();
 
 	if (tls == nullptr)
 		tls = getCurrentTLS();
