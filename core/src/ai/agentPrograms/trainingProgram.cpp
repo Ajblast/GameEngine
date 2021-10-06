@@ -25,7 +25,7 @@ GRAVEngine::AI::trainingProgram::trainingProgram(std::string name, const std::ve
 	trainerSettings.m_NetworkSettings = std::move(settings);
 
 	// Create the trainer for this AI if it doesn't exist
-	if (GRAVEngine::AI::environmentManager::instance().controller().getTrainer(name) != nullptr)
+	if (GRAVEngine::AI::environmentManager::instance().controller().getTrainer(name) == nullptr)
 		GRAVEngine::AI::environmentManager::instance().controller().createTrainer(trainerSettings);
 }
 
@@ -57,6 +57,9 @@ void GRAVEngine::AI::trainingProgram::requestDecision(agentInfo info, scope<ref<
 		// Add this sensor's data to the list of data
 		observations.push_back(sensorTensor);
 	}
+
+	if (trainer == nullptr)
+		return;
 
 	// Add the observation to the trainer
 	trainer->addObservation(info.m_EpisodeID, info, observations);
