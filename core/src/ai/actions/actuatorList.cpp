@@ -207,9 +207,10 @@ GRAVEngine::AI::Actions::actionSpec GRAVEngine::AI::Actions::actuatorList::getTo
 		// For each actuator
 		for (auto it = m_Actuators.begin(); it != m_Actuators.end(); it++)
 		{
+			actionSpec spec = (*it)->getActionSpec();
 			// Get the branch sizes and the branch count
-			scope<size_t[]>& branchSizes = (*it)->getActionSpec().branchSizes();
-			size_t branchCount = (*it)->getActionSpec().discreteActionCount();
+			scope<size_t[]>& branchSizes = spec.branchSizes();
+			size_t branchCount = spec.discreteActionCount();
 
 			// Copy the branch sizes into the combined array
 			memcpy(combinedBranches.get() + arrayOffset, branchSizes.get(), branchCount * sizeof(size_t));
