@@ -13,8 +13,10 @@ const GRAVEngine::AI::Training::algorithmFactory& GRAVEngine::AI::Training::trai
 	// Return the current algorithm factory
 	return *m_AlgorithmFactory.get();
 }
-const GRAVEngine::ref<GRAVEngine::AI::Training::trainer>& GRAVEngine::AI::Training::trainerController::getTrainer(const std::string& programName) const
+const GRAVEngine::ref<GRAVEngine::AI::Training::trainer>& GRAVEngine::AI::Training::trainerController::getTrainer(const std::string& programName)
 {
+	Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
+
 	auto it = m_Trainers.find(programName);
 	// Return a null pointer if the trainer doesn't exist
 	if (it == m_Trainers.end())
@@ -33,14 +35,18 @@ void GRAVEngine::AI::Training::trainerController::createTrainer(trainerSettings 
 		return;
 	}
 
-	// Create the algorithm
-	scope<ITrainingAlgorithm> algorithm = m_AlgorithmFactory->createAlgorithm(settings);
+	{
+		Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
 
-	// Create the trainer
-	ref<trainer> t = createRef<trainer>(settings, std::move(algorithm));
+		// Create the algorithm
+		scope<ITrainingAlgorithm> algorithm = m_AlgorithmFactory->createAlgorithm(settings);
 
-	// Add the trainer
-	m_Trainers.emplace(settings.m_ProgramName, t);
+		// Create the trainer
+		ref<trainer> t = createRef<trainer>(settings, std::move(algorithm));
+
+		// Add the trainer
+		m_Trainers.emplace(settings.m_ProgramName, t); 
+	}
 }
 void GRAVEngine::AI::Training::trainerController::createTrainer(const std::string& programName, scope<ITrainingAlgorithm> algorithm)
 {
@@ -55,18 +61,24 @@ void GRAVEngine::AI::Training::trainerController::createTrainer(const std::strin
 		return;
 	}
 
-	// Create the trainer settings based on the algorithm
-	trainerSettings settings = { programName, algorithm->getAlgorithmType(), algorithm->getNetworkSettings(), 64 };
+	{
+		Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
 
-	// Create the trainer
-	ref<trainer> t = createRef<trainer>(settings, std::move(algorithm));
+		// Create the trainer settings based on the algorithm
+		trainerSettings settings = { programName, algorithm->getAlgorithmType(), algorithm->getNetworkSettings(), 64 };
 
-	// Add the trainer
-	m_Trainers.emplace(programName, t);
+		// Create the trainer
+		ref<trainer> t = createRef<trainer>(settings, std::move(algorithm));
+
+		// Add the trainer
+		m_Trainers.emplace(programName, t);
+	}
 }
 
 void GRAVEngine::AI::Training::trainerController::step()
 {
+	Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
+
 	for (auto it = m_Trainers.begin(); it != m_Trainers.end(); it++)
 		it->second->step();
 }
