@@ -47,7 +47,11 @@ void Snake::onDetach()
 
 void Snake::onUpdate(GRAVEngine::Time::timestep ts)
 {
-	ac->pretty_print(std::cout);
+	if (GRAVEngine::IO::Input::isKeyPressed(GRAVEngine::Keys::Space))
+	{
+		GRAV_LOG_LINE_INFO("%s: Space Pressed!!!", __FUNCTION__);
+		GRAVEngine::application::getInstance().close();
+	}
 
 	GRAVEngine::Rendering::renderer2D::resetStats();
 
@@ -60,6 +64,7 @@ void Snake::onUpdate(GRAVEngine::Time::timestep ts)
 
 	//m_Agent->requestDecision();
 	//GRAVEngine::AI::environmentManager::instance().step();
+
 
 	if (elapsedTime >= 1 / fps)
 	{
@@ -96,11 +101,6 @@ void Snake::onUpdate(GRAVEngine::Time::timestep ts)
 	}
 	GRAVEngine::Rendering::renderer2D::endScene();
 
-	if (GRAVEngine::IO::Input::isKeyPressed(GRAVEngine::Keys::Space))
-	{
-		GRAV_LOG_LINE_INFO("%s: Space Pressed!!!", __FUNCTION__);
-		GRAVEngine::application::getInstance().close();
-	}
 }
 
 void Snake::onImGuiRender()
