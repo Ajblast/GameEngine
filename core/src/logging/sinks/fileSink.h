@@ -16,9 +16,14 @@ namespace GRAVEngine
 			{
 			public:
 				explicit fileSink(const std::string& filePath, bool truncate = false);
-				inline const std::string& filePath()
+				inline const std::string filePath()
 				{
 					return m_File.filePath();
+				}
+
+				inline const bool isOpen() const
+				{
+					return m_File.isOpen();
 				}
 
 			protected:
