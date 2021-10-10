@@ -21,7 +21,7 @@ namespace GRAVEngine
 				trainerController(scope<algorithmFactory> algorithmFactory);
 			public:
 				const algorithmFactory& getAlgorithmFactory() const;
-				const ref<trainer>& getTrainer(const std::string& programName);
+				const ref<trainer> getTrainer(const std::string& programName);
 
 				// Create a trainer with the desired settings
 				void createTrainer(trainerSettings settings);

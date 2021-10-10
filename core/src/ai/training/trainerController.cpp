@@ -1,6 +1,6 @@
 #include "gravpch.h"
 #include "trainerController.h"
-#include "exceptions/invalidArgumentException.h"
+#include "exceptions/standard/invalidArgumentException.h"
 
 GRAVEngine::AI::Training::trainerController::trainerController(scope<algorithmFactory> algorithmFactory) : m_AlgorithmFactory(std::move(algorithmFactory))
 {
@@ -13,7 +13,7 @@ const GRAVEngine::AI::Training::algorithmFactory& GRAVEngine::AI::Training::trai
 	// Return the current algorithm factory
 	return *m_AlgorithmFactory.get();
 }
-const GRAVEngine::ref<GRAVEngine::AI::Training::trainer>& GRAVEngine::AI::Training::trainerController::getTrainer(const std::string& programName)
+const GRAVEngine::ref<GRAVEngine::AI::Training::trainer> GRAVEngine::AI::Training::trainerController::getTrainer(const std::string& programName)
 {
 	Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
 

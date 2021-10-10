@@ -1,6 +1,6 @@
 #include "gravpch.h"
 #include "trainer.h"
-#include "exceptions/invalidArgumentException.h"
+#include "exceptions/standard/invalidArgumentException.h"
 #include "trajectory.h"
 #include <mutex>
 
