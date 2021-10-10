@@ -289,7 +289,7 @@ int GRAVEngine::IO::file::readChar()
 
 	return character;
 }
-bool GRAVEngine::IO::file::readAll(char*& buffer, size_t& bufferSize)
+bool GRAVEngine::IO::file::readAll(scope<char[]>& buffer, size_t& bufferSize)
 {
 	GRAV_ASSERT_LOGLESS(isOpen());
 	GRAV_ASSERT_LOGLESS(isInput());
@@ -301,7 +301,7 @@ bool GRAVEngine::IO::file::readAll(char*& buffer, size_t& bufferSize)
 	try
 	{
 		// TODO: override new to use custom allocation for memory tracking
-		buffer = (char*) new void* [bufferSize];
+		buffer = createScope<char[]>(bufferSize);
 	}
 	catch (std::bad_alloc)
 	{
@@ -312,7 +312,7 @@ bool GRAVEngine::IO::file::readAll(char*& buffer, size_t& bufferSize)
 	seekRead(0, seekOrigin::beg);
 
 	// Read into the buffer
-	return read(buffer, bufferSize);
+	return read(buffer.get(), bufferSize);
 }
 
 

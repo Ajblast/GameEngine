@@ -59,7 +59,7 @@ namespace GRAVEngine
 
 
 		// Get the file extension
-		GRAVAPI inline std::string fileExtension(const std::filesystem::path& path) { return path.extension().string(); }
+		GRAVAPI inline const std::string fileExtension(const std::filesystem::path& path){ return std::string(path.extension().string());	}
 		// Get the file extension
 		GRAVAPI inline std::string fileExtension(const char* path)					{ return fileExtension(std::filesystem::path(path)); }
 		// Get the file extension

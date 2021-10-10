@@ -69,7 +69,7 @@ namespace GRAVEngine
 			// Read a character. Returns eof if it was the end of the file
 			int readChar();
 			// Read the entire file into a buffer. Memory allocated
-			bool readAll(char*& buffer, size_t& bufferSize);
+			bool readAll(scope<char[]>& buffer, size_t& bufferSize);
 			#pragma endregion
 
 			#pragma region Output
@@ -83,9 +83,9 @@ namespace GRAVEngine
 			// Get the file mode
 			inline const fileMode fileMode() const { return m_FileMode; }
 			// Get the file path
-			inline const std::string& filePath() { return m_FilePath; }
+			inline const std::string filePath() const { return m_FilePath; }
 			// Get the file extension
-			inline const std::string& fileExtension() { return IO::fileExtension(filePath()); }
+			inline const std::string fileExtension() const { return IO::fileExtension(filePath()); }
 
 			// Is the file open
 			inline const bool isOpen() const { return m_Stream.is_open(); }
@@ -97,17 +97,17 @@ namespace GRAVEngine
 
 			#pragma region FileModeTests
 			// Is read enabled
-			inline const bool isInput() { return (m_FileMode & fileMode::INPUT) == fileMode::INPUT; }
+			inline const bool isInput() const { return (m_FileMode & fileMode::INPUT) == fileMode::INPUT; }
 			// Is write enabled
-			inline const bool isOutput() { return (m_FileMode & fileMode::OUTPUT) == fileMode::OUTPUT; }
+			inline const bool isOutput() const { return (m_FileMode & fileMode::OUTPUT) == fileMode::OUTPUT; }
 			// Is the output position moved to the end
-			inline const bool isEnd() { return (m_FileMode & fileMode::END) == fileMode::END; }
+			inline const bool isEnd() const { return (m_FileMode & fileMode::END) == fileMode::END; }
 			// Is the file appending
-			inline const bool isAppend() { return (m_FileMode & fileMode::APPEND) == fileMode::APPEND; }
+			inline const bool isAppend() const { return (m_FileMode & fileMode::APPEND) == fileMode::APPEND; }
 			// Is the file truncating
-			inline const bool isTruncate() { return (m_FileMode & fileMode::TRUNCATE) == fileMode::TRUNCATE; }
+			inline const bool isTruncate() const { return (m_FileMode & fileMode::TRUNCATE) == fileMode::TRUNCATE; }
 			// Is the file in binary
-			inline const bool isBinary() { return (m_FileMode & fileMode::BINARY) == fileMode::BINARY; }
+			inline const bool isBinary() const { return (m_FileMode & fileMode::BINARY) == fileMode::BINARY; }
 			#pragma endregion
 
 		protected:

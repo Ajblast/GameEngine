@@ -17,44 +17,44 @@ GRAVEngine::IO::textFile& GRAVEngine::IO::textFile::operator=(textFile&& other) 
 	return *this;
 }
 
-bool GRAVEngine::IO::textFile::readLine(char* buffer, size_t num)
-{
-	GRAV_ASSERT_LOGLESS(isOpen());
-	GRAV_ASSERT_LOGLESS(isInput());
-
-	if (endOfFile())
-		return false;
-
-	// Read a line from the stream
-	m_Stream.getline((char*)buffer, num);
-
-	// Check if an error occured
-	errorHandle();
-
-	if (failed())
-		return false;
-
-	return true;
-}
-bool GRAVEngine::IO::textFile::readLine(char* buffer, size_t num, char delim)
-{
-	GRAV_ASSERT_LOGLESS(isOpen());
-	GRAV_ASSERT_LOGLESS(isInput());
-
-	if (endOfFile())
-		return false;
-
-	// Read a line from the stream
-	m_Stream.getline((char*)buffer, num, delim);
-
-	// Check if an error occured
-	errorHandle();
-
-	if (failed())
-		return false;
-
-	return true;
-}
+//bool GRAVEngine::IO::textFile::readLine(char* buffer, size_t num)
+//{
+//	GRAV_ASSERT_LOGLESS(isOpen());
+//	GRAV_ASSERT_LOGLESS(isInput());
+//
+//	if (endOfFile())
+//		return false;
+//
+//	// Read a line from the stream
+//	m_Stream.getline((char*)buffer, num);
+//
+//	// Check if an error occured
+//	errorHandle();
+//
+//	if (failed())
+//		return false;
+//
+//	return true;
+//}
+//bool GRAVEngine::IO::textFile::readLine(char* buffer, size_t num, char delim)
+//{
+//	GRAV_ASSERT_LOGLESS(isOpen());
+//	GRAV_ASSERT_LOGLESS(isInput());
+//
+//	if (endOfFile())
+//		return false;
+//
+//	// Read a line from the stream
+//	m_Stream.getline((char*)buffer, num, delim);
+//
+//	// Check if an error occured
+//	errorHandle();
+//
+//	if (failed())
+//		return false;
+//
+//	return true;
+//}
 bool GRAVEngine::IO::textFile::readLine(std::string& str)
 {
 	GRAV_ASSERT_LOGLESS(isOpen());
@@ -94,22 +94,58 @@ bool GRAVEngine::IO::textFile::readLine(std::string& str, char delim)
 	return true;
 }
 
+bool GRAVEngine::IO::textFile::readAll(std::string& str)
+{
+	GRAV_ASSERT_LOGLESS(isOpen());
+	GRAV_ASSERT_LOGLESS(isInput());
+
+	if (endOfFile())
+		return false;
+
+	scope<char[]> buffer;
+	size_t bufferSize;
+
+	bool readResult = file::readAll(buffer, bufferSize);
+	if (readResult == false)
+		return false;
+
+	// Copy the generated buffer into another buffer +1 for /0
+	scope<char[]> nBuffer = createScope<char[]>(bufferSize + 1);
+	std::memcpy(nBuffer.get(), buffer.get(), bufferSize);
+	nBuffer[bufferSize] = 0;
+
+	// Create the string
+	str = std::string(nBuffer.get());
+
+	// Check if an error occured
+	errorHandle();
+
+	if (failed())
+		return false;
+
+	return true;
+}
+
 void GRAVEngine::IO::textFile::write(const std::string& string)
 {
+	// Write the string and the null character
 	file::write(string.c_str(), string.size());
 }
 void GRAVEngine::IO::textFile::writeLine(const std::string& string)
 {
-	writeLine(string.c_str(), string.size());
+	write(string + '\n');
 }
-void GRAVEngine::IO::textFile::writeLine(const char* string, size_t size)
-{
-	// Blocking write the string
-	write(string);
-
-	// Blocking write newline character
-	writeChar('\n');
-}
+//void GRAVEngine::IO::textFile::writeLine(const char* string, size_t size)
+//{
+//	// Blocking write the string without the null character
+//	file::write(string, size - 1);
+//
+//	// Blocking write newline character
+//	writeChar('\n');
+//
+//	// Write the null character
+//	writeChar(0);
+//}
 
 bool GRAVEngine::IO::textFile::searchForToken(const std::string* tokens, size_t tokenCount, size_t byteSearchDepth)
 {
