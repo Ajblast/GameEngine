@@ -7,12 +7,12 @@
 #include "common.h"
 #include "time/durations.h"
 #include "time/stopwatch.h"
-#include "jobs/jobManager.h"
 #include "locks/spinLock.h"
 #include "locks/scopedLock.h"
 #include "io/textFile.h"
 
 #include "debug/functionSignature.h"
+#include "jobs/jobTypes.h"
 
 namespace GRAVEngine
 {
@@ -69,32 +69,10 @@ namespace GRAVEngine
 	class GRAVAPI instrumentorStopwatch
 	{
 	public:
-		instrumentorStopwatch(const char* name) : m_Name(name)
-		{
-			// Start the stopwatch
-			stopwatch.start();
-		}
-		~instrumentorStopwatch()
-		{
-			if (stopwatch.isRunning())
-			{
-				stop();
+		instrumentorStopwatch(const char* name);
+		~instrumentorStopwatch();
 
-				// Output the 
-			}
-		}
-
-		void stop()
-		{
-			stopwatch.pause();
-
-			instrumentor::getInstance()->writeProfile({
-				m_Name,
-				Time::microseconds(stopwatch.startTick().time_since_epoch()),
-				stopwatch.elapsedMicrosecondsDuration(),
-				GRAVEngine::Jobs::jobManager::getInstance() == nullptr ? UINT8_MAX : GRAVEngine::Jobs::jobManager::getInstance()->getCurrentThreadIndex()
-				});
-		}
+		void stop();
 	private:
 		const char* m_Name;			// Name of instrumented line
 		Time::stopwatch stopwatch;	// Timer
@@ -102,7 +80,7 @@ namespace GRAVEngine
 
 }
 
-#define GRAV_PROFILE_LOG_CONSOLE 1
+#define GRAV_PROFILE_LOG_CONSOLE 0
 #define GRAV_PROFILE 1
 #if GRAV_PROFILE
 	#define GRAV_PROFILE_START_SESSION(name, filepath) GRAVEngine::instrumentor::getInstance()->startSession(name, filepath)
@@ -110,7 +88,7 @@ namespace GRAVEngine
 
 #if GRAV_PROFILE_LOG_CONSOLE
 	#define GRAV_PROFILE_SCOPE_LINE2(name, line) GRAVEngine::instrumentorStopwatch stopwatch##line(name);\
-												 if (Logging::logManager::getInstance()) GRAV_LOG_LINE_TRACE("Profile Function: %s", name)
+												 if (GRAVEngine::Logging::logManager::getInstance()) GRAV_LOG_LINE_TRACE("Profile Function: %s", name)
 #else
 	#define GRAV_PROFILE_SCOPE_LINE2(name, line) GRAVEngine::instrumentorStopwatch stopwatch##line(name);
 #endif

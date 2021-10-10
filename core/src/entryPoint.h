@@ -68,7 +68,6 @@ int main(int argc, char** argv)
 	// Deinitialize the trainer
 	GRAVEngine::AI::environmentManager::instance().deinitialize();
 
-	jobManager.startShutdown();
 	jobManager.shutDown();
 	logManager.shutDown();
 	GRAV_PROFILE_END_SESSION();

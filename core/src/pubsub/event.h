@@ -36,6 +36,8 @@ namespace GRAVEngine
 			// Register a callback with this event. Gives back the handle for the event
 			eventHandle registerCallback(const callback& function)
 			{
+				GRAV_PROFILE_FUNCTION();
+
 				Locks::scopedLock<decltype(m_VectorLock)> lock(m_VectorLock);
 
 				// Get the new handle
@@ -50,6 +52,8 @@ namespace GRAVEngine
 			// Unregister a callback based on the handle
 			void unregisterCallback(eventHandle handle)
 			{
+				GRAV_PROFILE_FUNCTION();
+
 				Locks::scopedLock<decltype(m_VectorLock)> lock(m_VectorLock);
 
 				// Find the event by the handle value
@@ -65,26 +69,30 @@ namespace GRAVEngine
 			// Execute the events
 			void execute(T... args)
 			{
+				GRAV_PROFILE_FUNCTION();
+
 				Locks::scopedLock<decltype(m_VectorLock)> lock(m_VectorLock);
 
-				ref<Jobs::counter> counter = createRef<Jobs::counter>();
+				size_t eventCount = m_Events.size();
 
-				for (auto it = m_Events.begin(); it != m_Events.end(); it++)
-				{
-					Jobs::declaration decl = Jobs::declaration([it](uintptr_t) {it->m_CallbackFunction(args...); }, 0, Jobs::jobPriority::NORMAL, counter);
+				// Create an array for the events and a place for the counter
+				scope<Jobs::declaration[]> jobs = createScope<Jobs::declaration[]>(eventCount);
+				ref<Jobs::counter> counter;
 
-					GRAV_KICK_JOB(decl);
+				// Create a job per event
+				for (size_t i = 0; i < eventCount; i++)
+					jobs[i] = Jobs::declaration([&](uintptr_t) {m_Events[i].m_CallbackFunction(args...); }, 0, Jobs::jobPriority::NORMAL);
 
-					//it->m_CallbackFunction(args...);
-				}
-
-				// Wait for all of the jobs
+				// Kick the jobs and wait for them
+				GRAV_KICK_JOBS(jobs.get(), eventCount, &counter);
 				GRAV_WAIT_COUNTER(counter, 0);
 			}
 
 			// Reset the event
 			void clear()
 			{
+				GRAV_PROFILE_FUNCTION();
+
 				Locks::scopedLock<decltype(m_VectorLock)> lock(m_VectorLock);
 
 				m_Events.clear();

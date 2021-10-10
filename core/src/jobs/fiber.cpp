@@ -1,42 +1,35 @@
 #include "gravpch.h"
 #include "fiber.h"
+#include "exceptions/concurrency/fiberCreationException.h"
+#include "exceptions/concurrency/fiberToThreadException.h"
+#include "exceptions/concurrency/fiberSwitchException.h"
 
-// Launch a fiber. Calls the fiber's callback function
-static void launchFiber(GRAVEngine::Jobs::fiber* fiber)
+GRAVEngine::Jobs::fiber::fiber() : m_FiberHandle(nullptr), m_Index(0),m_IsThreadFiber(false)
 {
-	// Get the function's callback function
-	auto callback = fiber->getCallback();
-	GRAV_ASSERT(callback);
-
-	// Call the fiber's function
-	callback(fiber);
 }
-
-GRAVEngine::Jobs::fiber::fiber() : m_FunctionCallback(nullptr), m_CallingFiber(nullptr)
+void GRAVEngine::Jobs::fiber::spawn(fiberCallback callback)
 {
-#ifdef GRAV_PLATFORM_WINDOWS
+	#ifdef GRAV_PLATFORM_WINDOWS
 	// Create the fiber with the launching fiber function
-	m_FiberHandle = (fiberHandle) CreateFiber(0, (LPFIBER_START_ROUTINE) launchFiber, this);
+	m_FiberHandle = (fiberHandle)CreateFiber(0, (LPFIBER_START_ROUTINE)callback, this);
 	m_IsThreadFiber = false;
-#endif
+	#endif
+
+	if (m_FiberHandle == NULL)
+		throw Exceptions::fiberCreationException("Unable to spawn fiber.");
 }
-
-//GRAVEngine::Jobs::fiber::fiber(fiberHandle fiber) : m_FiberHandle(fiber)
-//{
-//}
-
 GRAVEngine::Jobs::fiber::~fiber()
 {
-#ifdef GRAV_PLATFORM_WINDOWS
+	#ifdef GRAV_PLATFORM_WINDOWS
 	// Delete the system fiber
 	if (m_FiberHandle && m_IsThreadFiber == false)
 		DeleteFiber(m_FiberHandle);
-#endif
+	#endif
 }
 
 void GRAVEngine::Jobs::fiber::initializeFromCurrentThread()
 {
-#ifdef GRAV_PLATFORM_WINDOWS
+	#ifdef GRAV_PLATFORM_WINDOWS
 	// Delete the current system fiber if there is one
 	if (m_FiberHandle && m_IsThreadFiber == false)
 		DeleteFiber(m_FiberHandle);
@@ -44,15 +37,25 @@ void GRAVEngine::Jobs::fiber::initializeFromCurrentThread()
 	// Convert this thread to a fiber
 	m_FiberHandle = ConvertThreadToFiber(nullptr);
 	m_IsThreadFiber = true;
-#endif
-}
+	#endif
 
+	// Was a handle created
+	if (m_FiberHandle == NULL)
+		throw Exceptions::fiberCreationException("Unable to create fiber from current thread.");
+}
 void GRAVEngine::Jobs::fiber::convertToThread()
 {
-#ifdef GRAV_PLATFORM_WINDOWS
+	bool result;
+	#ifdef GRAV_PLATFORM_WINDOWS
 	// Turn this fiber back into a thread. Used for the main thread
-	ConvertFiberToThread();
-#endif
+	result = ConvertFiberToThread();
+	m_FiberHandle = NULL;
+	m_IsThreadFiber = false;
+	#endif
+
+	// Was the fiber turned back into a thread
+	if (result == false)
+		throw Exceptions::fiberToThreadException("Unable to convert the current fiber into a thread.");
 }
 
 void GRAVEngine::Jobs::fiber::switchTo(fiber* fiber)
@@ -60,26 +63,7 @@ void GRAVEngine::Jobs::fiber::switchTo(fiber* fiber)
 	GRAV_ASSERT(fiber)
 	GRAV_ASSERT(fiber->m_FiberHandle);
 
-	// Switch to a fiber and pass it the given data
-	fiber->m_CallingFiber = this;
-
-#ifdef GRAV_PLATFORM_WINDOWS
+	#ifdef GRAV_PLATFORM_WINDOWS
 	SwitchToFiber(fiber->m_FiberHandle);
-#endif
-}
-
-void GRAVEngine::Jobs::fiber::switchToCallingFiber()
-{
-	GRAV_ASSERT(m_CallingFiber);
-	GRAV_ASSERT(m_CallingFiber->m_FiberHandle);
-
-	// Switch to the calling fiber
-#ifdef GRAV_PLATFORM_WINDOWS
-	SwitchToFiber(m_CallingFiber->m_FiberHandle);
-#endif
-}
-
-void GRAVEngine::Jobs::fiber::setCallback(fiberFunction callback)
-{
-	m_FunctionCallback = callback;
+	#endif
 }
