@@ -2,7 +2,7 @@
 #include "objImporter.h"
 #include "io/io.h"
 #include "io/file.h"
-#include "exceptions/importException.h"
+#include "exceptions/importing/importException.h"
 #include "objParser.h"
 
 static const GRAVEngine::Tools::Importing::importerDescription s_Desc = {
