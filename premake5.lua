@@ -46,3 +46,6 @@ workspace "GRAVEngine"
 
 	include "core"
 	include "test"
+
+	group "UnitTests"
+		include "testing"
