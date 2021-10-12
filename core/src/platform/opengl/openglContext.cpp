@@ -15,7 +15,7 @@ void GRAVEngine::Rendering::openglContext::startup()
 	GRAV_PROFILE_FUNCTION();
 
 	// Make this context's window the current context
-	glfwMakeContextCurrent(m_WindowHandle);
+	bind();
 
 	// Load glad
 	int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -27,7 +27,9 @@ void GRAVEngine::Rendering::openglContext::startup()
 	GRAV_LOG_INFO("  Version: %s\n", glGetString(GL_VERSION));
 
 	// GRAVEngine requires at least OpenGL version 4.5!"
-	GRAV_ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5))
+	GRAV_ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5));
+
+	//unbind();
 }
 
 void GRAVEngine::Rendering::openglContext::swapBuffers()
@@ -36,4 +38,14 @@ void GRAVEngine::Rendering::openglContext::swapBuffers()
 
 	// Swap the buffers
 	glfwSwapBuffers(m_WindowHandle);
+}
+
+void GRAVEngine::Rendering::openglContext::bind()
+{
+	glfwMakeContextCurrent(m_WindowHandle);
+}
+
+void GRAVEngine::Rendering::openglContext::unbind()
+{
+	glfwMakeContextCurrent(0);
 }

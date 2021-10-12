@@ -16,8 +16,12 @@ namespace GRAVEngine
 
 			virtual void startup() override;
 			virtual void swapBuffers() override;
+
+			virtual void bind() override;
+			virtual void unbind() override;
 		private:
 			GLFWwindow* m_WindowHandle;
+
 		};
 	}
 }
