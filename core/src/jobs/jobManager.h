@@ -135,10 +135,12 @@ namespace GRAVEngine
 			jobQueue m_NormalPriorityQueue;			// The normal priority job queue
 			jobQueue m_LowPriorityQueue;			// The low priority job queue
 
+			jobManagerCallbacks m_Callbacks;			// Callbacks for the job manager
+
 			// Static Instance
 			static jobManager* s_Instance;				// The static job instance
 			std::atomic_bool m_IsValid = false;			// Is the job manager valid?
-			std::atomic_bool m_ShuttingDown = false;			// Is the job manager valid?
+			std::atomic_bool m_ShuttingDown = false;	// Is the job manager valid?
 		};
 	}
 }

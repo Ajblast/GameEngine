@@ -16,8 +16,10 @@ namespace GRAVEngine
 
 		struct tls
 		{
-			tls() : m_CurrentFiberIndex(GRAV_MAX_FIBER_INDEX) {}
+			tls() : m_ThreadIndex(GRAV_MAX_THREAD_INDEX), m_CurrentFiberIndex(GRAV_MAX_FIBER_INDEX) {}
 			~tls() = default;
+
+			threadIndex m_ThreadIndex;	// Index of the thread
 
 			// TODO: Make special threads for IO
 			//bool m_IsIOThread = false;

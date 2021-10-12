@@ -6,9 +6,7 @@
 #include "jobManagerOptions.h"
 #include "jobManager.h"
 
-#define GRAV_KICK_JOB(declaration)					GRAVEngine::Jobs::jobManager::getInstance()->kickJob(declaration)
 #define GRAV_KICK_JOB(declaration, counter)			GRAVEngine::Jobs::jobManager::getInstance()->kickJob(declaration, counter)
-#define GRAV_KICK_JOBS(declarations, size)			GRAVEngine::Jobs::jobManager::getInstance()->kickJobs(declarations, size)
 #define GRAV_KICK_JOBS(declarations, size, counter)	GRAVEngine::Jobs::jobManager::getInstance()->kickJobs(declarations, size, counter)
 #define GRAV_WAIT_COUNTER(counter, target)			GRAVEngine::Jobs::jobManager::getInstance()->waitForCounter(counter, target)
 

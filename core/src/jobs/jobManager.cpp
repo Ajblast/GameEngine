@@ -17,8 +17,19 @@ GRAV_JOB_ENTRY_POINT(GRAVEngine::Jobs::switchToReadyFiber)
 	tls->m_CurrentFiberIndex = bundle->m_Index;
 	tls->m_PreviousFiberDestination = fiberDestination::POOL;
 
+	// Fiber detached callback
+	if (instance->m_Callbacks.m_OnFiberDetached)
+		instance->m_Callbacks.m_OnFiberDetached(tls->m_PreviousFiberIndex, false);
+
 	// Switch to the now ready fiber
 	instance->m_Fibers[tls->m_PreviousFiberIndex].switchTo(&instance->m_Fibers[tls->m_CurrentFiberIndex]);
+
+	// Get the thread local storage again as it could have changed
+	tls = instance->getCurrentTLS();
+
+	// Fiber attached callback
+	if (instance->m_Callbacks.m_OnFiberAttached)
+		instance->m_Callbacks.m_OnFiberAttached(tls->m_CurrentFiberIndex);
 
 	// Clean the previous fiber after execution
 	instance->cleanPreviousFiber();
@@ -58,6 +69,8 @@ void GRAVEngine::Jobs::jobManager::startUp(jobManagerOptions& options)
 		GRAV_ASSERT(options.m_NumThreads <= std::thread::hardware_concurrency());
 	GRAV_ASSERT(options.m_MaxWaitingFibersCount > 1);
 
+	m_Callbacks = options.m_Callbacks;
+
 	GRAV_LOG_LINE_INFO("%s: Begin Startup", GRAV_CLEAN_FUNC_SIG);
 
 	s_Instance = this;
@@ -95,6 +108,7 @@ void GRAVEngine::Jobs::jobManager::startUp(jobManagerOptions& options)
 		{
 			// set thread index
 			auto tls = m_Threads[i].getTLS();
+			tls->m_ThreadIndex = i;
 
 			if (i != GRAV_MAIN_THREAD_INDEX)
 			{
@@ -111,6 +125,10 @@ void GRAVEngine::Jobs::jobManager::startUp(jobManagerOptions& options)
 				// Initialize the main thread into a gravThread because std::thread sucks
 				m_Threads[i].initializeFromCurrentThread();
 
+				// Main thread on initialized callback
+				if (m_Callbacks.m_OnThreadInitialized)
+					m_Callbacks.m_OnThreadInitialized(0);
+
 				// We do not initialize the main thread's TLS fiber because it isn't used.
 				// It is impossible to sync it's fiber with any fiber's in the pool, so just use one of the fiber's in the pool instead
 				//tls->m_Fiber.initializeFromCurrentThread();
@@ -125,6 +143,10 @@ void GRAVEngine::Jobs::jobManager::startUp(jobManagerOptions& options)
 			if (m_ThreadAffinity)
 				m_Threads[i].setAffinity(i);
 		}
+
+		// Thread creation callback
+		if (m_Callbacks.m_OnThreadsCreated)
+			m_Callbacks.m_OnThreadsCreated(m_ThreadCount);
 	}
 
 	// Spawn the fiber pool
@@ -152,9 +174,21 @@ void GRAVEngine::Jobs::jobManager::startUp(jobManagerOptions& options)
 				m_IdleFibers[i].store(false, std::memory_order_release);
 			}
 		}
+
+		// Fiber creation callback
+		if (m_Callbacks.m_OnFibersCreated)
+			m_Callbacks.m_OnFibersCreated(m_FiberCount);
 	}
 
+	// Fiber attached callback for the main fiber because it wouldn't be called otherwise
+	if (m_Callbacks.m_OnFiberAttached)
+		m_Callbacks.m_OnFiberAttached(GRAV_MAIN_FIBER_INDEX);
+
 	m_IsValid.store(true, std::memory_order_relaxed);
+	// Job manager statup callback
+	if (m_Callbacks.m_OnJobManagerStartup)
+		m_Callbacks.m_OnJobManagerStartup();
+
 	GRAV_LOG_LINE_INFO("%s: End Startup", GRAV_CLEAN_FUNC_SIG);
 }
 void GRAVEngine::Jobs::jobManager::shutDown()
@@ -177,6 +211,9 @@ void GRAVEngine::Jobs::jobManager::shutDown()
 	if (m_QueueBehavior.load(std::memory_order_relaxed) == queueBehavior::SLEEP)
 		m_ThreadCV.notify_all();
 
+	// Fiber detached callback
+	if (m_Callbacks.m_OnFiberDetached)
+		m_Callbacks.m_OnFiberDetached(getCurrentTLS()->m_PreviousFiberIndex, false);
 
 	// Jump to this thread's quit fiber. This is done just in case a different thread started the shutdown process.
 	GRAV_LOG_LINE_INFO("%s: Jump to thread quit fiber to isolate the starting main thread", GRAV_CLEAN_FUNC_SIG);
@@ -200,6 +237,9 @@ void GRAVEngine::Jobs::jobManager::shutDown()
 	m_Threads[GRAV_MAIN_THREAD_INDEX].getTLS()->m_Fiber.convertToThread();
 
 	s_Instance = nullptr;
+	if (m_Callbacks.m_OnJobManagerShutdown)
+		m_Callbacks.m_OnJobManagerShutdown();
+
 	GRAV_LOG_LINE_INFO("%s: End Shutdown", GRAV_CLEAN_FUNC_SIG);
 }
 
@@ -288,8 +328,19 @@ void GRAVEngine::Jobs::jobManager::waitForCounter(ref<counter>& counter, counter
 	tls->m_PreviousFiberStored = &currentBundle->m_FiberIsSwitched;	// Set previous stored flag as the pointer to the current bundle's flag
 	tls->m_CurrentFiberIndex = freeFiberIndex;						// Find a free fiber
 
+	// Fiber detached callback
+	if (m_Callbacks.m_OnFiberDetached)
+		m_Callbacks.m_OnFiberDetached(tls->m_PreviousFiberIndex, true);
+
 	// Switch to the new fiber from the current fiber
 	m_Fibers[currentFiberIndex].switchTo(&m_Fibers[freeFiberIndex]);
+
+	// Get the thread local storage again as it could have changed
+	tls = getCurrentTLS();
+
+	// Fiber attached callback
+	if (m_Callbacks.m_OnFiberAttached)
+		m_Callbacks.m_OnFiberAttached(tls->m_CurrentFiberIndex);
 
 	// The fiber was switched back to here
 	// Clean up the previous fiber information
@@ -304,10 +355,13 @@ GRAVEngine::Jobs::threadID GRAVEngine::Jobs::jobManager::getCurrentThreadID() co
 }
 GRAVEngine::Jobs::threadIndex GRAVEngine::Jobs::jobManager::getCurrentThreadIndex() const
 {
-	gravThread* thread = getCurrentThread();
-	for (size_t i = 0; i < m_ThreadCount; i++)
-		if (&m_Threads[i] == thread)
-			return i;
+	if (isValid())
+	{
+		gravThread* thread = getCurrentThread();
+		for (size_t i = 0; i < m_ThreadCount; i++)
+			if (&m_Threads[i] == thread)
+				return i;
+	}
 	return GRAV_MAX_THREAD_INDEX;
 }
 std::wstring GRAVEngine::Jobs::jobManager::getCurrentThreadName() const
@@ -332,18 +386,21 @@ void GRAVEngine::Jobs::jobManager::addReadyFiber(fiberBundle* bundle)
 
 GRAVEngine::Jobs::gravThread* GRAVEngine::Jobs::jobManager::getThread(threadIndex index) const
 {
+	GRAV_ASSERT(isValid());
 	GRAV_ASSERT(index < m_ThreadCount);
 	return &m_Threads[index];
 }
 GRAVEngine::Jobs::gravThread* GRAVEngine::Jobs::jobManager::getCurrentThread() const
 {
-#ifdef GRAV_PLATFORM_WINDOWS
-	threadID id = GetCurrentThreadId();
-	for (threadIndex i = 0; i < m_ThreadCount; i++)
-		if (m_Threads[i].getID() == id)
-			return &m_Threads[i];
-#endif
-
+	if (isValid())
+	{
+		#ifdef GRAV_PLATFORM_WINDOWS
+		threadID id = GetCurrentThreadId();
+		for (threadIndex i = 0; i < m_ThreadCount; i++)
+			if (m_Threads[i].getID() == id)
+				return &m_Threads[i];
+		#endif
+	}
 	return nullptr;
 }
 GRAVEngine::Jobs::tls* GRAVEngine::Jobs::jobManager::getCurrentTLS() const
@@ -445,6 +502,14 @@ void GRAVEngine::Jobs::jobManager::fiberCallback(fiber* currentFiber)
 	fiberIndex index = currentFiber->getIndex();
 	GRAV_LOG_LINE_INFO("%s: Start Fiber: %i", GRAV_CLEAN_FUNC_SIG, index);
 	
+	// Fiber attached callback
+	if (instance->m_Callbacks.m_OnFiberAttached)
+		instance->m_Callbacks.m_OnFiberAttached(index);
+
+	// Fiber initialized callback
+	if (instance->m_Callbacks.m_OnFiberInitialized)
+		instance->m_Callbacks.m_OnFiberInitialized(index);
+
 	// This fiber is starting. Clean the previous fiber of its resources
 	instance->cleanPreviousFiber();
 
@@ -454,12 +519,20 @@ void GRAVEngine::Jobs::jobManager::fiberCallback(fiber* currentFiber)
 		// Get the next job
 		if (instance->getNextJob(job))
 		{
+			// Job Before callback
+			if (instance->m_Callbacks.m_OnJobBefore)
+				instance->m_Callbacks.m_OnJobBefore(job.m_Declaration);
+
 			// Run the job
 			job.m_Declaration.m_EntryPoint(job.m_Declaration.m_Arg);
 
 			// Decrement the counter associated with this job if it exists
 			if (job.m_Counter && *job.m_Counter)
 				(*job.m_Counter)->decrement();
+
+			// Job After callback
+			if (instance->m_Callbacks.m_OnJobAfter)
+				instance->m_Callbacks.m_OnJobAfter(job.m_Declaration);
 		}
 		else
 		{
@@ -485,8 +558,16 @@ void GRAVEngine::Jobs::jobManager::fiberCallback(fiber* currentFiber)
 		}
 	}
 
+	// Fiber initialized callback
+	if (instance->m_Callbacks.m_OnFiberEnds)
+		instance->m_Callbacks.m_OnFiberEnds(index);
+
 	GRAV_LOG_LINE_INFO("%s: End Fiber: %i", GRAV_CLEAN_FUNC_SIG, index);
 	
+	// Fiber detached callback
+	if (instance->m_Callbacks.m_OnFiberDetached)
+		instance->m_Callbacks.m_OnFiberDetached(instance->getCurrentTLS()->m_PreviousFiberIndex, false);
+
 	// Switch back to the calling fiber because the thread's have to die using their personal fibers
 	threadIndex currentThread = instance->getCurrentThreadIndex();
 	fiber* threadQuitFiber = &instance->m_ThreadQuitFibers[currentThread];
@@ -529,10 +610,16 @@ void GRAVEngine::Jobs::jobManager::threadCallback(gravThread* gravThread)
 		GRAVEngine::Jobs::gravThread::sleepFor(1);
 	}
 
-	fiberIndex freeFiberIndex = instance->findFreeFiber();
-
 	// Get the thread's thread local storage
 	GRAVEngine::Jobs::tls* tls = gravThread->getTLS();
+
+	// Thread initialized callback
+	if (instance->m_Callbacks.m_OnThreadInitialized)
+		instance->m_Callbacks.m_OnThreadInitialized(tls->m_ThreadIndex);
+
+
+	fiberIndex freeFiberIndex = instance->findFreeFiber();
+
 
 	// Setup the thread's personal fiber. It uses the max fiber index because these are personal fiber's that don't exist in the fiber pool.
 	tls->m_Fiber.initializeFromCurrentThread();
@@ -542,4 +629,8 @@ void GRAVEngine::Jobs::jobManager::threadCallback(gravThread* gravThread)
 	GRAV_LOG_LINE_INFO("%s: Thread: %u | Start fiber", GRAV_CLEAN_FUNC_SIG, gravThread->getID());	
 	tls->m_Fiber.switchTo(&instance->m_Fibers[freeFiberIndex]);
 	GRAV_LOG_LINE_INFO("%s: Thread: %u | Thread Finished", GRAV_CLEAN_FUNC_SIG, gravThread->getID());
+
+	// Fiber initialized callback
+	if (instance->m_Callbacks.m_OnThreadEnds)
+		instance->m_Callbacks.m_OnThreadEnds(tls->m_ThreadIndex);
 }
