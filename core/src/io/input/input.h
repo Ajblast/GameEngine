@@ -8,6 +8,7 @@ namespace GRAVEngine
 {
 	namespace IO
 	{
+		// Static API to get input
 		class GRAVAPI Input
 		{
 		public:

@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "textFileTest.h"
-#include "io/textFile.h"
+#include "io/files/textFile.h"
 
 void GRAVCore::IO::textFile::canReadLine()
 {

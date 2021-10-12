@@ -2,7 +2,7 @@
 
 #include "common.h"
 #include "baseSink.h"
-#include "io/textFile.h"
+#include "io/files/textFile.h"
 
 namespace GRAVEngine
 {

@@ -9,7 +9,7 @@
 #include "time/stopwatch.h"
 #include "locks/spinLock.h"
 #include "locks/scopedLock.h"
-#include "io/textFile.h"
+#include "io/files/textFile.h"
 
 #include "debug/functionSignature.h"
 #include "jobs/jobTypes.h"

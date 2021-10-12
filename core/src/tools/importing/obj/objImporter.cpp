@@ -1,7 +1,7 @@
 #include "gravpch.h"
 #include "objImporter.h"
-#include "io/io.h"
-#include "io/file.h"
+#include "io/files/io.h"
+#include "io/files/file.h"
 #include "exceptions/importing/importException.h"
 #include "objParser.h"
 
