@@ -16,7 +16,6 @@ void GRAVEngine::Layers::layerStack::pushLayer(layer* layer)
 	m_Layers.emplace(begin() + m_LayerInsertIndex, layer);
 	m_LayerInsertIndex++;
 }
-
 void GRAVEngine::Layers::layerStack::pushOverlay(layer* overlay)
 {
 	m_Layers.emplace_back(overlay);
@@ -32,7 +31,6 @@ void GRAVEngine::Layers::layerStack::popLayer(layer* layer)
 		m_LayerInsertIndex--;
 	}
 }
-
 void GRAVEngine::Layers::layerStack::popOverlay(layer* overlay)
 {
 	auto it = std::find(begin() + m_LayerInsertIndex, end(), overlay);

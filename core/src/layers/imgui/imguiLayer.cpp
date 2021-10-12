@@ -58,7 +58,6 @@ void GRAVEngine::Layers::imguiLayer::onAttach()
 	application& app = application::getInstance();
 	GLFWwindow* window = static_cast<GLFWwindow*>(app.getWindow().getNativeWindow());
 
-
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 
 	// Setup Platform/Renderer bindings
@@ -74,9 +73,7 @@ void GRAVEngine::Layers::imguiLayer::onAttach()
 		GRAV_ASSERT(false);
 		break;
 	}
-
 }
-
 void GRAVEngine::Layers::imguiLayer::onDetach()
 {
 	GRAV_PROFILE_FUNCTION();
@@ -131,7 +128,6 @@ void GRAVEngine::Layers::imguiLayer::begin()
 	ImGui::NewFrame();
 	// ImGuizmo::BeginFrame();
 }
-
 void GRAVEngine::Layers::imguiLayer::end()
 {
 	GRAV_PROFILE_FUNCTION();
