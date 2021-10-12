@@ -2,7 +2,7 @@
 #include "platform/opengl/openglShader.h"
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
-#include "io/textFile.h"
+#include "io/files/textFile.h"
 #include <array>
 
 namespace GRAVEngine
