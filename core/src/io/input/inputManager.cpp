@@ -54,6 +54,7 @@ void GRAVEngine::IO::inputManager::pollEvents()
 	GRAV_ASSERT(isValid());
 
 	auto* window = static_cast<GLFWwindow*>(application::getInstance().getWindow().getNativeWindow());
+	glfwPollEvents();
 
 	// Keycodes
 	for (auto it = m_KeyPressedMap.begin(); it != m_KeyPressedMap.end(); it++)
@@ -67,9 +68,6 @@ void GRAVEngine::IO::inputManager::pollEvents()
 	for (auto it = m_MousePressedMap.begin(); it != m_MousePressedMap.end(); it++)
 	{
 		auto state = glfwGetMouseButton(window, static_cast<int32>(it->first));
-		bool result = state == GLFW_PRESS;
-		if (result)
-			GRAV_LOG_LINE_INFO("************************************************************************************* Pressed!");
 
 		// Store the state
 		it->second.store(state == GLFW_PRESS, std::memory_order_release);

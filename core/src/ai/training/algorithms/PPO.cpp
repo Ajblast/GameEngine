@@ -1,19 +1,22 @@
 #include "gravpch.h"
 #include "PPO.h"
+#include "../../models/model.h"
 
-GRAVEngine::AI::Training::Algorithms::PPO::PPO(networkSettings settings, ref<ppoHyperparameters> hyperparameters) :
-    m_Model(createRef<Models::ActorCritic::actorCritic>(settings)),
+GRAVEngine::AI::Training::Algorithms::PPO::PPO(ref<ppoHyperparameters> hyperparameters) :
+    m_Model(std::move(Models::ActorCritic::actorCritic())),
     m_Hyperparameters(hyperparameters),
-    m_Optimizer(m_Model->operator->()->parameters(), torch::optim::AdamOptions(0.0001).betas({ 0.5, 0.999 }))
+    m_Optimizer(m_Model->parameters(), torch::optim::AdamOptions(0.0001).betas({ 0.5, 0.999 }))
+{
+    GRAV_ASSERT(hyperparameters != nullptr);    // Make sure that the hyperparameters are actually passed in
+}
+GRAVEngine::AI::Training::Algorithms::PPO::PPO(networkSettings settings, ref<ppoHyperparameters> hyperparameters) :
+    m_Model(std::move(Models::ActorCritic::actorCritic(settings))),
+    m_Hyperparameters(hyperparameters),
+    m_Optimizer(m_Model->parameters(), torch::optim::AdamOptions(0.0001).betas({ 0.5, 0.999 }))
 {
     GRAV_ASSERT(hyperparameters != nullptr);    // Make sure that the hyperparameters are actually passed in
 }
 
-//GRAVEngine::AI::Models::model& GRAVEngine::AI::Training::Algorithms::PPO::model()
-//{
-//    // Cast the actor-critic into a generic model
-//    return &(*m_Model);
-//}
 GRAVEngine::AI::Training::algorithmType GRAVEngine::AI::Training::Algorithms::PPO::getAlgorithmType()
 {
     return algorithmType::PPO;
@@ -34,21 +37,19 @@ bool GRAVEngine::AI::Training::Algorithms::PPO::shouldUpdate()
 
     return true;
 }
-//bool GRAVEngine::AI::Training::Algorithms::PPO::initialized()
-//{
-//    return false;
-//}
+
 
 GRAVEngine::AI::Models::ActorCritic::actorCriticOputput GRAVEngine::AI::Training::Algorithms::PPO::forward(std::vector<torch::Tensor> inputs)
 {
-    return m_Model->operator->()->forward(inputs);
+    return m_Model->forward(inputs);
 }
+
 
 void GRAVEngine::AI::Training::Algorithms::PPO::print() const
 {
     std::stringstream ss;
 
-    ss << *m_Model->operator->() << std::endl;
+    ss << m_Model << std::endl;
 
     GRAV_LOG_LINE_INFO("\nPrint Model:\n%s", ss.str().c_str());
 
@@ -95,7 +96,7 @@ void GRAVEngine::AI::Training::Algorithms::PPO::update()
             //returns.print();
 
             // Run through the model
-            Models::ActorCritic::actorCriticOputput output = m_Model->operator->()->forward(observation);
+            Models::ActorCritic::actorCriticOputput output = m_Model->forward(observation);
             torch::Tensor value = std::get<1>(output);
             torch::Tensor entropy = std::get<2>(std::get<0>(output));
 
@@ -105,7 +106,7 @@ void GRAVEngine::AI::Training::Algorithms::PPO::update()
             //torch::print(entropy);
             //GRAV_LOG_LINE_INFO("");
 
-            Models::ActorCritic::agentLogProbs newLogProbs = m_Model->operator->()->logProbs(observation, actions);
+            Models::ActorCritic::agentLogProbs newLogProbs = m_Model->logProbs(observation, actions);
 
 
             // Calculate the surrogates
@@ -152,9 +153,11 @@ void GRAVEngine::AI::Training::Algorithms::PPO::update()
 
 void GRAVEngine::AI::Training::Algorithms::PPO::saveModel(const std::string& filePath)
 {
+    GRAVEngine::AI::Models::save<Models::ActorCritic::actorCritic>(m_Model, filePath);
 }
 void GRAVEngine::AI::Training::Algorithms::PPO::loadModel(const std::string& filePath)
 {
+    GRAVEngine::AI::Models::load<Models::ActorCritic::actorCritic>(m_Model, filePath);
 }
 
 void GRAVEngine::AI::Training::Algorithms::PPO::addTrajectory(trajectory trajectory)
@@ -201,23 +204,21 @@ void GRAVEngine::AI::Training::Algorithms::PPO::addTrajectory(trajectory traject
     // Add to the update buffer the trajectory
     m_UpdateBuffer.append(buffer);
 }
-
 void GRAVEngine::AI::Training::Algorithms::PPO::sendToDevice(inferenceDevice device)
 {
     switch (device)
     {
     case GRAVEngine::AI::inferenceDevice::CPU:
-        m_Model->operator->()->to(torch::kCPU);
+        m_Model->to(torch::kCPU);
         break;
     case GRAVEngine::AI::inferenceDevice::GPU:
         // Send the model to the GPU if cuda core are actually available.
-        m_Model->operator->()->to(torch::cuda::is_available() ? torch::kCUDA : torch::kCPU);
+        m_Model->to(torch::cuda::is_available() ? torch::kCUDA : torch::kCPU);
         break;
     default:
         break;
     }
 }
-
 std::vector<torch::Tensor> GRAVEngine::AI::Training::Algorithms::PPO::gae(trajectory trajectory)
 {
     std::vector<torch::Tensor> returns;
@@ -243,7 +244,3 @@ std::vector<torch::Tensor> GRAVEngine::AI::Training::Algorithms::PPO::gae(trajec
 
     return returns;
 }
-
-//void GRAVEngine::AI::Training::Algorithms::PPO::initialize(networkSettings settings, ref<hyperparameters> parameters)
-//{
-//}

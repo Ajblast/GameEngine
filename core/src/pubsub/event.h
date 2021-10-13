@@ -75,6 +75,10 @@ namespace GRAVEngine
 
 				size_t eventCount = m_Events.size();
 
+				// Don't do anything if there are no events
+				if (eventCount == 0)
+					return;
+
 				// Create an array for the events and a place for the counter
 				scope<Jobs::declaration[]> jobs = createScope<Jobs::declaration[]>(eventCount);
 				ref<Jobs::counter> counter;

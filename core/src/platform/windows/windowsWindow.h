@@ -18,6 +18,7 @@ namespace GRAVEngine
 		{
 		public:
 			windowsWindow(const windowProperties& properties);
+			windowsWindow(scope<windowsWindow>& window, const windowProperties& properties);
 			virtual ~windowsWindow();
 
 			void onUpdate() override;
@@ -33,6 +34,7 @@ namespace GRAVEngine
 			inline void* getNativeWindow() const { return m_Window; }
 		private:
 			virtual void startup(const windowProperties& properties);
+			virtual void startup(scope<windowsWindow>& window, const windowProperties& properties);
 			virtual void shutdown();
 		private:
 			struct windowData
@@ -45,7 +47,6 @@ namespace GRAVEngine
 			};
 
 			GLFWwindow* m_Window;
-			scope<graphicsContext> m_Context;
 			windowData m_Data;
 		};
 	}

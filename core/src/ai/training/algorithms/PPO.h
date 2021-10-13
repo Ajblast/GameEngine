@@ -20,6 +20,7 @@ namespace GRAVEngine
 				class GRAVAPI PPO : public ITrainingAlgorithm
 				{
 				public:
+					PPO(ref<ppoHyperparameters> hyperparameters);
 					PPO(networkSettings settings, ref<ppoHyperparameters> hyperparameters);
 					virtual ~PPO() = default;
 
@@ -63,7 +64,7 @@ namespace GRAVEngine
 				private:
 					std::vector<torch::Tensor> gae(trajectory trajectory);
 				private:
-					ref<Models::ActorCritic::actorCritic> m_Model;	// The model for training
+					Models::ActorCritic::actorCritic m_Model;	// The model for training
 					ref<ppoHyperparameters> m_Hyperparameters;		// Hyperparameters for the algorithm
 					networkSettings m_Settings;						// Algorithm settings
 

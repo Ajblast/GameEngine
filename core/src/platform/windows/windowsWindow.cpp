@@ -25,6 +25,12 @@ namespace GRAVEngine
 
 			startup(properties);
 		}
+		windowsWindow::windowsWindow(scope<windowsWindow>& window, const windowProperties& properties)
+		{
+			GRAV_PROFILE_FUNCTION();
+
+			startup(window, properties);
+		}
 		windowsWindow::~windowsWindow()
 		{
 			GRAV_PROFILE_FUNCTION();
@@ -36,8 +42,7 @@ namespace GRAVEngine
 		{
 			GRAV_PROFILE_FUNCTION();
 
-			// Poll for events and swap the buffers
-			glfwPollEvents();
+			// Swap the render buffers
 			m_Context->swapBuffers();
 		}
 
@@ -70,7 +75,6 @@ namespace GRAVEngine
 			// Initialize glfw if needed
 			if (s_GLFWWindowCount == 0)
 			{
-				// TODO: glfwTerminate on system shutdown
 				int success = glfwInit();
 				GRAV_ASSERT(success);
 
@@ -84,13 +88,19 @@ namespace GRAVEngine
 				glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GRAV_GLFW_CONTEXT_VERSION_MINOR);
 			}
 
-#ifdef GRAV_DEBUG
+			#ifdef GRAVCORE_DEBUG
 			if (Rendering::rendererAPI::getAPI() == Rendering::rendererAPI::API::OpenGL)
 			{
 				glfwWindowHint(GLFW_OPENGL_PROFILE, GRAV_GLFW_OPENGL_PROFILE);
 				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 			}
-#endif
+			#endif
+
+			// Set whether the window is visible
+			if (properties.m_Visible)
+				glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+			else
+				glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
 			{
 				GRAV_PROFILE_SCOPE("glfwCreateWindow");
@@ -111,13 +121,12 @@ namespace GRAVEngine
 			m_Context = Rendering::rendererAPI::createContext(m_Window);
 			m_Context->startup();
 
+			bindGraphicsContext();
 
 			// Set data associated with this window
 			glfwSetWindowUserPointer(m_Window, &m_Data);
 			setVSync(true);
 
-
-			// TODO: Callbacks
 
 			glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int32 width, int32 height)
 			{
@@ -202,11 +211,146 @@ namespace GRAVEngine
 					Events::mouseMovedEvent event((float)xPos, (float)yPos);
 					data.m_EventCallback(event);
 			});
+		}
+		void windowsWindow::startup(scope<windowsWindow>& window, const windowProperties& properties)
+		{
+			GRAV_PROFILE_FUNCTION();
 
+			m_Data.m_Title = properties.m_Title;
+			m_Data.m_Width = properties.m_Width;
+			m_Data.m_Height = properties.m_Height;
+
+			GRAV_LOG_LINE_INFO("Creating window \"%s\" (%d, %d) dependent on \"%s\"", properties.m_Title.c_str(), properties.m_Width, properties.m_Height, window->m_Data.m_Title.c_str());
+
+			#ifdef GRAVCORE_DEBUG
+			if (Rendering::rendererAPI::getAPI() == Rendering::rendererAPI::API::OpenGL)
+			{
+				glfwWindowHint(GLFW_OPENGL_PROFILE, GRAV_GLFW_OPENGL_PROFILE);
+				glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+			}
+			#endif
+
+			// Set whether the window is visible
+			if (properties.m_Visible)
+				glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE);
+			else
+				glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+
+			{
+				GRAV_PROFILE_SCOPE("glfwCreateDependentWindow");
+
+				// Create the window
+				m_Window = glfwCreateWindow((int)properties.m_Width, (int)properties.m_Height, m_Data.m_Title.c_str(), nullptr, (GLFWwindow*) window->getNativeWindow());
+				if (m_Window == nullptr)
+				{
+					GRAV_LOG_LINE_ERROR("Error in creating window (%s)", m_Data.m_Title.c_str());
+					return;
+				}
+
+				// Increment the window count
+				++s_GLFWWindowCount;
+			}
+
+			// Create the context of the window
+			m_Context = Rendering::rendererAPI::createContext(m_Window);
+
+			// Rebind the context because startup will unbind it
+			bindGraphicsContext();
+
+			// Set data associated with this window
+			glfwSetWindowUserPointer(m_Window, &m_Data);
+			setVSync(true);
+
+
+			//glfwSetWindowSizeCallback(m_Window, [](GLFWwindow* window, int32 width, int32 height)
+			//	{
+			//		windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+			//		data.m_Width = width;
+			//		data.m_Height = height;
+
+			//		Events::windowResizeEvent event(width, height);
+			//		data.m_EventCallback(event);
+			//	});
+			//glfwSetWindowCloseCallback(m_Window, [](GLFWwindow* window)
+			//	{
+			//		windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+
+			//		Events::windowCloseEvent event;
+			//		data.m_EventCallback(event);
+			//	});
+			//glfwSetKeyCallback(m_Window, [](GLFWwindow* window, int32 key, int32 scancode, int32 action, int32 mods)
+			//	{
+			//		windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+
+			//		switch (action)
+			//		{
+			//		case GLFW_PRESS:
+			//		{
+			//			Events::keyPressedEvent event(key, 0);
+			//			data.m_EventCallback(event);
+			//			break;
+			//		}
+			//		case GLFW_RELEASE:
+			//		{
+			//			Events::keyReleasedEvent event(key);
+			//			data.m_EventCallback(event);
+			//			break;
+			//		}
+			//		case GLFW_REPEAT:
+			//		{
+			//			Events::keyPressedEvent event(key, 1);
+			//			data.m_EventCallback(event);
+			//			break;
+			//		}
+			//		}
+			//	});
+			//glfwSetCharCallback(m_Window, [](GLFWwindow* window, uint32 keycode)
+			//	{
+			//		windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+
+			//		Events::KeyTypedEvent event(keycode);
+			//		data.m_EventCallback(event);
+			//	});
+			//glfwSetMouseButtonCallback(m_Window, [](GLFWwindow* window, int32 button, int32 action, int32 mods)
+			//	{
+			//		windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+
+			//		switch (action)
+			//		{
+			//		case GLFW_PRESS:
+			//		{
+			//			Events::mouseButtonPressedEvent event(button);
+			//			data.m_EventCallback(event);
+			//			break;
+			//		}
+			//		case GLFW_RELEASE:
+			//		{
+			//			Events::mouseButtonReleasedEvent event(button);
+			//			data.m_EventCallback(event);
+			//			break;
+			//		}
+			//		}
+			//	});
+			//glfwSetScrollCallback(m_Window, [](GLFWwindow* window, double xOffset, double yOffset)
+			//	{
+			//		windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+
+			//		Events::mouseScrolledEvent event((float)xOffset, (float)yOffset);
+			//		data.m_EventCallback(event);
+			//	});
+			//glfwSetCursorPosCallback(m_Window, [](GLFWwindow* window, double xPos, double yPos)
+			//	{
+			//		windowData& data = *(windowData*)glfwGetWindowUserPointer(window);
+
+			//		Events::mouseMovedEvent event((float)xPos, (float)yPos);
+			//		data.m_EventCallback(event);
+			//	});
 		}
 		void windowsWindow::shutdown()
 		{
 			GRAV_PROFILE_FUNCTION();
+
+			bindGraphicsContext();
 
 			// Destroy the window decrement the count
 			glfwDestroyWindow(m_Window);

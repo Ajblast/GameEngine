@@ -196,14 +196,13 @@ void GRAVEngine::Jobs::jobManager::shutDown()
 	GRAV_PROFILE_FUNCTION();
 	GRAV_ASSERT(s_Instance);
 
+	// The job manager is now shutting down
+	m_ShuttingDown.store(true, std::memory_order_release);
+
 	// Create the fiber's quitting
 	m_ThreadQuitFibers = createScope<fiber[]>(m_ThreadCount);
 	for (size_t i = 0; i < m_ThreadCount; i++)
 		m_ThreadQuitFibers[i].spawn(fiberQuitCallback);
-
-	// The job manager is now shutting down is invalid
-	m_IsValid.store(false, std::memory_order_release);
-	m_ShuttingDown.store(true, std::memory_order_release);
 
 	GRAV_LOG_LINE_INFO("%s: Begin Shutdown", GRAV_CLEAN_FUNC_SIG);
 
@@ -236,9 +235,12 @@ void GRAVEngine::Jobs::jobManager::shutDown()
 	GRAV_LOG_LINE_INFO("%s: Convert the main fiber back into a thread", GRAV_CLEAN_FUNC_SIG);
 	m_Threads[GRAV_MAIN_THREAD_INDEX].getTLS()->m_Fiber.convertToThread();
 
-	s_Instance = nullptr;
 	if (m_Callbacks.m_OnJobManagerShutdown)
 		m_Callbacks.m_OnJobManagerShutdown();
+
+	// The job manager is now shutting down is invalid
+	m_IsValid.store(false, std::memory_order_release);
+	s_Instance = nullptr;
 
 	GRAV_LOG_LINE_INFO("%s: End Shutdown", GRAV_CLEAN_FUNC_SIG);
 }
@@ -514,7 +516,7 @@ void GRAVEngine::Jobs::jobManager::fiberCallback(fiber* currentFiber)
 	instance->cleanPreviousFiber();
 
 	job job;
-	while (instance->isValid())
+	while (instance->isShuttingDown() == false)
 	{	
 		// Get the next job
 		if (instance->getNextJob(job))
@@ -576,7 +578,7 @@ void GRAVEngine::Jobs::jobManager::fiberCallback(fiber* currentFiber)
 	// Fiber's switch to their quit equivalent fibers and should never be ran again. As such, this area should never be ran.
 	throw Exceptions::fiberCallbackException("Fiber code ran after switching to quit fiber. This code should never be reached!");
 }
-void GRAVEngine::Jobs::jobManager::fiberQuitCallback(fiber* fiber)
+void GRAVEngine::Jobs::jobManager::fiberQuitCallback(fiber* fiber) 
 {
 	jobManager* instance = jobManager::getInstance();
 

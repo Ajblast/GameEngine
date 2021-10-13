@@ -40,10 +40,6 @@ void Test2D::onUpdate(GRAVEngine::Time::timestep ts)
 {
 	orthoCam.OnUpdate(ts);
 	
-	GRAVEngine::Rendering::renderer2D::resetStats();
-
-	GRAVEngine::Rendering::rendererCommand::setClearColor({ 0.2f, 0.3f, 0.3f, 1.0f });
-	GRAVEngine::Rendering::rendererCommand::clear();
 
 	if (GRAVEngine::IO::Input::isKeyPressed(GRAVEngine::Keys::Space))
 	{
@@ -53,26 +49,22 @@ void Test2D::onUpdate(GRAVEngine::Time::timestep ts)
 
 	GRAVEngine::ref<GRAVEngine::Jobs::counter> counter;
 
-	std::cout << std::this_thread::get_id() << std::endl;
+	//GRAV_LOG_LINE_INFO("Kick single wait job");
+	//GRAVEngine::Jobs::declaration job = { waitJob, 0, GRAVEngine::Jobs::jobPriority::NORMAL };
+	//GRAV_KICK_JOB(job, &counter);
+	//GRAV_WAIT_COUNTER(counter, 0);
 
-	GRAV_LOG_LINE_INFO("Kick single wait job");
-	GRAVEngine::Jobs::declaration job = { waitJob, 0, GRAVEngine::Jobs::jobPriority::NORMAL };
-	GRAV_KICK_JOB(job, &counter);
-	GRAV_WAIT_COUNTER(counter, 0);
+	//GRAV_LOG_LINE_INFO("Kick waiting jobs");
+	//int jobCount = 32;
+	//GRAVEngine::scope<GRAVEngine::Jobs::declaration[]> jobs = GRAVEngine::createScope<GRAVEngine::Jobs::declaration[]>(jobCount);
 
-	std::cout << std::this_thread::get_id() << std::endl;
-
-	GRAV_LOG_LINE_INFO("Kick waiting jobs");
-	int jobCount = 32;
-	GRAVEngine::scope<GRAVEngine::Jobs::declaration[]> jobs = GRAVEngine::createScope<GRAVEngine::Jobs::declaration[]>(jobCount);
-
-	for (size_t i = 0; i < jobCount; i++)
-		jobs[i] = GRAVEngine::Jobs::declaration(waitJob, i, GRAVEngine::Jobs::jobPriority::NORMAL);
-	GRAV_KICK_JOBS(jobs.get(), 32, &counter);
-	GRAV_WAIT_COUNTER(counter, 0);
+	//for (size_t i = 0; i < jobCount; i++)
+	//	jobs[i] = GRAVEngine::Jobs::declaration(waitJob, i, GRAVEngine::Jobs::jobPriority::NORMAL);
+	//GRAV_KICK_JOBS(jobs.get(), 32, &counter);
+	//GRAV_WAIT_COUNTER(counter, 0);
 
 
-	//// Test lambda and passing value
+	// Test lambda and passing value
 	//GRAV_LOG_LINE_INFO("Kick lambda jobs");
 	//auto lambdaJob = [](uintptr_t value)
 	//{
@@ -83,28 +75,25 @@ void Test2D::onUpdate(GRAVEngine::Time::timestep ts)
 	//GRAV_KICK_JOBS(jobs.get(), 32, &counter);
 	//GRAV_WAIT_COUNTER(counter, 0);
 
+	{
+		static float rotation = 0.0f;
+		rotation += ts * 360.0f;
 
-	//{
-	//	static float rotation = 0.0f;
-	//	rotation += ts * 360.0f;
+		GRAVEngine::Rendering::renderer2D::beginScene(orthoCam);
+		GRAVEngine::Rendering::renderer2D::drawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
+		GRAVEngine::Rendering::renderer2D::drawRotatedQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, rotation, { 0.8f, 0.2f, 1.0f, 1.0f });
 
-	//	GRAVEngine::Rendering::renderer2D::beginScene(orthoCam);
-	//	GRAVEngine::Rendering::renderer2D::drawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
-	//	GRAVEngine::Rendering::renderer2D::drawRotatedQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, rotation, { 0.8f, 0.2f, 1.0f, 1.0f });
-	//	GRAVEngine::Rendering::renderer2D::endScene();
-
-	//	GRAVEngine::Rendering::renderer2D::beginScene(orthoCam);
-	//	for (float y = -5.0f; y < 5.0f; y += 0.5f)
-	//	{
-	//		for (float x = -5.0f; x < 5.0f; x += 0.5f)
-	//		{
-	//			glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-	//			GRAVEngine::Rendering::renderer2D::drawQuad({ x, y }, { 0.45f, 0.45f }, color);
-	//		}
-	//	}		
-	//	GRAVEngine::Rendering::renderer2D::drawQuad({ 0,0 }, { 100, 100 }, { 1, 1, 1, 1 });
-	//	GRAVEngine::Rendering::renderer2D::endScene();
-	//}
+		for (float y = -5.0f; y < 5.0f; y += 0.5f)
+		{
+			for (float x = -5.0f; x < 5.0f; x += 0.5f)
+			{
+				glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
+				GRAVEngine::Rendering::renderer2D::drawQuad({ x, y }, { 0.45f, 0.45f }, color);
+			}
+		}		
+		GRAVEngine::Rendering::renderer2D::drawQuad({ 0,0 }, { 100, 100 }, { 1, 1, 1, 1 });
+		GRAVEngine::Rendering::renderer2D::endScene();
+	}
 
 }
 

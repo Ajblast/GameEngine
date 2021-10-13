@@ -21,15 +21,6 @@ namespace GRAVEngine
 				virtual ~modelImpl() = default;
 
 			public:
-				// Load a model from a file and take its weights, parameters, and buffers
-				virtual void load(std::string filePath)
-				{
-				}
-				// Save a model with its weights, parameters, and buffers
-				virtual void save(std::string filePath)
-				{
-				}
-
 				// Run through the model
 				virtual ActorCritic::actorCriticOputput forward(std::vector<torch::Tensor> inputs)
 				{
@@ -42,6 +33,18 @@ namespace GRAVEngine
 				}
 			};
 			TORCH_MODULE(model);
+
+			template<typename T>
+			void load(T model, const std::string& filePath)
+			{
+				torch::load(model, filePath);
+			}
+			template<typename T>
+			void save(T model, const std::string& filePath)
+			{
+				torch::save(model, filePath);
+			}
+
 		}
 	}
 }

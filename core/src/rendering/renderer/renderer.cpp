@@ -14,7 +14,7 @@ void GRAVEngine::Rendering::renderer::startup()
 	// TODO: Allow picking which renderer is being used. Explicity, allowing 2D and 3D renderers
 	// Startup a 2D renderer
 	renderer2D::startup();
-	renderer3D::startup();
+	//renderer3D::startup();
 }
 
 void GRAVEngine::Rendering::renderer::shutdown()
@@ -24,7 +24,7 @@ void GRAVEngine::Rendering::renderer::shutdown()
 	// TODO: Allow picking which renderer is being used. Explicity, allowing 2D and 3D renderers
 	// Shutdown a 2D renderer
 	renderer2D::shutdown();
-	renderer3D::shutdown();
+	//renderer3D::shutdown();
 }
 
 void GRAVEngine::Rendering::renderer::onWindowResize(uint32 width, uint32 height)
@@ -49,20 +49,20 @@ void GRAVEngine::Rendering::renderer::endScene()
 
 }
 
-void GRAVEngine::Rendering::renderer::submit(const ref<shader>& shader, const ref<vertexArray>& vertexArray, const glm::mat4& transform)
-{
-	GRAV_PROFILE_FUNCTION();
-
-	// Bind the shader
-	shader->bind();
-
-	// Set the view projection matrix
-	shader->setMat4("u_ViewProjection", s_SceneData->viewProjectionMatrix);
-
-	// Set the transform
-	shader->setMat4("u_Transform", transform);
-
-	// Bind the vertex array for rendering
-	vertexArray->bind();
-	rendererCommand::drawIndexed(vertexArray);
-}
+//void GRAVEngine::Rendering::renderer::submit(const ref<shader>& shader, const ref<vertexArray>& vertexArray, const glm::mat4& transform)
+//{
+//	GRAV_PROFILE_FUNCTION();
+//
+//	// Bind the shader
+//	shader->bind();
+//
+//	// Set the view projection matrix
+//	shader->setMat4("u_ViewProjection", s_SceneData->viewProjectionMatrix);
+//
+//	// Set the transform
+//	shader->setMat4("u_Transform", transform);
+//
+//	// Bind the vertex array for rendering
+//	vertexArray->bind();
+//	rendererCommand::drawIndexed(vertexArray);
+//}

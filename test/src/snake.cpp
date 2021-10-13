@@ -2,6 +2,9 @@
 #include "snake.h"
 #include <imgui/imgui.h>
 
+#include "ai/models/actorcritic/actorCritic.h"
+#include "ai/training/algorithms/PPO.h"
+
 
 //Snake::Snake() : layer("Snake"), orthoCam(-1.778, 1.778, -1, 1, 0.1f, 100.0f)
 Snake::Snake() : layer("Snake"), orthoCam(90.0f, 1.778, 0.1f, 1000.0f)
@@ -18,27 +21,60 @@ Snake::Snake() : layer("Snake"), orthoCam(90.0f, 1.778, 0.1f, 1000.0f)
 
 void Snake::onAttach()
 {
-	// Generate the agent
-	GRAVEngine::AI::programParams params = GRAVEngine::AI::programParams(GRAVEngine::AI::inferenceDevice::CPU, "Snake AI");
-	m_Agent = GRAVEngine::createRef<snakeAgent>(m_WallWidth, m_WallHeight, params);
+	//// Generate the agent
+	//GRAVEngine::AI::programParams params = GRAVEngine::AI::programParams(GRAVEngine::AI::inferenceDevice::CPU, "Snake AI");
+	//m_Agent = GRAVEngine::createRef<snakeAgent>(m_WallWidth, m_WallHeight, params);
 
-	// Create the sensors for the agent
-	std::vector<GRAVEngine::ref<GRAVEngine::AI::Sensors::ISensor>> sensors;
-	sensors.push_back(GRAVEngine::createRef<directionSensor>(m_Agent));
-	sensors.push_back(GRAVEngine::createRef<headSensor>(m_Agent));
-	sensors.push_back(GRAVEngine::createRef<fruitSensor>(m_Agent));
-	sensors.push_back(GRAVEngine::createRef<wallSensor>(m_Agent, m_WallWidth, m_WallHeight, false));
-	m_Agent->initializeSensors(sensors);
+	//// Create the sensors for the agent
+	//std::vector<GRAVEngine::ref<GRAVEngine::AI::Sensors::ISensor>> sensors;
+	//sensors.push_back(GRAVEngine::createRef<directionSensor>(m_Agent));
+	//sensors.push_back(GRAVEngine::createRef<headSensor>(m_Agent));
+	//sensors.push_back(GRAVEngine::createRef<fruitSensor>(m_Agent));
+	//sensors.push_back(GRAVEngine::createRef<wallSensor>(m_Agent, m_WallWidth, m_WallHeight, false));
+	//m_Agent->initializeSensors(sensors);
 
-	// Create the actuators for the agent
-	std::vector<GRAVEngine::ref<GRAVEngine::AI::Actions::IActuator>> actuators;
-	actuators.push_back(GRAVEngine::createRef<directionActuator>(m_Agent));
-	m_Agent->initializeActuators(actuators);	
+	//// Create the actuators for the agent
+	//std::vector<GRAVEngine::ref<GRAVEngine::AI::Actions::IActuator>> actuators;
+	//actuators.push_back(GRAVEngine::createRef<directionActuator>(m_Agent));
+	//m_Agent->initializeActuators(actuators);	
 
-	// Initialize the agent
-	m_Agent->safeInitialization();
+	//// Initialize the agent
+	//m_Agent->safeInitialization();
 
-	GRAVEngine::AI::environmentManager::instance().reset();
+	//GRAVEngine::AI::environmentManager::instance().reset();
+
+	GRAVEngine::scope<size_t[]> branchSizes = GRAVEngine::createScope<size_t[]>(1);
+	branchSizes[0] = 4;
+	GRAVEngine::AI::Actions::actionSpec spec = GRAVEngine::AI::Actions::actionSpec(0, 1, std::move(branchSizes));
+	GRAVEngine::AI::Training::networkSettings settings = GRAVEngine::AI::Training::networkSettings(2, 8, {
+		GRAVEngine::AI::Sensors::observationParams(8)
+		}, spec);
+	//GRAVEngine::AI::Models::ActorCritic::actorCritic ac = GRAVEngine::AI::Models::ActorCritic::actorCritic(settings);
+
+	GRAVEngine::ref<GRAVEngine::AI::Training::Algorithms::ppoHyperparameters> parameters = GRAVEngine::createRef<GRAVEngine::AI::Training::Algorithms::ppoHyperparameters>();
+	GRAVEngine::AI::Training::Algorithms::PPO ppo = GRAVEngine::AI::Training::Algorithms::PPO(settings, parameters);
+
+	ppo.saveModel("A:\\Development\\source\\Ajblast\\GameEngine\\test\\models\\TestModel.pt");
+	ppo.print();
+
+	GRAVEngine::AI::Training::Algorithms::PPO ppo2 = GRAVEngine::AI::Training::Algorithms::PPO(parameters);
+	ppo2.print();
+	ppo2.loadModel("A:\\Development\\source\\Ajblast\\GameEngine\\test\\models\\TestModel.pt");
+	ppo2.print();
+
+	ppo2.saveModel("A:\\Development\\source\\Ajblast\\GameEngine\\test\\models\\TestModel2.pt");
+
+
+	auto MySequential = torch::nn::Sequential(torch::nn::Conv2d(1 /*input channels*/, 1 /*output channels*/, 2 /*kernel size*/),
+		torch::nn::Conv2d(1, 1, 2));
+
+	std::cout << MySequential << std::endl;
+	// Save the model
+	torch::save(MySequential, "A:\\Development\\source\\Ajblast\\GameEngine\\test\\models\\TestModel3.pt");
+
+	// Load the model
+	torch::load(MySequential, "A:\\Development\\source\\Ajblast\\GameEngine\\test\\models\\TestModel3.pt");
+	std::cout << MySequential << std::endl;
 }
 
 void Snake::onDetach()
@@ -53,8 +89,6 @@ void Snake::onUpdate(GRAVEngine::Time::timestep ts)
 		GRAVEngine::application::getInstance().close();
 	}
 
-	GRAVEngine::Rendering::renderer2D::resetStats();
-
 	orthoCam.OnUpdate(ts);
 
 	elapsedTime += ts.getSeconds();
@@ -66,40 +100,37 @@ void Snake::onUpdate(GRAVEngine::Time::timestep ts)
 	//GRAVEngine::AI::environmentManager::instance().step();
 
 
-	if (elapsedTime >= 1 / fps)
-	{
-		elapsedTime = 0;
+	//if (elapsedTime >= 1 / fps)
+	//{
+	//	elapsedTime = 0;
 
-		m_Agent->requestDecision();
+	//	m_Agent->requestDecision();
 
 
-		// Update the environment
-		GRAVEngine::AI::environmentManager::instance().step();
-	}
+	//	// Update the environment
+	//	GRAVEngine::AI::environmentManager::instance().step();
+	//}
 
-	GRAVEngine::Rendering::rendererCommand::setClearColor({ 0.0f, 0.0f, 0.0f, 1.0f });
-	GRAVEngine::Rendering::rendererCommand::clear();
+	//GRAVEngine::Rendering::renderer2D::beginScene(orthoCam);
+	//// Draw the fruit
+	//GRAVEngine::Rendering::renderer2D::drawQuad({ m_Agent->m_FruitPosition.m_X, m_Agent->m_FruitPosition.m_Y, 0 }, { 1, 1 }, m_FruitColor);
 
-	GRAVEngine::Rendering::renderer2D::beginScene(orthoCam);
-	// Draw the fruit
-	GRAVEngine::Rendering::renderer2D::drawQuad({ m_Agent->m_FruitPosition.m_X, m_Agent->m_FruitPosition.m_Y, 0 }, { 1, 1 }, m_FruitColor);
+	//// Draw the walls
+	//for (int i = -1; i <= m_WallWidth; i++)
+	//{
+	//	for (int j = -1; j <= m_WallHeight; j++)
+	//	{
+	//		if (i == -1 || j == -1 || i == m_WallWidth || j == m_WallHeight)
+	//			GRAVEngine::Rendering::renderer2D::drawQuad({ i, j, 0 }, { 1, 1 }, m_WallColor);
+	//	}
+	//}
 
-	// Draw the walls
-	for (int i = -1; i <= m_WallWidth; i++)
-	{
-		for (int j = -1; j <= m_WallHeight; j++)
-		{
-			if (i == -1 || j == -1 || i == m_WallWidth || j == m_WallHeight)
-				GRAVEngine::Rendering::renderer2D::drawQuad({ i, j, 0 }, { 1, 1 }, m_WallColor);
-		}
-	}
-
-	for (auto it = m_Agent->m_Body.begin(); it != m_Agent->m_Body.end(); it++)
-	{
-		// Draw the snake
-		GRAVEngine::Rendering::renderer2D::drawQuad({ it->m_X, it->m_Y, 0 }, { 1, 1 }, m_SnakeColor);
-	}
-	GRAVEngine::Rendering::renderer2D::endScene();
+	//for (auto it = m_Agent->m_Body.begin(); it != m_Agent->m_Body.end(); it++)
+	//{
+	//	// Draw the snake
+	//	GRAVEngine::Rendering::renderer2D::drawQuad({ it->m_X, it->m_Y, 0 }, { 1, 1 }, m_SnakeColor);
+	//}
+	//GRAVEngine::Rendering::renderer2D::endScene();
 
 }
 
@@ -129,13 +160,13 @@ void Snake::onImGuiRender()
 	ImGui::Text("Focal Point: %f, %f, %f", foc.x, foc.y, foc.z);
 	ImGui::End();
 
-	ImGui::Begin("Training");
-	ImGui::Text("Training Statistics");
-	ImGui::Text("Fruits Captured: %i", m_Agent->fruitsCaptured);
-	ImGui::Text("Suicide by Backwards: %i", m_Agent->timesMovingBackwards);
-	ImGui::Text("Suicide by Wall: %i", m_Agent->wallsHit);
-	ImGui::Text("Suicide by Body: %i", m_Agent->bodyHit);
-	ImGui::End();
+	//ImGui::Begin("Training");
+	//ImGui::Text("Training Statistics");
+	//ImGui::Text("Fruits Captured: %i", m_Agent->fruitsCaptured);
+	//ImGui::Text("Suicide by Backwards: %i", m_Agent->timesMovingBackwards);
+	//ImGui::Text("Suicide by Wall: %i", m_Agent->wallsHit);
+	//ImGui::Text("Suicide by Body: %i", m_Agent->bodyHit);
+	//ImGui::End();
 }
 
 void Snake::onEvent(GRAVEngine::Events::event& event)

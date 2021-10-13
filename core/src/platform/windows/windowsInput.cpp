@@ -1,6 +1,7 @@
 #include "gravpch.h"
 
-#include "io/input.h"
+#include "io/input/input.h"
+#include "io/input/inputManager.h"
 #include "application.h"
 #include <GLFW/glfw3.h>
 
@@ -10,34 +11,24 @@ namespace GRAVEngine
 	{
 		bool Input::isKeyPressed(const Keys::keyCode key)
 		{
-			auto* window = static_cast<GLFWwindow*>(application::getInstance().getWindow().getNativeWindow());
-			auto state = glfwGetKey(window, static_cast<int32>(key));
-
-			return state == GLFW_PRESS || state == GLFW_REPEAT;
+			return inputManager::getInstance()->isKeyPressed(key);
 		}
 
 		bool Input::isMouseButtonPressed(Mouse::mouseCode button)
 		{
-			auto* window = static_cast<GLFWwindow*>(application::getInstance().getWindow().getNativeWindow());
-			auto state = glfwGetMouseButton(window, static_cast<int32>(button));
-
-			return state == GLFW_PRESS;
+			return inputManager::getInstance()->isMouseButtonPressed(button);
 		}
 		vec2 Input::getMousePosition()
 		{
-			auto* window = static_cast<GLFWwindow*>(application::getInstance().getWindow().getNativeWindow());
-			double xpos, ypos;
-			glfwGetCursorPos(window, &xpos, &ypos);
-
-			return { (float)xpos, (float)ypos };
+			return inputManager::getInstance()->getMousePosition();
 		}
 		float Input::getMouseX()
 		{
-			return getMousePosition().x;
+			return inputManager::getInstance()->getMouseX();
 		}
 		float Input::getMouseY()
 		{
-			return getMousePosition().y;
+			return inputManager::getInstance()->getMouseY();
 		}
 	}
 }

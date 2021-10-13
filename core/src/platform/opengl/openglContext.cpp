@@ -29,7 +29,7 @@ void GRAVEngine::Rendering::openglContext::startup()
 	// GRAVEngine requires at least OpenGL version 4.5!"
 	GRAV_ASSERT(GLVersion.major > 4 || (GLVersion.major == 4 && GLVersion.minor >= 5));
 
-	//unbind();
+	unbind();
 }
 
 void GRAVEngine::Rendering::openglContext::swapBuffers()
