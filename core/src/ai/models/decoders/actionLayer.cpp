@@ -8,9 +8,11 @@ GRAVEngine::AI::Models::Decoders::actionLayerImpl::actionLayerImpl(int64 numInpu
 
 	// Create the continuous actions
 	if (m_ContinuousActionCount.item<int32>() > 0)
+	{
 		m_ContinuousLayer = normalLayer(numInput, actionSpec.continuousActionCount());
-	else
-		m_ContinuousLayer = normalLayer(0, 0);
+		// Register the module
+		register_module("Continuous Layer", m_ContinuousLayer);
+	}
 
 	// Create the discrete actions
 	if (m_DiscreteActionCount.item<int32>() > 0)
@@ -22,19 +24,13 @@ GRAVEngine::AI::Models::Decoders::actionLayerImpl::actionLayerImpl(int64 numInpu
 
 		// Create the layer
 		m_DiscreteLayer = multicategoricalLayer(numInput, branches);
+		// Register the module
+		register_module("Discrete Layer", m_DiscreteLayer);
 	}
-	else
-		m_DiscreteLayer = multicategoricalLayer(0, std::vector<int64>());
 
 
 	register_buffer("Continuous Action Count", m_ContinuousActionCount);
 	register_buffer("Discrete Action Count", m_DiscreteActionCount);
-
-	// Register the module
-	register_module("Continuous Layer", m_ContinuousLayer);
-	// Register the module
-	register_module("Discrete Layer", m_DiscreteLayer);
-
 }
 
 std::tuple<GRAVEngine::AI::Models::ActorCritic::agentAction, GRAVEngine::AI::Models::ActorCritic::agentLogProbs, torch::Tensor> GRAVEngine::AI::Models::Decoders::actionLayerImpl::forward(torch::Tensor hidden)
