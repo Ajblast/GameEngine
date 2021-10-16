@@ -31,6 +31,8 @@ void GRAVEngine::AI::Training::updateBuffer::clear()
 
 void GRAVEngine::AI::Training::updateBuffer::append(const updateBuffer& other)
 {
+	//GRAV_PROFILE_FUNCTION();
+	
 	// Copy all of the data from the other update buffer
 	for (auto it = other.m_Observations.begin(); it != other.m_Observations.end(); it++)
 		m_Observations[it->first].insert(m_Observations[it->first].end(), it->second.begin(), it->second.end());
@@ -43,6 +45,8 @@ void GRAVEngine::AI::Training::updateBuffer::append(const updateBuffer& other)
 
 std::vector<std::vector<torch::Tensor>> GRAVEngine::AI::Training::updateBuffer::toObservation() const
 {
+	//GRAV_PROFILE_FUNCTION();
+	
 	std::vector<std::vector<torch::Tensor>> observation;
 	// Add each observation to the overall observation
 	for (auto it = m_Observations.begin(); it != m_Observations.end(); it++)
@@ -56,6 +60,8 @@ std::vector<std::vector<torch::Tensor>> GRAVEngine::AI::Training::updateBuffer::
 
 GRAVEngine::AI::Models::ActorCritic::agentAction GRAVEngine::AI::Training::updateBuffer::toAgentAction() const
 {
+	//GRAV_PROFILE_FUNCTION();
+	
 	// Get all of the continuous actions
 	std::vector<torch::Tensor> continuousActions;
 	for (auto it = m_Actions.begin(); it != m_Actions.end(); it++)
@@ -85,6 +91,8 @@ GRAVEngine::AI::Models::ActorCritic::agentAction GRAVEngine::AI::Training::updat
 
 GRAVEngine::AI::Models::ActorCritic::agentLogProbs GRAVEngine::AI::Training::updateBuffer::toLogProbs() const
 {
+	//GRAV_PROFILE_FUNCTION();
+
 	// Get all of the continuous log probs
 	std::vector<torch::Tensor> continousLogProbs;
 	for (auto it = m_LogProbs.begin(); it != m_LogProbs.end(); it++)
@@ -114,6 +122,7 @@ GRAVEngine::AI::Models::ActorCritic::agentLogProbs GRAVEngine::AI::Training::upd
 
 GRAVEngine::AI::Training::updateBuffer GRAVEngine::AI::Training::updateBuffer::minibatch(size_t batchSize)
 {
+	GRAV_PROFILE_FUNCTION();
 	updateBuffer buffer;
 
 	// Get the indices that will be copied

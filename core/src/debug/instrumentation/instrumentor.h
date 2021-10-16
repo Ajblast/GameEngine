@@ -81,7 +81,7 @@ namespace GRAVEngine
 }
 
 #define GRAV_PROFILE_LOG_CONSOLE 0
-#define GRAV_PROFILE 1
+#define GRAV_PROFILE 0
 #if GRAV_PROFILE
 	#define GRAV_PROFILE_START_SESSION(name, filepath) GRAVEngine::instrumentor::getInstance()->startSession(name, filepath)
 	#define GRAV_PROFILE_END_SESSION() GRAVEngine::instrumentor::getInstance()->endSession()

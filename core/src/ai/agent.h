@@ -26,9 +26,9 @@ namespace GRAVEngine
 		{
 		public:
 			// Default agent that can only use collectObservations
-			agent(programParams programParams);
+			agent(programParams programParams, size_t maxStep = 0);
 			// Agent with premade sensors. Will initialize
-			agent(std::vector<ref<Sensors::ISensor>>& sensors, std::vector<ref<Actions::IActuator>>& actuators, programParams programParams);
+			agent(std::vector<ref<Sensors::ISensor>>& sensors, std::vector<ref<Actions::IActuator>>& actuators, programParams programParams, size_t maxStep = 0);
 			//agent(agent&& other) noexcept;
 			//agent& operator=(agent&& other) noexcept;
 
@@ -44,7 +44,7 @@ namespace GRAVEngine
 
 			inline void requestAction() { m_ShouldRequestAction = true; }
 			inline void requestDecision() { m_ShouldRequestDecision = true; requestAction(); }
-
+			inline float currentReward() const { return m_Info.m_Reward; }
 		private:
 			// Update the sensors
 			void updateSensors();
@@ -88,7 +88,9 @@ namespace GRAVEngine
 			// Add a reward
 			virtual void addReward(float increment) override;
 			// What is the cumulative reward
-			virtual float cumulativeReward() override;
+			float cumulativeReward() override;
+			// What is the maximum amount of steps
+			const float maxStep() const;
 
 			// Called when the episode begins
 			virtual void onEpisodeBegin() override;

@@ -69,9 +69,9 @@ namespace GRAVEngine
 			// Execute the events
 			void execute(T... args)
 			{
-				GRAV_PROFILE_FUNCTION();
-
 				Locks::scopedLock<decltype(m_VectorLock)> lock(m_VectorLock);
+
+				GRAV_PROFILE_FUNCTION();
 
 				size_t eventCount = m_Events.size();
 
@@ -85,7 +85,7 @@ namespace GRAVEngine
 
 				// Create a job per event
 				for (size_t i = 0; i < eventCount; i++)
-					jobs[i] = Jobs::declaration([&](uintptr_t) {m_Events[i].m_CallbackFunction(args...); }, 0, Jobs::jobPriority::NORMAL);
+					jobs[i] = Jobs::declaration([&](uintptr_t value) {m_Events[(size_t) value].m_CallbackFunction(args...); }, i, Jobs::jobPriority::NORMAL);
 
 				// Kick the jobs and wait for them
 				GRAV_KICK_JOBS(jobs.get(), eventCount, &counter);
@@ -95,9 +95,9 @@ namespace GRAVEngine
 			// Reset the event
 			void clear()
 			{
-				GRAV_PROFILE_FUNCTION();
-
 				Locks::scopedLock<decltype(m_VectorLock)> lock(m_VectorLock);
+
+				GRAV_PROFILE_FUNCTION();
 
 				m_Events.clear();
 				m_CurrentHandleValue = 0;

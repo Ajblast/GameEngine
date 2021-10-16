@@ -8,12 +8,12 @@ GRAVEngine::AI::environmentManager& GRAVEngine::AI::environmentManager::s_Instan
 void GRAVEngine::AI::environmentManager::step()
 {
 	Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
+	
+	GRAV_PROFILE_FUNCTION();
 
 	// Can only step if there is an instance
 	if (instance().initialized() == false)
 		return;
-
-	GRAV_PROFILE_FUNCTION();
 
 	//GRAV_LOG_LINE_DEBUG("%s: Step environmentManager", GRAV_CLEAN_FUNC_SIG);
 
@@ -40,12 +40,12 @@ void GRAVEngine::AI::environmentManager::step()
 void GRAVEngine::AI::environmentManager::reset()
 {
 	Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
+	
+	GRAV_PROFILE_FUNCTION();
 
 	// Can only step if there is an instance
 	if (instance().initialized() == false)
 		return;
-
-	GRAV_PROFILE_FUNCTION();
 
 	GRAV_LOG_LINE_DEBUG("%s: Reset environmentManager", GRAV_CLEAN_FUNC_SIG);
 
@@ -67,13 +67,12 @@ GRAVEngine::AI::environmentManager::~environmentManager()
 void GRAVEngine::AI::environmentManager::initialize(scope<Training::algorithmFactory> algorithmFactory)
 {
 	Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
+	GRAV_PROFILE_FUNCTION();
+	
 
 	// Only a single instance of the trainer is allowed
 	if(instance().initialized())
 		return;
-
-
-	GRAV_PROFILE_FUNCTION();
 
 	GRAV_LOG_LINE_DEBUG("%s: Initialize environmentManager", GRAV_CLEAN_FUNC_SIG);
 
@@ -89,11 +88,11 @@ void GRAVEngine::AI::environmentManager::initialize(scope<Training::algorithmFac
 void GRAVEngine::AI::environmentManager::deinitialize()
 {
 	Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
+	GRAV_PROFILE_FUNCTION();
+	
 
 	if (instance().initialized() == false)
 		return;
-
-	GRAV_PROFILE_FUNCTION();
 
 	GRAV_LOG_LINE_DEBUG("%s: Deinitializing environmentManager", GRAV_CLEAN_FUNC_SIG);
 
