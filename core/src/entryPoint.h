@@ -59,8 +59,6 @@ int main(int argc, char** argv)
 
 #pragma region ShuttingDownManagers
 	GRAV_PROFILE_START_SESSION("Manager Shutdown", "debug/profiles/GRAVEngineProfile-ManagerShutdown.json");
-	// Deinitialize the trainer
-	GRAVEngine::AI::environmentManager::instance().deinitialize();
 
 	inputManager.shutdown();
 	logManager.shutDown();

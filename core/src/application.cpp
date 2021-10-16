@@ -4,6 +4,9 @@
 #include "io/input/input.h"
 #include "io/input/inputManager.h"
 #include "rendering/renderer/renderer.h"
+#include "ai/environmentManager.h"
+
+#include "time/time.h"
 
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
@@ -163,15 +166,23 @@ void GRAVEngine::application::runWorker()
 	// This has to be done in the runWorker thread instead of the main thread, otherwise this thread wouldn't be accessible to the job system
 	m_JobManager.startUp(m_JobManagerOptions);
 
+	GRAVEngine::AI::environmentManager::instance().reset();
+
 	while (m_Running.load(std::memory_order_acquire))
 	{
-		// Get the delta time
-		float time = (float)glfwGetTime();
-		Time::timestep timestep = Time::timestep((float)(time - m_LastFrameTime));
-		m_LastFrameTime = time;
-
 		if (m_Minimized == false)
 		{
+			// Get the delta time
+			float time = (float)glfwGetTime();
+			float deltaTime = time - Time::time::getOldFrameTime();
+
+			// Set the delta time and old time
+			Time::time::setDeltaTime(deltaTime);
+			Time::time::setOldFrameTime(time);
+
+			// Get the timestep
+			Time::timestep timestep = Time::timestep(deltaTime);
+
 			{
 				GRAV_PROFILE_SCOPE("LayerStack onUpdate");
 				// Update layers
@@ -193,6 +204,9 @@ void GRAVEngine::application::runWorker()
 			}
 		}
 	}
+
+	// Deinitialize the trainer
+	GRAVEngine::AI::environmentManager::instance().deinitialize();
 
 	// Shutdown the job manager
 	m_JobManager.shutDown();
