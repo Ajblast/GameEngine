@@ -19,7 +19,7 @@ GRAVEngine::AI::Actions::actionBuffer::actionBuffer(const actionBuffer& other) :
 {
 }
 
-GRAVEngine::AI::Actions::actionBuffer::actionBuffer(const actionBuffer&& other) noexcept : m_ContinuousActions(std::move(other.m_ContinuousActions)), m_DiscreteActions(std::move(other.m_DiscreteActions))
+GRAVEngine::AI::Actions::actionBuffer::actionBuffer(actionBuffer&& other) noexcept : m_ContinuousActions(std::move(other.m_ContinuousActions)), m_DiscreteActions(std::move(other.m_DiscreteActions))
 {
 }
 
@@ -33,7 +33,7 @@ GRAVEngine::AI::Actions::actionBuffer& GRAVEngine::AI::Actions::actionBuffer::op
 	return *this;
 }
 
-GRAVEngine::AI::Actions::actionBuffer& GRAVEngine::AI::Actions::actionBuffer::operator=(const actionBuffer&& other) noexcept
+GRAVEngine::AI::Actions::actionBuffer& GRAVEngine::AI::Actions::actionBuffer::operator=(actionBuffer&& other) noexcept
 {
 	if (this != &other)
 	{
