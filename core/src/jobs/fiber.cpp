@@ -64,6 +64,13 @@ void GRAVEngine::Jobs::fiber::switchTo(fiber* fiber)
 	GRAV_ASSERT(fiber->m_FiberHandle);
 
 	#ifdef GRAV_PLATFORM_WINDOWS
-	SwitchToFiber(fiber->m_FiberHandle);
+	try
+	{
+		SwitchToFiber(fiber->m_FiberHandle);
+	}
+	catch (...)
+	{
+		GRAV_LOG_LINE_CRITICAL("%s: Unable to switch to fiber!!!!", GRAV_CLEAN_FUNC_SIG);
+	}
 	#endif
 }

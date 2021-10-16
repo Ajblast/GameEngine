@@ -259,7 +259,7 @@ void GRAVEngine::Jobs::jobManager::kickJob(const declaration& declaration, ref<c
 	if (declaration.m_EntryPoint == false)
 		return;
 
-	GRAV_LOG_LINE_INFO("%s: Kick Job | EntryPoint %ul | Priority %s", GRAV_CLEAN_FUNC_SIG, declaration.m_EntryPoint, toString(declaration.m_Priority));
+	//GRAV_LOG_LINE_INFO("%s: Kick Job | EntryPoint %ul | Priority %s", GRAV_CLEAN_FUNC_SIG, declaration.m_EntryPoint, toString(declaration.m_Priority));
 
 	// Check if a memory address to store a potential counter exists
 	if (count && *count)
@@ -316,7 +316,16 @@ void GRAVEngine::Jobs::jobManager::waitForCounter(ref<counter>& counter, counter
 	currentBundle->m_FiberIsSwitched.store(false);				// The bundle is not currently stored
 
 	// Add the fiber to the waiting list, and check if it finished while doing so
-	bool alreadyDone = counter->addWaitingFiber(currentBundle, target);
+	bool alreadyDone;
+	try
+	{
+		alreadyDone = counter->addWaitingFiber(currentBundle, target);
+	}
+	catch (...)
+	{
+		GRAV_LOG_LINE_CRITICAL("%s: Unable to switch to fiber!!!!", GRAV_CLEAN_FUNC_SIG);
+	}
+
 	// Return if it finished already
 	if (alreadyDone)
 		return;
@@ -334,8 +343,10 @@ void GRAVEngine::Jobs::jobManager::waitForCounter(ref<counter>& counter, counter
 	if (m_Callbacks.m_OnFiberDetached)
 		m_Callbacks.m_OnFiberDetached(tls->m_PreviousFiberIndex, true);
 
+
 	// Switch to the new fiber from the current fiber
 	m_Fibers[currentFiberIndex].switchTo(&m_Fibers[freeFiberIndex]);
+
 
 	// Get the thread local storage again as it could have changed
 	tls = getCurrentTLS();
