@@ -4,6 +4,9 @@
 
 GRAVEngine::AI::Models::Decoders::multicategoricalLayerImpl::multicategoricalLayerImpl(int64 numInput, std::vector<int64> branchSizes)
 {
+	GRAV_ASSERT(numInput > 0);
+	GRAV_ASSERT(branchSizes.size() > 0);
+
 	// Create a linear layer for each branch
 	for (auto it = branchSizes.begin(); it != branchSizes.end(); it++)
 		m_Branches->push_back(torch::nn::Linear(numInput, *it));
