@@ -11,6 +11,7 @@
 #include "locks/scopedLock.h"
 #include "locks/spinLock.h"
 #include "jobs/jobs.h"
+#include "stats/stats.h"
 #include <map>
 #include <vector>
 #include <torch/torch.h>
@@ -46,14 +47,17 @@ namespace GRAVEngine
 				// Print the model
 				void printModel() const;
 
+				void save();
+
 				// Send the model to a device
 				void sendToDevice(inferenceDevice device) const;
+			private:
+				void shouldWriteSummary(size_t interval);
 			private:
 				trainerSettings m_Settings;												// Trainer settings
 				scope<ITrainingAlgorithm> m_Algorithm;									// Learning algorithm of the trainer
 				Locks::spinLock m_SpinLock;
 
-				//std::vector<agentEpisodeId> m_AgentsRequestingDecision;					// Agents that are currently requesting a decision to be made for them
 				std::map<agentEpisodeId, Actions::actionBuffer> m_DecidedAgentActions;	// Actions decided for each agent
 
 				std::map<agentEpisodeId, std::vector<agentExperience>> m_Experiences;	// Agent experiences
@@ -64,6 +68,10 @@ namespace GRAVEngine
 				std::map<agentEpisodeId, size_t> m_Steps;				// Total number of steps an agent takes
 
 				std::vector<trajectory> m_Trajectories;	// Trajectories created from agents adding observations
+				Stats::stats m_Stats;					// Where stats are stored
+
+				size_t m_CurrentStep;					// The current step of the trainer
+				size_t m_NextSummaryStep;				// The next training step that should save the summary and model
 			};
 		}
 	}

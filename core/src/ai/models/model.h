@@ -34,15 +34,17 @@ namespace GRAVEngine
 			};
 			TORCH_MODULE(model);
 
-			template<typename T>
-			void load(T model, const std::string& filePath)
+			template<typename Model, typename Optimizer>
+			void load(Model model, Optimizer& optimizer, const std::string& filePath)
 			{
-				torch::load(model, filePath);
+				torch::load(model, filePath + "Model.pt");
+				torch::load(optimizer, filePath + "Optimizer.pt");
 			}
-			template<typename T>
-			void save(T model, const std::string& filePath)
+			template<typename Model, typename Optimizer>
+			void save(Model model, Optimizer& optimizer, const std::string& filePath)
 			{
-				torch::save(model, filePath);
+				torch::save(model, filePath + "Model.pt");
+				torch::save(optimizer, filePath + "Optimizer.pt");
 			}
 
 		}
