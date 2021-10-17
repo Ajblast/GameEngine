@@ -12,8 +12,8 @@ public:
 class snakeAgent : public GRAVEngine::AI::agent
 {
 public:
-	snakeAgent(int wallWidth, int wallHeight, GRAVEngine::AI::programParams params);
-	snakeAgent(int wallWidth, int wallHeight, std::vector<GRAVEngine::ref<GRAVEngine::AI::Sensors::ISensor>>& sensors, std::vector<GRAVEngine::ref<GRAVEngine::AI::Actions::IActuator>>& actuators, GRAVEngine::AI::programParams programParams);
+	snakeAgent(int wallWidth, int wallHeight, GRAVEngine::AI::programParams params, size_t maxStep);
+	snakeAgent(int wallWidth, int wallHeight, std::vector<GRAVEngine::ref<GRAVEngine::AI::Sensors::ISensor>>& sensors, std::vector<GRAVEngine::ref<GRAVEngine::AI::Actions::IActuator>>& actuators, GRAVEngine::AI::programParams programParams, size_t maxStep);
 
 	virtual ~snakeAgent() = default;
 
@@ -29,13 +29,15 @@ public:
 public:
 	float m_MovementDirection;
 	bodyPosition m_CurrentHeadPosition;		// The current head position;
+	bodyPosition m_OldHeadPosition;			// The old head position;
 	std::vector<bodyPosition> m_Body;		// The snake's body. The first in the list is the head and the last is the tail
 	bodyPosition m_FruitPosition;
+	int bodySize;
 
-	int m_WallWidth = 20, m_WallHeight = 20;
+	int m_WallWidth, m_WallHeight;
 
 	int fruitsCaptured = 0;
-	int timesMovingBackwards = 0;
+	int currentLifespan = 0;
 	int wallsHit = 0;
 	int bodyHit = 0;
 };
