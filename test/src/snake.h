@@ -27,8 +27,14 @@ private:
 	glm::vec4 m_FruitColor = { 1.0f, 0.0f, 0.0f, 1.0f };
 	glm::vec4 m_SnakeColor = { 1.0f, 1.0f, 0.0f, 1.0f };
 
-	GRAVEngine::ref<snakeAgent> m_Agent;
-	int m_WallWidth = 20, m_WallHeight = 20;
+	const static size_t agentCountX = 5;
+	const static size_t agentCountY = 5;
+	std::array<GRAVEngine::ref<snakeAgent>, agentCountX * agentCountY> m_Agents;
+
+	size_t maxStep = 500;
+
+	//GRAVEngine::ref<snakeAgent> m_Agent;
+	int m_WallWidth = 15, m_WallHeight = 15;
 
 	float fps = 60;
 	float elapsedTime = 0;
