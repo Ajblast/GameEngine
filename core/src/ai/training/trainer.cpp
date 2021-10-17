@@ -1,11 +1,17 @@
 #include "gravpch.h"
 #include "trainer.h"
-#include "exceptions/invalidArgumentException.h"
+#include "exceptions/standard/invalidArgumentException.h"
 #include "trajectory.h"
 #include <mutex>
 
-GRAVEngine::AI::Training::trainer::trainer(trainerSettings settings, scope<ITrainingAlgorithm> algorithm) : m_Settings(settings), m_Algorithm(std::move(algorithm))
+GRAVEngine::AI::Training::trainer::trainer(trainerSettings settings, scope<ITrainingAlgorithm> algorithm) : 
+	m_Settings(settings), m_Algorithm(std::move(algorithm)), m_Stats(), m_CurrentStep(0), m_NextSummaryStep(0)
 {
+	m_Stats.createStat("Cumulative Reward");
+	m_Stats.createStat("Actor Loss");
+	m_Stats.createStat("Critic Loss");
+	m_Stats.createStat("Total Loss");
+
 	if (m_Algorithm == nullptr)
 		throw Exceptions::invalidArgumentException("Algorithm is null.");
 }
@@ -19,22 +25,28 @@ GRAVEngine::AI::Training::trainer& GRAVEngine::AI::Training::trainer::operator=(
 		m_Settings = other.m_Settings;
 		m_Algorithm = std::move(other.m_Algorithm);
 
-		//m_AgentsRequestingDecision = std::move(other.m_AgentsRequestingDecision);
 		m_DecidedAgentActions = std::move(other.m_DecidedAgentActions);
 		m_Experiences = std::move(other.m_Experiences);
+
 		m_LastObservation = std::move(other.m_LastObservation);
-		//m_Observations = std::move(other.m_Observations);
-		//m_Infos = std::move(other.m_Infos);
+		m_CumulativeRewards = std::move(other.m_CumulativeRewards);
+		m_Steps = std::move(other.m_Steps);
+
+		m_Trajectories = std::move(other.m_Trajectories);
+		m_Stats = std::move(other.m_Stats);
+
+		m_CurrentStep = other.m_CurrentStep;
+		m_NextSummaryStep = other.m_NextSummaryStep;
 	}
 	return *this;
 }
 
 void GRAVEngine::AI::Training::trainer::addObservation(agentEpisodeId agentId, agentInfo info, std::vector<torch::Tensor> observation)
 {
-	GRAV_PROFILE_FUNCTION();
-
 	// Lock the trainer so the observation can be created
 	Locks::scopedLock<decltype(m_SpinLock)> lock(m_SpinLock);
+
+	GRAV_PROFILE_FUNCTION();
 
 	// Is the previous observation a terminal step. This means that the current observation is not the result of a previous action
 	bool terminal = info.m_IsDone;
@@ -79,10 +91,19 @@ void GRAVEngine::AI::Training::trainer::addObservation(agentEpisodeId agentId, a
 
 			// Add the trajectory to the list of trajectories for when the update is called on the model
 			m_Trajectories.push_back(traj);
+
+			// Check if the cumulative reward should be added before checking if a write should happen
+			if (terminal)
+				m_Stats.addStat("Cumulative Reward", m_CumulativeRewards[agentId]);
+
+			// Increate the total step
+			m_CurrentStep += traj.size();
+			// Should the model be saved because of the step
+			shouldWriteSummary(m_CurrentStep + traj.size());
 		}
 
 
-		// If the last state wass terminal, record the episode length and clear experience data associated with the agent
+		// If the last state was terminal, record the episode length and clear experience data associated with the agent
 		if (terminal)
 		{
 			m_Experiences.erase(agentId);		// Clear the experience buffer
@@ -106,21 +127,31 @@ void GRAVEngine::AI::Training::trainer::step()
 {
 	Locks::scopedLock<decltype(m_SpinLock)> lock(m_SpinLock);
 
+	GRAV_PROFILE_FUNCTION();
+
 	// Add all of the trajectories to the algorithm
 	for (auto it = m_Trajectories.begin(); it != m_Trajectories.end(); it++)
 		m_Algorithm->addTrajectory(*it);
+
 	// Clear the trajectories buffer because they were all added
 	m_Trajectories.clear();
 
 	if (m_Algorithm->shouldUpdate())
-		m_Algorithm->update();
+	{
+		// Get the loss from the update
+		updateLoss loss = m_Algorithm->update();
+		m_Stats.addStat("Actor Loss", loss.m_ActorLoss);
+		m_Stats.addStat("Critic Loss", loss.m_CriticLoss);
+		m_Stats.addStat("Total Loss", loss.m_TotalLoss);
+	}
 }
 void GRAVEngine::AI::Training::trainer::reset()
 {
 	// Lock the trainer so everything can be removed
 	Locks::scopedLock<decltype(m_SpinLock)> lock(m_SpinLock);
 
-	//m_AgentsRequestingDecision.clear();
+	GRAV_PROFILE_FUNCTION();
+
 	m_DecidedAgentActions.clear();
 	m_Experiences.clear();
 
@@ -142,21 +173,36 @@ const GRAVEngine::AI::Actions::actionBuffer GRAVEngine::AI::Training::trainer::g
 
 	return m_DecidedAgentActions[agentId];
 }
-
 void GRAVEngine::AI::Training::trainer::printModel() const
 {
 	m_Algorithm->print();
 }
+void GRAVEngine::AI::Training::trainer::save()
+{
+	GRAV_PROFILE_FUNCTION();
 
+	// Write out the model
+	m_Algorithm->saveModel(m_Settings.m_StatsFolder + "\\" + m_Settings.m_ProgramName);
+
+	// Save the statistics
+	m_Stats.write(m_Settings.m_StatsFolder + "\\" + m_Settings.m_ProgramName + ".csv");
+}
 void GRAVEngine::AI::Training::trainer::sendToDevice(inferenceDevice device) const
 {
 	// Send the algorithm to a device
 	m_Algorithm->sendToDevice(device);
 }
 
-//void GRAVEngine::AI::Training::trainer::addObservationJob(uintptr_t params)
-//{
-//}
-//void GRAVEngine::AI::Training::trainer::stepJob(uintptr_t params)
-//{
-//}
+void GRAVEngine::AI::Training::trainer::shouldWriteSummary(size_t interval)
+{
+	if (m_NextSummaryStep == 0)
+		m_NextSummaryStep = m_CurrentStep + (m_Settings.m_SummaryFrequency - m_CurrentStep % m_Settings.m_SummaryFrequency);
+	else if (interval >= m_NextSummaryStep && m_CurrentStep != 0)
+	{
+		m_NextSummaryStep = m_CurrentStep + (m_Settings.m_SummaryFrequency - m_CurrentStep % m_Settings.m_SummaryFrequency);
+
+		save();
+	}
+
+
+}

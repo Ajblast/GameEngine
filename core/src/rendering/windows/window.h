@@ -3,6 +3,7 @@
 #include "common.h"
 #include "windowProperties.h"
 #include "events/event.h"
+#include "rendering/graphicsContext.h"
 
 #include <functional>
 
@@ -31,7 +32,17 @@ namespace GRAVEngine
 			// Get the native representation of this window
 			virtual void* getNativeWindow() const = 0;
 
+			// Bind this window's graphical context
+			void bindGraphicsContext();
+			// Unbind this window's graphical context
+			void unbindGraphicsContext();
+
+			// Create a window. This must be ran on the main thread!
 			static scope<window> create(const windowProperties& properties = windowProperties());
+			// Create a dependent window that shares resources with another window. This must be ran on the main thread!
+			static scope<window> create(scope<window>& window, const windowProperties& properties = windowProperties());
+		protected:
+			scope<graphicsContext> m_Context;
 		};
 	}
 }

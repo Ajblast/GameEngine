@@ -1,6 +1,7 @@
 #include "gravpch.h"
 #include "trainerController.h"
-#include "exceptions/invalidArgumentException.h"
+#include "exceptions/standard/invalidArgumentException.h"
+#include "io/files/io.h"
 
 GRAVEngine::AI::Training::trainerController::trainerController(scope<algorithmFactory> algorithmFactory) : m_AlgorithmFactory(std::move(algorithmFactory))
 {
@@ -8,12 +9,21 @@ GRAVEngine::AI::Training::trainerController::trainerController(scope<algorithmFa
 		throw Exceptions::invalidArgumentException("Algorithm Factory was null");
 }
 
+GRAVEngine::AI::Training::trainerController::~trainerController()
+{
+	Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
+
+	// Trainers should save before exiting
+	for (auto it = m_Trainers.begin(); it != m_Trainers.end(); it++)
+		it->second->save();
+}
+
 const GRAVEngine::AI::Training::algorithmFactory& GRAVEngine::AI::Training::trainerController::getAlgorithmFactory() const
 {
 	// Return the current algorithm factory
 	return *m_AlgorithmFactory.get();
 }
-const GRAVEngine::ref<GRAVEngine::AI::Training::trainer>& GRAVEngine::AI::Training::trainerController::getTrainer(const std::string& programName)
+const GRAVEngine::ref<GRAVEngine::AI::Training::trainer> GRAVEngine::AI::Training::trainerController::getTrainer(const std::string& programName)
 {
 	Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
 
@@ -28,6 +38,8 @@ const GRAVEngine::ref<GRAVEngine::AI::Training::trainer>& GRAVEngine::AI::Traini
 
 void GRAVEngine::AI::Training::trainerController::createTrainer(trainerSettings settings)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Do nothing if the trainer already exists
 	if (m_Trainers.find(settings.m_ProgramName) != m_Trainers.end())
 	{
@@ -41,6 +53,9 @@ void GRAVEngine::AI::Training::trainerController::createTrainer(trainerSettings 
 		// Create the algorithm
 		scope<ITrainingAlgorithm> algorithm = m_AlgorithmFactory->createAlgorithm(settings);
 
+		if (IO::exists(settings.m_StatsFolder + "\\" + settings.m_ProgramName + "Model.pt"))
+			algorithm->loadModel(settings.m_StatsFolder + "\\" + settings.m_ProgramName);
+
 		// Create the trainer
 		ref<trainer> t = createRef<trainer>(settings, std::move(algorithm));
 
@@ -48,8 +63,10 @@ void GRAVEngine::AI::Training::trainerController::createTrainer(trainerSettings 
 		m_Trainers.emplace(settings.m_ProgramName, t); 
 	}
 }
-void GRAVEngine::AI::Training::trainerController::createTrainer(const std::string& programName, scope<ITrainingAlgorithm> algorithm)
+void GRAVEngine::AI::Training::trainerController::createTrainer(const std::string& programName, const std::string& folderPath, scope<ITrainingAlgorithm> algorithm)
 {
+	GRAV_PROFILE_FUNCTION();
+
 	// Check if the algorithm exists
 	if (algorithm == nullptr)
 		throw Exceptions::invalidArgumentException("Algorithm is null.");
@@ -65,7 +82,13 @@ void GRAVEngine::AI::Training::trainerController::createTrainer(const std::strin
 		Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
 
 		// Create the trainer settings based on the algorithm
-		trainerSettings settings = { programName, algorithm->getAlgorithmType(), algorithm->getNetworkSettings(), 64 };
+		trainerSettings settings = { programName, algorithm->getAlgorithmType(), algorithm->getNetworkSettings(), 64, folderPath, 1000 };
+
+		// Create the algorithm
+		scope<ITrainingAlgorithm> algorithm = m_AlgorithmFactory->createAlgorithm(settings);
+
+		if (IO::exists(settings.m_StatsFolder + "\\" + settings.m_ProgramName + "Model.pt"))
+			algorithm->loadModel(settings.m_StatsFolder + "\\" + settings.m_ProgramName);
 
 		// Create the trainer
 		ref<trainer> t = createRef<trainer>(settings, std::move(algorithm));
@@ -78,6 +101,8 @@ void GRAVEngine::AI::Training::trainerController::createTrainer(const std::strin
 void GRAVEngine::AI::Training::trainerController::step()
 {
 	Locks::scopedLock<decltype(m_TrainerLock)> lock(m_TrainerLock);
+
+	GRAV_PROFILE_FUNCTION();
 
 	for (auto it = m_Trainers.begin(); it != m_Trainers.end(); it++)
 		it->second->step();

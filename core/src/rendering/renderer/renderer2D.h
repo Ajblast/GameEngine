@@ -4,11 +4,16 @@
 
 #include "rendering/textures/texture2D.h"
 #include "rendering/cameras/camera.h"
+#include "locks/spinLock.h"
+#include "locks/scopedLock.h"
 
 #include <glm/glm.hpp>
+#include <atomic>
 
 namespace GRAVEngine
 {
+	class application;
+
 	namespace Rendering
 	{
 		// TODO: Finish implementation of the 2D rendering
@@ -16,6 +21,8 @@ namespace GRAVEngine
 		// A renderer for 2D graphics
 		class GRAVAPI renderer2D
 		{
+			friend application;
+
 		public:
 			// Startup the 2D renderer
 			static void startup();
@@ -26,9 +33,8 @@ namespace GRAVEngine
 			static void beginScene(const camera& camera);
 			// End drawing the current scene
 			static void endScene();
-			// Flush the scene to the buffer
-			static void flush();
-
+			// Ask for a renderer flush
+			static void askFlush();
 
 			// Primitive drawing
 			static void drawQuad(const glm::vec2& position, const glm::vec2& size, const glm::vec4& color);
@@ -74,6 +80,12 @@ namespace GRAVEngine
 			static void startBatch();
 			// Start the next batch of rendering
 			static void nextBatch();
+
+			// Flush the scene to the buffer
+			static void flush();
+
+		private:
+			static Locks::spinLock s_BatchLock;
 		};
 	}
 }

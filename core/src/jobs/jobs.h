@@ -6,16 +6,9 @@
 #include "jobManagerOptions.h"
 #include "jobManager.h"
 
-#define GRAV_JOB_ENTRY_POINT(jobName) void jobName(uintptr_t param)
-#define GRAV_KICK_JOB(declaration)					GRAVEngine::Jobs::jobManager::getInstance()->kickJob(declaration)
-#define GRAV_KICK_JOBS(declarations, count)			GRAVEngine::Jobs::jobManager::getInstance()->kickJobs(declarations, count)
-#define GRAV_KICK_JOB_WAIT(declaration)				GRAVEngine::Jobs::jobManager::getInstance()->kickJobAndWait(declaration)
-#define GRAV_KICK_JOBS_WAIT(declarations, count)	GRAVEngine::Jobs::jobManager::getInstance()->kickJobsAndWait(declarations, count)
-
+#define GRAV_KICK_JOB(declaration, counter)			GRAVEngine::Jobs::jobManager::getInstance()->kickJob(declaration, counter)
+#define GRAV_KICK_JOBS(declarations, size, counter)	GRAVEngine::Jobs::jobManager::getInstance()->kickJobs(declarations, size, counter)
 #define GRAV_WAIT_COUNTER(counter, target)			GRAVEngine::Jobs::jobManager::getInstance()->waitForCounter(counter, target)
-#define GRAV_WAIT_COUNTER_FREE(counter, target)		GRAV_WAIT_COUNTER(counter, target); //delete counter
-
-// TODO: Fix GRAV_WAIT_COUNTER_FREE for memory management
 
 // TODO: Special job mutex that is used for lock that are held longer
 //	Puts the current job to sleep if needed instead of spin lock

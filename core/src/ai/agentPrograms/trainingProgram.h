@@ -12,7 +12,7 @@ namespace GRAVEngine
 		class GRAVAPI trainingProgram : public IAgentProgram
 		{
 		public:
-			trainingProgram(std::string name, const std::vector<ref<Sensors::ISensor>>& sensors, Actions::actuatorList& actuators);
+			trainingProgram(const std::string& name, const std::string& folderPath, const std::vector<ref<Sensors::ISensor>>& sensors, Actions::actuatorList& actuators);
 			virtual ~trainingProgram() = default;
 
 			// Inherited via IAgentProgram

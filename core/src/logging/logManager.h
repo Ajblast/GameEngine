@@ -6,6 +6,7 @@
 #include "logger.h"
 #include "locks/scopedLock.h"
 #include "locks/spinLock.h"
+#include <atomic>
 
 namespace GRAVEngine
 {
@@ -68,6 +69,8 @@ namespace GRAVEngine
 			// Set verbosities for all existing/future loggers. Unspecified verbosities can be set or not. Specified loggers do not have to exist yet.
 			void setVerbosities(std::unordered_map<std::string, Logging::verbosity> verbosities, bool setUnspecified, Logging::verbosity& verbosity);
 
+			const bool isValid() const { return m_IsValid.load(std::memory_order_acquire); }
+
 			// Statically get the logging instance
 			inline static logManager* getInstance()
 			{
@@ -90,6 +93,7 @@ namespace GRAVEngine
 			bool m_AutomaticRegistration = true;
 
 			static logManager* s_Instance;
+			std::atomic_bool m_IsValid = false;
 		};
 	}
 }

@@ -22,9 +22,6 @@ namespace GRAVEngine
 				public:
 					PPO(networkSettings settings, ref<ppoHyperparameters> hyperparameters);
 					virtual ~PPO() = default;
-
-					// Get the model
-					//virtual Models::model& model() override;
 					
 					// Get the algorithm type
 					virtual algorithmType getAlgorithmType() override;
@@ -34,8 +31,6 @@ namespace GRAVEngine
 					virtual hyperparameters& getHyperparameters() override;
 					// Should an update be triggered
 					virtual bool shouldUpdate() override;
-					//// Is the algorithm initialized
-					//virtual bool initialized() override;
 
 					// Run through the algorithm's model
 					virtual Models::ActorCritic::actorCriticOputput forward(std::vector<torch::Tensor> inputs) override;
@@ -44,10 +39,12 @@ namespace GRAVEngine
 					virtual void print() const override;
 
 					// Update the model with a trajectory
-					virtual void update() override;
+					virtual updateLoss update() override;
 
-					//// Create a model for the algorithm
-					//virtual ref<Models::model> createModel() override;
+					// Create a model for the algorithm
+					virtual torch::nn::AnyModule getModel() override { return torch::nn::AnyModule(m_Model); }
+					// Get the optimizer
+					virtual torch::optim::Optimizer& getOptimizer() override { return m_Optimizer; }
 
 					// Save the model to filePath
 					virtual void saveModel(const std::string& filePath) override;
@@ -57,13 +54,10 @@ namespace GRAVEngine
 					virtual void addTrajectory(trajectory trajectory) override;
 
 					virtual void sendToDevice(inferenceDevice device) override;
-
-					//// Initialize the training algorithm
-					//virtual void initialize(networkSettings settings, ref<hyperparameters> parameters) override;
 				private:
 					std::vector<torch::Tensor> gae(trajectory trajectory);
 				private:
-					ref<Models::ActorCritic::actorCritic> m_Model;	// The model for training
+					Models::ActorCritic::actorCritic m_Model;	// The model for training
 					ref<ppoHyperparameters> m_Hyperparameters;		// Hyperparameters for the algorithm
 					networkSettings m_Settings;						// Algorithm settings
 

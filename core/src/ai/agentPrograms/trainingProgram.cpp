@@ -6,8 +6,10 @@
 #include "ai/agentEpisodeId.h"
 #include <torch/torch.h>
 
-GRAVEngine::AI::trainingProgram::trainingProgram(std::string name, const std::vector<ref<Sensors::ISensor>>& sensors, Actions::actuatorList& actuators) : m_Name(name)
+GRAVEngine::AI::trainingProgram::trainingProgram(const std::string& name, const std::string& folderPath, const std::vector<ref<Sensors::ISensor>>& sensors, Actions::actuatorList& actuators) : m_Name(name)
 {
+	GRAV_PROFILE_FUNCTION();
+	
 	// Network Settings
 	GRAVEngine::AI::Training::networkSettings settings;
 
@@ -20,6 +22,7 @@ GRAVEngine::AI::trainingProgram::trainingProgram(std::string name, const std::ve
 
 	// Create the trainer settings
 	GRAVEngine::AI::Training::trainerSettings trainerSettings;
+	trainerSettings.m_StatsFolder = folderPath;
 	trainerSettings.m_ProgramName = name;
 	trainerSettings.m_Algorithm = GRAVEngine::AI::Training::algorithmType::PPO;
 	trainerSettings.m_NetworkSettings = std::move(settings);
@@ -31,6 +34,8 @@ GRAVEngine::AI::trainingProgram::trainingProgram(std::string name, const std::ve
 
 void GRAVEngine::AI::trainingProgram::requestDecision(agentInfo info, scope<ref<Sensors::ISensor>[]>& sensors, size_t count)
 {
+	GRAV_PROFILE_FUNCTION();
+	
 	// Get the trainer
 	auto trainer = GRAVEngine::AI::environmentManager::instance().controller().getTrainer(m_Name);
 

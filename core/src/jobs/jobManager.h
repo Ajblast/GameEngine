@@ -8,7 +8,7 @@
 #include "gravThread.h"
 #include "fiber.h"
 #include "tls.h"
-#include "jobQueue.h"
+#include "containers/threadSafe/queue.h"
 
 #include "locks/spinLock.h"
 #include "exceptions/exceptions.h"
@@ -17,128 +17,130 @@
 // TODO: Implement automatic allocation for counters
 
 #define GRAV_MAIN_THREAD_INDEX 0
+#define GRAV_MAIN_FIBER_INDEX 0
 
 namespace GRAVEngine
 {
 	namespace Jobs
 	{
-		struct GRAVAPI waitingFiberSlot
+		GRAV_JOB_ENTRY_POINT(switchToReadyFiber);
+
+		struct job
 		{
-			fiberIndex m_FiberIndex = UINT16_MAX;
-			counterTarget m_TargetValue = 0;
-			ref<counter> counter = nullptr;
+			declaration m_Declaration;
+			ref<counter>* m_Counter;
 		};
 
+		typedef queue<job, Locks::spinLock> jobQueue;
 
 		class GRAVAPI jobManager
 		{
+			// The job manager is a friend of the counter so that waiting fibers can be added easierly and without complicating public API
 			friend counter;
+			// Switch to ready fiber is a friend because it needs access to the fibers and the tls
+			friend GRAV_JOB_ENTRY_POINT(switchToReadyFiber);
 
 		public:
-			using mainMethodFunction = void(*)();
-
 			jobManager();													// Constructor
 			jobManager(const jobManager&) = delete;							// Cannot copy the job manager
 			jobManager(jobManager&& other) = delete;						// Move constructor
-
 			jobManager& operator= (const jobManager&) = delete;				// Cannot copy the job manager
 			jobManager& operator= (jobManager&& other) noexcept = delete;	// Move set operator
 			~jobManager();													// Deconstructor
 
 			// Start up the job manager
 			void startUp(jobManagerOptions& options);
-			void runMain(mainMethodFunction mainMethod);
-			void startShutdown();
 			// Shut down the job manager
 			void shutDown();
 
-			// Kick jobs
+			// Kick a single job
 			void kickJob(const declaration& declaration);
+			// Kick a single job and return a counter
+			void kickJob(const declaration& declaration, ref<counter>* counter);
+			// Kick an array of jobs. Jobs can be created on the stack as long as the array is not freed before all the jobs are ran
 			void kickJobs(const declaration* declarations, size_t count);
-			void kickJobAndWait(const declaration& declaration);
-			void kickJobsAndWait(const declaration* declarations, size_t count);
-
-			// Wait for a job to terminate
-			void waitForCounter(ref<counter> counter, counterTarget target, bool blocking = true);
-
-
-			//counter* allocCounter();
-			//void freeCounter(counter* counter);
+			// Kick an array of jobs. Jobs can be created on the stack as long as the array is not freed before all the jobs are ran
+			void kickJobs(const declaration* declarations, size_t count, ref<counter>* counter);
+			// Wait for the atomic counter to be the target value before allowing execution to continue
+			void waitForCounter(ref<counter>& counter, counterTarget target);
 
 		public:
 			inline const uint8 getNumThreads() const{ return m_ThreadCount; }
 			inline const uint16 getNumFibers() const{ return m_FiberCount; }
-			inline bool isValid() const { return m_IsValid.load(std::memory_order_acquire); }
-			inline bool isShuttingDown() const { return m_IsShuttingDown.load(std::memory_order_acquire); }
+			inline const bool isValid() const { return m_IsValid.load(std::memory_order_acquire); }
+			inline const bool isShuttingDown() const { return m_ShuttingDown.load(std::memory_order_acquire); }
 
-			gravThread* getThread(uint8 index);
+			// Get the current thraed id
 			threadID getCurrentThreadID() const;
+			// Get the current thread index
 			threadIndex getCurrentThreadIndex() const;
-			std::string getCurrentThreadName() const;
+			// Get the current thread name
+			std::wstring getCurrentThreadName() const;
 
 			// Statically get the job instance
 			inline static jobManager* getInstance() { return s_Instance; }
 		private:
-			// Add a fiber to the waiting list
-			void addWaitingFiber(ref<counter> counter, fiberIndex index, counterTarget target);
-			// Check if there are any fibers that need to be removed from the waiting list and be resumed
-			void checkWaitingFibers();
-			//void waitForCounterProxy(waitForCounterProxyArgs args);
+			void addReadyFiber(fiberBundle* bundle);
+		private:
 
-			// Thread
+			// Get a thread based on its index
+			gravThread* getThread(threadIndex index) const;
+			// Get the current thread
 			gravThread* getCurrentThread() const;
+			// Get the current tls
 			tls* getCurrentTLS() const;
 
-			// Spawn a worker thread
-			void spawnThread(uint8 index);
-
-			// Fiber
+			// Find a free fiber
 			fiberIndex findFreeFiber();
-			void cleanPreviousFiber(tls* tls = nullptr);
+			// Clean the previous fiber
+			void cleanPreviousFiber();
 
 
 			// Get a jobQueue by priority. Defaults to low priority queue
 			jobQueue& getQueue(jobPriority priority);
-			// Get the next job and switch to a fiber
-			bool getNextJob(declaration& declaration, tls* tls);
+			// Get the next job
+			bool getNextJob(job& job);
 
 			// Callback Function
-			static void fiberCallbackMain(fiber* fiber);
 			static void fiberCallback(fiber* fiber);
+			static void fiberQuitCallback(fiber* fiber);
 			static void threadCallback(gravThread* gravThread);
 		private:
-			// Fiber Waiting List
-			uint16 m_MaxWaitingFibersCount;
-			std::atomic_bool* m_FreeWaitingFibers;
-			waitingFiberSlot* m_WaitingFibers;
-			GRAVEngine::Locks::spinLock m_WaitingFiberLock;
-			std::vector<fiberIndex> m_ReadyFibers;
+			// Array to hold the currently ready fibers
+			scope<fiberBundle[]> m_ReadyFibers;
 			GRAVEngine::Locks::spinLock m_ReadyFiberLock;
 
 			// Threads
-			uint8 m_ThreadCount;
-			gravThread* m_Threads;
+			uint8 m_ThreadCount;						// The number of threads
+			scope<gravThread[]> m_Threads;				// The array of threads
+			bool m_ThreadAffinity;						// Should threads be set with a thread affinity
 
-			bool m_ThreadAffinity;
-			bool m_AutoInitializeThreads;
+			// Thead sleeping behavior
+			std::mutex m_SleepingThreadLock;			// Lock used for when threads sleep instead of spin locking
+			std::condition_variable m_ThreadCV;			// Condition variable to wake up worker threads when they sleep instead of spin locking
+			std::atomic<queueBehavior> m_QueueBehavior;	// What is the thread sleeping behavior when there are no jobs
 
 			// Fibers
-			uint16 m_FiberCount;
-			fiber* m_Fibers;
-			std::atomic_bool* m_IdleFibers;
+			fiberIndex m_FiberCount;					// The number of fibers
+			scope<fiber[]> m_Fibers;					// The array of fibers
+			scope<std::atomic_bool[]> m_IdleFibers;		// Array holding a bool that determines if a fiber is available
+
+			// Thread shutdown infomation
+			scope<fiber[]> m_ThreadQuitFibers;			// The fibers that are explicitly used to make sure that threads switch back to their personal fibers
+			std::atomic_size_t m_ShutdownThreadCount;	// The amount of threads that have shutdown and finished
 
 			// Job queues
-			jobQueue m_CriticalPriorityQueue;
-			jobQueue m_HighPriorityQueue;
-			jobQueue m_NormalPriorityQueue;
-			jobQueue m_LowPriorityQueue;
+			jobQueue m_CriticalPriorityQueue;		// The critical priority job queue
+			jobQueue m_HighPriorityQueue;			// The high priority job queue
+			jobQueue m_NormalPriorityQueue;			// The normal priority job queue
+			jobQueue m_LowPriorityQueue;			// The low priority job queue
+
+			jobManagerCallbacks m_Callbacks;			// Callbacks for the job manager
 
 			// Static Instance
-			mainMethodFunction m_MainMethod;
-			bool m_ShutdownAfterMain;
-			static jobManager* s_Instance;
-			std::atomic_bool m_IsValid = false;
-			std::atomic_bool m_IsShuttingDown = false;
+			static jobManager* s_Instance;				// The static job instance
+			std::atomic_bool m_IsValid = false;			// Is the job manager valid?
+			std::atomic_bool m_ShuttingDown = false;	// Is the job manager valid?
 		};
 	}
 }

@@ -1,19 +1,15 @@
 #include "gravpch.h"
 #include "PPO.h"
+#include "../../models/model.h"
 
 GRAVEngine::AI::Training::Algorithms::PPO::PPO(networkSettings settings, ref<ppoHyperparameters> hyperparameters) :
-    m_Model(createRef<Models::ActorCritic::actorCritic>(settings)),
+    m_Model(std::move(Models::ActorCritic::actorCritic(settings))),
     m_Hyperparameters(hyperparameters),
-    m_Optimizer(m_Model->operator->()->parameters(), torch::optim::AdamOptions(0.0001).betas({ 0.5, 0.999 }))
+    m_Optimizer(m_Model->parameters(), torch::optim::AdamOptions(0.0001).betas({ 0.5, 0.999 }))
 {
     GRAV_ASSERT(hyperparameters != nullptr);    // Make sure that the hyperparameters are actually passed in
 }
 
-//GRAVEngine::AI::Models::model& GRAVEngine::AI::Training::Algorithms::PPO::model()
-//{
-//    // Cast the actor-critic into a generic model
-//    return &(*m_Model);
-//}
 GRAVEngine::AI::Training::algorithmType GRAVEngine::AI::Training::Algorithms::PPO::getAlgorithmType()
 {
     return algorithmType::PPO;
@@ -34,34 +30,47 @@ bool GRAVEngine::AI::Training::Algorithms::PPO::shouldUpdate()
 
     return true;
 }
-//bool GRAVEngine::AI::Training::Algorithms::PPO::initialized()
-//{
-//    return false;
-//}
+
 
 GRAVEngine::AI::Models::ActorCritic::actorCriticOputput GRAVEngine::AI::Training::Algorithms::PPO::forward(std::vector<torch::Tensor> inputs)
 {
-    return m_Model->operator->()->forward(inputs);
+    return m_Model->forward(inputs);
 }
+
 
 void GRAVEngine::AI::Training::Algorithms::PPO::print() const
 {
     std::stringstream ss;
 
-    ss << *m_Model->operator->() << std::endl;
+    ss << m_Model << std::endl;
 
     GRAV_LOG_LINE_INFO("\nPrint Model:\n%s", ss.str().c_str());
 
 }
-void GRAVEngine::AI::Training::Algorithms::PPO::update()
+GRAVEngine::AI::Training::updateLoss GRAVEngine::AI::Training::Algorithms::PPO::update()
 {
-    // Cheeck if there are enough update experiences to be able to update
+    GRAV_PROFILE_FUNCTION();
+    
+    updateLoss loss{ 0, 0, 0 };
+
+    // Check if there are enough update experiences to be able to update
     if (shouldUpdate() == false)
-        return;
+        return loss;
 
     size_t batchSize = m_UpdateBuffer.size();               // Total batch size
     size_t miniBatchSize = m_Hyperparameters->m_BatchSize;  // Size of the minibatches
     float clip = m_Hyperparameters->m_Clip;                 // Clipping parameter
+
+    // Training stats
+    std::vector<float> actorLosses;
+    std::vector<float> criticLosses;
+    std::vector<float> totalLosses;
+
+
+    // Normalize the advantages to be in a normal distribution
+    torch::Tensor advantages = torch::cat(m_UpdateBuffer.m_Advantages);
+    for (auto it = m_UpdateBuffer.m_Advantages.begin(); it != m_UpdateBuffer.m_Advantages.end(); it++)
+        *it = (*it - advantages.mean()) / (advantages.std() + 1e-10);
 
     // Run for the specified epoch count
     for (size_t i = 0; i < m_Hyperparameters->m_EpochCount; i++)
@@ -69,6 +78,8 @@ void GRAVEngine::AI::Training::Algorithms::PPO::update()
         // For as many minibatches that can be created
         for (size_t j = 0; j < batchSize / miniBatchSize; j++)
         {
+            GRAV_PROFILE_SCOPE("Update Batch");
+
             // Get a random sample from the update buffer batchSize long
             updateBuffer miniBatch = m_UpdateBuffer.minibatch(miniBatchSize);
 
@@ -88,16 +99,41 @@ void GRAVEngine::AI::Training::Algorithms::PPO::update()
             // Combine to single advantage
             torch::Tensor advantage = torch::cat(miniBatch.m_Advantages);
             torch::Tensor returns = torch::cat(miniBatch.m_Returns);
+            if (advantage.isnan().any().item<bool>() || advantage.isinf().any().item<bool>())
+            {
+                GRAV_LOG_LINE_WARN("advantage is nan or inf");
+                std::cout << advantage << std::endl;
+            }
+            if (returns.isnan().any().item<bool>() || returns.isinf().any().item<bool>())
+            {
+                GRAV_LOG_LINE_WARN("returns is nan or inf");
+                std::cout << returns << std::endl;
+            }
 
             //GRAV_LOG_LINE_INFO("Advantage");
             //advantage.print();
             //GRAV_LOG_LINE_INFO("Returns");
             //returns.print();
 
-            // Run through the model
-            Models::ActorCritic::actorCriticOputput output = m_Model->operator->()->forward(observation);
+            Models::ActorCritic::actorCriticOputput output;
+            {
+                GRAV_PROFILE_SCOPE("Run Model");
+                // Run through the model
+                output = m_Model->forward(observation);
+            }
             torch::Tensor value = std::get<1>(output);
             torch::Tensor entropy = std::get<2>(std::get<0>(output));
+            if (value.isnan().any().item<bool>() || value.isinf().any().item<bool>())
+            {
+                GRAV_LOG_LINE_WARN("value is nan or inf");
+                std::cout << value << std::endl;
+            }
+            if (entropy.isnan().any().item<bool>() || entropy.isinf().any().item<bool>())
+            {
+                GRAV_LOG_LINE_WARN("entropy is nan or inf");
+                std::cout << entropy << std::endl;
+            }
+
 
             //GRAV_LOG_LINE_INFO("Critic Value");
             //value.print();
@@ -105,11 +141,25 @@ void GRAVEngine::AI::Training::Algorithms::PPO::update()
             //torch::print(entropy);
             //GRAV_LOG_LINE_INFO("");
 
-            Models::ActorCritic::agentLogProbs newLogProbs = m_Model->operator->()->logProbs(observation, actions);
+            Models::ActorCritic::agentLogProbs newLogProbs = m_Model->logProbs(observation, actions);
 
 
             // Calculate the surrogates
-            torch::Tensor ratio = (newLogProbs.flatten() - oldlogProbs.flatten()).exp();
+            torch::Tensor flattenedNewLog = newLogProbs.flatten();
+            torch::Tensor flattenedOldLog = oldlogProbs.flatten();
+            if (flattenedNewLog.isnan().any().item<bool>() || flattenedNewLog.isinf().any().item<bool>())
+            {
+                GRAV_LOG_LINE_WARN("flattenedNewLog is nan or inf");
+                std::cout << flattenedNewLog << std::endl;
+            }
+            if (flattenedOldLog.isnan().any().item<bool>() || flattenedOldLog.isinf().any().item<bool>())
+            {
+                GRAV_LOG_LINE_WARN("flattenedOldLog is nan or inf");
+                std::cout << flattenedOldLog << std::endl;
+            }
+
+
+            torch::Tensor ratio = (flattenedNewLog - flattenedOldLog).exp();
             torch::Tensor surr1 = ratio * advantage;
             torch::Tensor surr2 = torch::clamp(ratio, 1.0 - clip, 1.0 + clip) * advantage;
 
@@ -127,6 +177,16 @@ void GRAVEngine::AI::Training::Algorithms::PPO::update()
             // Claculate the actor and critic loss
             torch::Tensor actorLoss = -torch::min(surr1, surr2).mean();
             torch::Tensor criticLoss = (returns - value).pow(2).mean();
+            if (actorLoss.isnan().any().item<bool>() || actorLoss.isinf().any().item<bool>())
+            {
+                GRAV_LOG_LINE_WARN("actorLoss is nan or inf");
+                std::cout << actorLoss << std::endl;
+            }
+            if (criticLoss.isnan().any().item<bool>() || criticLoss.isinf().any().item<bool>())
+            {
+                GRAV_LOG_LINE_WARN("criticLoss is nan or inf");
+                std::cout << criticLoss << std::endl;
+            }
 
             //GRAV_LOG_LINE_INFO("Actor Loss");
             //torch::print(actorLoss);
@@ -135,30 +195,78 @@ void GRAVEngine::AI::Training::Algorithms::PPO::update()
             //torch::print(criticLoss);
             //GRAV_LOG_LINE_INFO("");
 
-            // Calculate the overall loss
-            torch::Tensor loss = 0.5 * criticLoss + actorLoss - 0.001 * entropy;
+            // Add the loss items per batch
+            actorLosses.push_back(torch::abs(actorLoss).item<float>());
+            criticLosses.push_back(criticLoss.item<float>());
 
-            //GRAV_LOG_LINE_INFO("Total Loss");
-            //torch::print(loss.sum());
-            //GRAV_LOG_LINE_INFO("");
+            // Calculate the overall loss
+            torch::Tensor loss = 0.5 * criticLoss + actorLoss - 0.001 * entropy.mean();
             
+            if (loss.isnan().any().item<bool>() || loss.isinf().any().item<bool>())
+            {
+                GRAV_LOG_LINE_WARN("Loss is nan or inf");
+                std::cout << loss << std::endl;
+            }
+
             // Take a step through the optimization
-            m_Optimizer.zero_grad();
-            loss.sum().backward();
-            m_Optimizer.step();
+            {
+                GRAV_PROFILE_SCOPE("Optimize Tensor");
+                m_Optimizer.zero_grad();
+                totalLosses.push_back(loss.item<float>());
+
+                //GRAV_LOG_LINE_INFO("Total Loss");
+                //torch::print(lossSum);
+                //GRAV_LOG_LINE_INFO("");
+
+                if (loss.isnan().any().item<bool>() || loss.isinf().any().item<bool>())
+                {
+                    GRAV_LOG_LINE_WARN("Loss is nan or inf");
+                    std::cout << loss << std::endl;
+                }
+
+                loss.backward();
+                //torch::nn::utils::clip_grad_value_(m_Model->parameters(), 1.0);
+                m_Optimizer.step();
+            }
+
+            if (loss.isnan().any().item<bool>() || loss.isinf().any().item<bool>())
+            {
+                GRAV_LOG_LINE_WARN("Loss is nan or inf");
+                std::cout << loss << std::endl;
+            }
+
         }
     }
+
+    // Get the average loss from all of the batches
+    loss = {
+        torch::tensor(actorLosses).mean().item<float>(),
+        torch::tensor(criticLosses).mean().item<float>(),
+        torch::tensor(totalLosses).mean().item<float>()
+    };
+
+    // Clear the update buffer now that learning has happened from the experiences
+    m_UpdateBuffer.clear();
+
+    // Return the loss of every batch
+    return loss;
 }
 
 void GRAVEngine::AI::Training::Algorithms::PPO::saveModel(const std::string& filePath)
 {
+    // Save the model and optimizer
+    GRAVEngine::AI::Models::save(m_Model, m_Optimizer, filePath);
 }
 void GRAVEngine::AI::Training::Algorithms::PPO::loadModel(const std::string& filePath)
 {
+    // Load the model and optimizer
+    GRAVEngine::AI::Models::load(m_Model, m_Optimizer, filePath);
 }
 
 void GRAVEngine::AI::Training::Algorithms::PPO::addTrajectory(trajectory trajectory)
 {
+    GRAV_PROFILE_FUNCTION();
+    
     // Create a buffer from the trajectory
     updateBuffer buffer = trajectory.toUpdateBuffer();
 
@@ -168,9 +276,6 @@ void GRAVEngine::AI::Training::Algorithms::PPO::addTrajectory(trajectory traject
     // Detach the return values
     for (auto it = buffer.m_Returns.begin(); it != buffer.m_Returns.end(); it++)
         *it = it->detach();
-    //// Detach the advantages values
-    //for (auto it = buffer.m_Advantages.begin(); it != buffer.m_Advantages.end(); it++)
-    //    it->detach();
     
     // Detach the log probs
     for (auto it = buffer.m_LogProbs.begin(); it != buffer.m_LogProbs.end(); it++)
@@ -201,25 +306,25 @@ void GRAVEngine::AI::Training::Algorithms::PPO::addTrajectory(trajectory traject
     // Add to the update buffer the trajectory
     m_UpdateBuffer.append(buffer);
 }
-
 void GRAVEngine::AI::Training::Algorithms::PPO::sendToDevice(inferenceDevice device)
 {
     switch (device)
     {
     case GRAVEngine::AI::inferenceDevice::CPU:
-        m_Model->operator->()->to(torch::kCPU);
+        m_Model->to(torch::kCPU);
         break;
     case GRAVEngine::AI::inferenceDevice::GPU:
         // Send the model to the GPU if cuda core are actually available.
-        m_Model->operator->()->to(torch::cuda::is_available() ? torch::kCUDA : torch::kCPU);
+        m_Model->to(torch::cuda::is_available() ? torch::kCUDA : torch::kCPU);
         break;
     default:
         break;
     }
 }
-
 std::vector<torch::Tensor> GRAVEngine::AI::Training::Algorithms::PPO::gae(trajectory trajectory)
 {
+    GRAV_PROFILE_FUNCTION();
+    
     std::vector<torch::Tensor> returns;
     auto gamma = m_Hyperparameters->m_Gamma;
     auto tau = m_Hyperparameters->m_Lamda;
@@ -243,7 +348,3 @@ std::vector<torch::Tensor> GRAVEngine::AI::Training::Algorithms::PPO::gae(trajec
 
     return returns;
 }
-
-//void GRAVEngine::AI::Training::Algorithms::PPO::initialize(networkSettings settings, ref<hyperparameters> parameters)
-//{
-//}

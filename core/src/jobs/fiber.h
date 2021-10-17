@@ -1,64 +1,60 @@
 #pragma once
 
 #include "common.h"
-
-#ifdef GRAV_PLATFORM_WINDOWS
-#ifndef	WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <Windows.h>
-#endif
-#endif
+#include "jobTypes.h"
 
 namespace GRAVEngine
 {
 	namespace Jobs
 	{
-		typedef uint16 fiberIndex;
-		typedef void* fiberHandle;
+		// Forward declare job manager for friendship
+		class jobManager;
 
+		// TODO: Add the potential for there to be fiber's with different stack sizes
+
+		// A fiber is a piece of execution context with its own stack that is called explicitly
 		class GRAVAPI fiber
 		{
+			friend jobManager;
+
 		public:
 			// Callback for fiber function
-			using fiberFunction = void(*)(fiber*);
-
+			//typedef std::function<void(fiber*)> fiberCallback;
+			using fiberCallback = void(*)(fiber*);
 		public:
 			fiber();
-			fiber(const fiber& other) = delete;
-			//fiber(fiber&& other);
-
-			fiber& operator=(const fiber& other) = delete;
-			//fiber& operator=(fiber&& other);
+			fiber(const fiber& other) = delete;				// Not allowed to copy construct
+			fiber(fiber&& other) = delete;					// Not allowed to move construct
+			fiber& operator=(const fiber& other) = delete;	// Not allowed to copy set
+			fiber& operator=(fiber&& other) = delete;		// Not allowed to move set
 			~fiber();
 
-			// Convert the current thread to a fiber
+
+			void spawn(fiberCallback callback);
+			// Initialize the current thread and make it a fiber
 			void initializeFromCurrentThread();
+			// Convert the current fiber to a thread
 			void convertToThread();
 
-			// Fiber switching
+			// Switch to a fiber from this current one
 			void switchTo(fiber* fiber);
-			void switchToCallingFiber();
 
-			void setCallback(fiberFunction callback);
+			// Is the current fiber valid
+			inline bool isValid() const { return m_FiberHandle; }
 
-			inline fiberFunction getCallback() const { return m_FunctionCallback; };
-			inline bool isValid() const { return m_FiberHandle && m_FunctionCallback; }
-
-			void setIndex(fiberIndex index) { m_Index = index; }
+			// Get the fiber's index
 			const fiberIndex getIndex() const { return m_Index; }
 		private:
-			//fiber(fiberHandle fiber);
+			// Set the fiber's index
+			void setIndex(fiberIndex index) { m_Index = index; }
 
 		private:
 			fiberHandle m_FiberHandle;
-			fiberFunction m_FunctionCallback;
-			fiber* m_CallingFiber;
+			fiberIndex m_Index;
 
 			// Is this a fiber created from a thread
 			bool m_IsThreadFiber = false;
 
-			fiberIndex m_Index;
 
 			// TODO: Add fiber debug string for identification
 		};

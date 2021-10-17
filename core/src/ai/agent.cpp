@@ -6,13 +6,20 @@
 #include <algorithm>
 #include <functional>
 
-GRAVEngine::AI::agent::agent(programParams programParams) :
-    m_Brain(nullptr), m_ShouldRequestAction(false), m_ShouldRequestDecision(false), m_Initialized(false), m_BehaviorParams(programParams)
+GRAVEngine::AI::agent::agent(programParams programParams, size_t maxStep) :
+    m_Brain(nullptr), m_Info(), m_Actuators(), m_Sensors(),
+    m_ShouldRequestAction(false), m_ShouldRequestDecision(false), m_Initialized(false), m_AgentParams(), m_BehaviorParams(programParams),
+    m_StepHandle(), m_SendInfoHandle(), m_DecideActionHandle(), m_ActHandle(), m_ResetHandle()
 {
+    m_AgentParams.m_MaxStepCount = maxStep;
 }
-GRAVEngine::AI::agent::agent(std::vector<ref<Sensors::ISensor>>& sensors, std::vector<ref<Actions::IActuator>>& actuators, programParams programParams) :
-    m_Brain(nullptr), m_ShouldRequestAction(false), m_ShouldRequestDecision(false), m_Initialized(false), m_BehaviorParams(programParams)
+GRAVEngine::AI::agent::agent(std::vector<ref<Sensors::ISensor>>& sensors, std::vector<ref<Actions::IActuator>>& actuators, programParams programParams, size_t maxStep) :
+    m_Brain(nullptr), m_Info(), m_Actuators(), m_Sensors(),
+    m_ShouldRequestAction(false), m_ShouldRequestDecision(false), m_Initialized(false), m_AgentParams(), m_BehaviorParams(programParams),
+    m_StepHandle(), m_SendInfoHandle(), m_DecideActionHandle(), m_ActHandle(), m_ResetHandle()
 {
+    m_AgentParams.m_MaxStepCount = maxStep;
+
     {
         GRAV_PROFILE_SCOPE("Initialize Actuators");
         initializeActuators(actuators);
@@ -33,6 +40,8 @@ GRAVEngine::AI::agent::~agent()
 
 void GRAVEngine::AI::agent::markDone(doneReason reason)
 {
+    GRAV_PROFILE_FUNCTION();
+    
     // Do nothing if the agent is already done.
     if (m_Info.m_IsDone)
         return;
@@ -71,6 +80,8 @@ void GRAVEngine::AI::agent::markDone(doneReason reason)
 
 void GRAVEngine::AI::agent::initializeSensors(std::vector<ref<Sensors::ISensor>>& sensors)
 {
+    GRAV_PROFILE_FUNCTION();
+    
     if (m_Initialized)
         return;
 
@@ -90,6 +101,8 @@ void GRAVEngine::AI::agent::initializeSensors(std::vector<ref<Sensors::ISensor>>
 }
 void GRAVEngine::AI::agent::initializeActuators(std::vector<ref<Actions::IActuator>>& actuators)
 {
+    GRAV_PROFILE_FUNCTION();
+    
     if (m_Initialized)
         return;
 
@@ -100,6 +113,8 @@ void GRAVEngine::AI::agent::initializeActuators(std::vector<ref<Actions::IActuat
 
 void GRAVEngine::AI::agent::sendInfoToBrain()
 {
+    GRAV_PROFILE_FUNCTION();
+   
     if (m_Initialized == false)
         throw Exceptions::agentException("sendInfoToBrain called while agent isn't initialized");
 
@@ -164,8 +179,14 @@ float GRAVEngine::AI::agent::cumulativeReward()
     return m_Info.m_CumulativeReward;
 }
 
+const float GRAVEngine::AI::agent::maxStep() const
+{
+    return m_AgentParams.m_MaxStepCount;
+}
+
 void GRAVEngine::AI::agent::onEpisodeBegin()
 {
+    m_AgentParams.m_EpisodeCount++;
 }
 void GRAVEngine::AI::agent::onEpisodeEnd()
 {
@@ -195,7 +216,7 @@ void GRAVEngine::AI::agent::reset()
     // Reset the data and set the step count to 0
     resetData();
     m_AgentParams.m_StepCount = 0;
-    
+
     // Potential for recursion right here. Maybe check for it
     onEpisodeBegin();
 }
@@ -213,6 +234,8 @@ void GRAVEngine::AI::agent::resetData()
 
 void GRAVEngine::AI::agent::safeInitialization()
 {
+    GRAV_PROFILE_FUNCTION();
+
     // Do nothing if already initialized
     if (m_Initialized)
         return;
@@ -257,6 +280,8 @@ void GRAVEngine::AI::agent::initialize()
 }
 void GRAVEngine::AI::agent::deinitialize()
 {
+    GRAV_PROFILE_FUNCTION();
+   
     // Remove the callbacks from the trainer
     if (GRAVEngine::AI::environmentManager::instance().initialized())
     {
@@ -276,6 +301,8 @@ void GRAVEngine::AI::agent::deinitialize()
 
 void GRAVEngine::AI::agent::updateSensors()
 {
+    GRAV_PROFILE_FUNCTION();
+  
     for (auto it = m_Sensors.begin(); it != m_Sensors.end(); it++)
     {
         (*it)->update();
@@ -283,6 +310,8 @@ void GRAVEngine::AI::agent::updateSensors()
 }
 void GRAVEngine::AI::agent::resetSensors()
 {
+    GRAV_PROFILE_FUNCTION();
+   
     for (auto it = m_Sensors.begin(); it != m_Sensors.end(); it++)
     {
         (*it)->reset();
@@ -307,6 +336,8 @@ void GRAVEngine::AI::agent::incrementStep()
 }
 void GRAVEngine::AI::agent::step()
 {
+    GRAV_PROFILE_FUNCTION();
+   
     if (m_ShouldRequestAction && m_Brain != nullptr)
     {
         m_ShouldRequestAction = false;
@@ -321,6 +352,8 @@ void GRAVEngine::AI::agent::step()
 }
 void GRAVEngine::AI::agent::decideAction()
 {
+    GRAV_PROFILE_FUNCTION();
+    
     // Get the actions from the brain or use a default action buffer
     Actions::actionBuffer actions = m_Brain == nullptr ? Actions::actionBuffer() : m_Brain->decideAction();
 

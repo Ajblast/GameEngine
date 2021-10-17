@@ -1,8 +1,8 @@
 #include "gravpch.h"
 #include "camera.h"
-#include "io/input.h"
-#include "io/keyCodes.h"
-#include "io/mouseCodes.h"
+#include "io/input/input.h"
+#include "io/input/keyCodes.h"
+#include "io/input/mouseCodes.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 

@@ -34,7 +34,8 @@ namespace GRAVEngine
 				private:
 					normalLayer m_ContinuousLayer;			// The output layer for continous actions
 					multicategoricalLayer m_DiscreteLayer;	// The output layer for discrete actions
-					Actions::actionSpec m_ActionSpec;		// The action spec
+					torch::Tensor m_ContinuousActionCount;	// Number of continuous actions
+					torch::Tensor m_DiscreteActionCount;	// Number of discrete actions
 				};
 				TORCH_MODULE(actionLayer);
 			}

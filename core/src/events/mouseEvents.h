@@ -3,7 +3,7 @@
 #include "common.h"
 #include "event.h"
 #include "eventType.h"
-#include "io/mouseCodes.h"
+#include "io/input/mouseCodes.h"
 
 namespace GRAVEngine
 {

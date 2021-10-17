@@ -2,6 +2,8 @@
 #include "normal.h"
 #include <math.h>
 
+#define EPSILON 1e-7
+
 GRAVEngine::AI::Distributions::normal::normal(torch::Tensor location, torch::Tensor scale) : distribution(location.sizes()), m_Location(location), m_Scale(scale)
 {
 }
@@ -34,14 +36,15 @@ torch::Tensor GRAVEngine::AI::Distributions::normal::sample(c10::IntArrayRef sam
 
 torch::Tensor GRAVEngine::AI::Distributions::normal::logProb(torch::Tensor value)
 {
+    torch::Tensor logScale = torch::log(m_Scale + EPSILON);
     return -(
-        torch::pow(value - m_Location, 2) / (2 * variance()) - m_Scale.log() - log(sqrt(2 * M_PI))
+        torch::pow(value - m_Location, 2) / (2 * variance() + EPSILON) - logScale - log(sqrt(2 * M_PI))
         );
 }
 
 torch::Tensor GRAVEngine::AI::Distributions::normal::entropy()
 {
-    return 0.5 + 0.5 * log(2 * M_PI) + torch::log(m_Scale);
+    return 0.5 + 0.5 * log(2 * M_PI * std::exp(1) * m_Scale + EPSILON).mean();
 }
 
 

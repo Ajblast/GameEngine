@@ -2,14 +2,13 @@
 #include <vector>
 
 #include "common.h"
+#include "jobTypes.h"
 #include "fiber.h"
 
 namespace GRAVEngine
 {
 	namespace Jobs
 	{
-		typedef uint8 threadIndex;
-
 		enum class fiberDestination : uint8
 		{
 			NONE, WAITNIG, POOL
@@ -17,16 +16,16 @@ namespace GRAVEngine
 
 		struct tls
 		{
-			tls() : m_ThreadIndex(UINT8_MAX), m_HasAffinity(false), m_CurrentFiberIndex(UINT16_MAX) {}
+			tls() : m_ThreadIndex(GRAV_MAX_THREAD_INDEX), m_CurrentFiberIndex(GRAV_MAX_FIBER_INDEX) {}
 			~tls() = default;
 
-			threadIndex m_ThreadIndex;
-			bool m_HasAffinity;
+			threadIndex m_ThreadIndex;	// Index of the thread
 
 			// TODO: Make special threads for IO
 			//bool m_IsIOThread = false;
 
-			// Fiber of the thread
+			// The thread's personal starting fiber that is outside of the fiber pool.
+			// This is used to start fiber's into the fiber pool, and allows the fiber pool to return back to the calling thread callback after execution ends
 			fiber m_Fiber;
 
 			// Current fiber
@@ -35,20 +34,9 @@ namespace GRAVEngine
 
 			// Previous thread fiber
 			uint16 m_PreviousFiberIndex = UINT16_MAX;
-			//std::atomic_bool* m_PreviousFiberInWaitingList = nullptr;
+			std::atomic_bool* m_PreviousFiberStored = nullptr;
 			// Where was the previous fiber going to be placed
 			fiberDestination m_PreviousFiberDestination = fiberDestination::NONE;
-
-			// Fibers in the wait list that are now ready to be ran
-			//std::vector<std::pair<fiberIndex, std::atomic_bool*>> m_ReadyFibers;
-
-			// Clean this TLS. Remove previous fiber index and destination
-			inline void clean()
-			{
-				m_PreviousFiberIndex = UINT16_MAX;
-				m_PreviousFiberDestination = fiberDestination::NONE;
-				//m_PreviousFiberInWaitingList = nullptr;
-			}
 		};
 	}
 }

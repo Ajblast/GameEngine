@@ -5,28 +5,24 @@
 #include "counter.h"
 #include <functional>
 
+#define GRAV_JOB_ENTRY_POINT(jobName)				void jobName(uintptr_t param)
+
 namespace GRAVEngine
 {
 	namespace Jobs
 	{
-		//typedef void (*entryPoint)(uintptr_t param);
+		typedef std::function<void(uintptr_t)> entryPoint;	// A job's entry point
 
-		typedef std::function<void(uintptr_t)> entryPoint;
-
-
+		// A job declaration
 		struct GRAVAPI declaration
 		{
-			entryPoint m_EntryPoint;
-			uintptr_t m_Param;
-			jobPriority m_Priority;
-			ref<counter> m_Counter;
+			entryPoint m_EntryPoint;	// The job function pointer
+			uintptr_t m_Arg;			// Pointer to the job's arguments
+			jobPriority m_Priority;		// The priority of the job
 
-			// TODO: Add debug job declaration string
-
-			declaration() : m_EntryPoint(nullptr), m_Param(0), m_Priority(jobPriority::LOW), m_Counter(nullptr) {}
-			declaration(entryPoint entryPoint, uintptr_t param, jobPriority priority, ref<counter> counter) : 
-				m_EntryPoint(entryPoint), m_Param(param), m_Priority(priority), m_Counter(counter)
-			{}
+		public:
+			declaration() : m_Arg(0), m_Priority(jobPriority::NORMAL) {}
+			declaration(entryPoint entryPoint, uintptr_t arg, jobPriority priority = jobPriority::NORMAL) : m_EntryPoint(entryPoint), m_Arg(arg), m_Priority(priority) {}
 		};
 	}
 }

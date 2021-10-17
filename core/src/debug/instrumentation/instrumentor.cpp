@@ -1,5 +1,6 @@
 #include "gravpch.h"
 #include "instrumentor.h"
+#include "jobs/jobManager.h"
 
 void GRAVEngine::instrumentor::startSession(const std::string& sessionName, const std::string& filepath)
 {
@@ -89,4 +90,31 @@ void GRAVEngine::instrumentor::writeSessionHeader()
 void GRAVEngine::instrumentor::writeSessionFooter()
 {
 	m_OutputFile.write("]}");
+}
+
+GRAVEngine::instrumentorStopwatch::instrumentorStopwatch(const char* name) : m_Name(name)
+{
+	// Start the stopwatch
+	stopwatch.start();
+}
+GRAVEngine::instrumentorStopwatch::~instrumentorStopwatch()
+{
+	if (stopwatch.isRunning())
+	{
+		stop();
+
+		// Output the 
+	}
+}
+void GRAVEngine::instrumentorStopwatch::stop()
+{
+	stopwatch.pause();
+
+	if (instrumentor::getInstance())
+		instrumentor::getInstance()->writeProfile({
+			m_Name,
+			Time::microseconds(stopwatch.startTick().time_since_epoch()),
+			stopwatch.elapsedMicrosecondsDuration(),
+			GRAVEngine::Jobs::jobManager::getInstance() == nullptr ? UINT8_MAX : GRAVEngine::Jobs::jobManager::getInstance()->getCurrentThreadIndex()
+			});
 }

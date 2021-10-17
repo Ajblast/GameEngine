@@ -1,7 +1,7 @@
 #include "gravpch.h"
 #include "objParser.h"
 #include "utils/stringUtils.h"
-#include "exceptions/importException.h"
+#include "exceptions/importing/importException.h"
 
 static const std::string s_DefaultObjectName = "defaultObject";
 

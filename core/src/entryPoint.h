@@ -2,23 +2,24 @@
 
 #include "common.h"
 #include "application.h"
-#include "jobs/jobManager.h"
 #include "logging/sinks/sinks.h"
 #include "rendering/renderer/rendererCommand.h"
 #include "ai/environmentManager.h"
+#include "debug/instrumentation/instrumentor.h"
+#include "time/stopwatch.h"
+
+#include "io/input/inputManager.h"
+
 #include <iostream>
 
-#include "debug/instrumentation/instrumentor.h"
-
-#include "time/stopwatch.h"
 
 #ifdef GRAV_PLATFORM_WINDOWS
 int main(int argc, char** argv)
 {
 	GRAVEngine::Logging::logManager logManager;
-	GRAVEngine::Jobs::jobManager jobManager;
 	GRAVEngine::instrumentor instrumentor;
 	//GRAVEngine::AI::trainer trainer;
+	GRAVEngine::IO::inputManager inputManager;
 
 
 	GRAV_PROFILE_START_SESSION("Manager Startup", "debug/profiles/GRAVEngineProfile-ManagerStartup.json");
@@ -39,13 +40,7 @@ int main(int argc, char** argv)
 #pragma endregion
 
 #pragma region StartingUpManagers
-	// Use default job manager options
-	GRAVEngine::Jobs::jobManagerOptions jobManagerOptions;
-
-	// Start up the job manager
-	GRAV_LOG_LINE_INFO("%s: Start Up JobManager", GRAV_CLEAN_FUNC_SIG);
-	jobManager.startUp(jobManagerOptions);
-	GRAV_LOG_LINE_INFO("%s: JobManager Initialized", GRAV_CLEAN_FUNC_SIG);
+	inputManager.startup();
 #pragma endregion
 	GRAV_PROFILE_END_SESSION();
 
@@ -55,7 +50,6 @@ int main(int argc, char** argv)
 
 	// Run the application
 	GRAV_PROFILE_START_SESSION("Runtime", "debug/profiles/GRAVEngineProfile-RunTime.json");
-	//jobManager.runMain( []() { });
 	application->run();
 	GRAV_PROFILE_END_SESSION();
 
@@ -65,11 +59,8 @@ int main(int argc, char** argv)
 
 #pragma region ShuttingDownManagers
 	GRAV_PROFILE_START_SESSION("Manager Shutdown", "debug/profiles/GRAVEngineProfile-ManagerShutdown.json");
-	// Deinitialize the trainer
-	GRAVEngine::AI::environmentManager::instance().deinitialize();
 
-	jobManager.startShutdown();
-	jobManager.shutDown();
+	inputManager.shutdown();
 	logManager.shutDown();
 	GRAV_PROFILE_END_SESSION();
 #pragma endregion

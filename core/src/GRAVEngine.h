@@ -15,9 +15,9 @@
 #include "time/timestep.h"
 
 // Input
-#include "io/input.h"
-#include "io/keyCodes.h"
-#include "io/mouseCodes.h"
+#include "io/input/input.h"
+#include "io/input/keyCodes.h"
+#include "io/input/mouseCodes.h"
 
 // ImGui
 #include "layers/imgui/imguiLayer.h"

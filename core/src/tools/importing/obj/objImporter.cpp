@@ -1,8 +1,8 @@
 #include "gravpch.h"
 #include "objImporter.h"
-#include "io/io.h"
-#include "io/file.h"
-#include "exceptions/importException.h"
+#include "io/files/io.h"
+#include "io/files/file.h"
+#include "exceptions/importing/importException.h"
 #include "objParser.h"
 
 static const GRAVEngine::Tools::Importing::importerDescription s_Desc = {

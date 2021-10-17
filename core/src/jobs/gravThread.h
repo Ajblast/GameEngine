@@ -2,53 +2,55 @@
 
 #include <thread>
 #include "common.h"
+#include "jobTypes.h"
 #include "tls.h"
-
-#define GRAV_MAX_THREAD_ID UINT32_MAX
 
 namespace GRAVEngine
 {
 	namespace Jobs
 	{
-		typedef uint32 threadID;
-		typedef void* threadHandle;
-
-		class gravThread
+		class GRAVAPI gravThread
 		{
 		public:
-			using threadCallbackFunction = void(*)(GRAVEngine::Jobs::gravThread*);
+			//typedef std::function<void(gravThread*)> threadCallback;
+			using threadCallback = void(*)(gravThread*);
 
 		public:
 			gravThread();
-			gravThread(const gravThread& other) = delete;
-			virtual GRAVEngine::Jobs::gravThread::~gravThread() = default;			// Deconstructing thread does not despawn it
+			gravThread(const gravThread& other) = delete;	// Copy constructor is not allowed as a single thread object can only exist per thread
+			~gravThread();									// Deconstructing thread does not despawn it
 
-			void spawn(threadCallbackFunction callback);
-			void setAffinity(size_t affinity);
-			void setName(const std::wstring& name);
-			void setIndex(const threadID index);
-
+			// Spawn a thread into this thread holder
+			void spawn(threadCallback callback);
+			// Join this thread with the current thread
 			void join();
 			// Get the handle and id from the currently running thread
 			void initializeFromCurrentThread();
 
+			// Set the thread's affinity
+			void setAffinity(size_t affinity);
+			// Get the thread's affinity
+			size_t getAffinity();
+			// Set the thread's name
+			void setName(const std::wstring& name);
+			std::wstring getName() const;
+
 			inline tls* getTLS() { return &m_ThreadLocalStorage; }
 			inline threadID getID() const { return m_ThreadID; }
-			inline threadID getIndex() const { return m_ThreadIndex; }
-			inline bool isValid() const { return getID() != GRAV_MAX_THREAD_ID; }
-			inline std::string getName() const { return m_Name; }
 			inline threadHandle getHandle() const { return m_ThreadHandle; }
 
+			// Is the current thread valid
+			inline bool isValid() const { return getID() != GRAV_MAX_THREAD_ID; }
+
+			// Cause the thread to sleep for so many milliseconds
 			static void sleepFor(uint32 ms);
 		private:
-			//std::thread m_Thread;
-			//std::thread::id m_ID;
-			tls m_ThreadLocalStorage;
-			std::string m_Name;
 
-			threadID m_ThreadID			= GRAV_MAX_THREAD_ID;
-			threadID m_ThreadIndex		= GRAV_MAX_THREAD_ID;
-			threadHandle m_ThreadHandle	= nullptr;
+		private:
+			tls m_ThreadLocalStorage;								// The thread local storage of the thread
+
+			threadID m_ThreadID			= GRAV_MAX_THREAD_ID;		// The thread's ID
+			threadHandle m_ThreadHandle	= nullptr;					// The native handle for the thread
 		};
 	}
 }

@@ -1,32 +1,36 @@
 #include "gravpch.h"
 #include "actionLayer.h"
 
-GRAVEngine::AI::Models::Decoders::actionLayerImpl::actionLayerImpl(int64 numInput, Actions::actionSpec actionSpec) : m_ContinuousLayer(nullptr), m_DiscreteLayer(nullptr), m_ActionSpec(actionSpec)
+GRAVEngine::AI::Models::Decoders::actionLayerImpl::actionLayerImpl(int64 numInput, Actions::actionSpec actionSpec)
 {
+	m_ContinuousActionCount = torch::tensor({ (int32)actionSpec.continuousActionCount() });
+	m_DiscreteActionCount = torch::tensor({ (int32)actionSpec.discreteActionCount() });
+
 	// Create the continuous actions
-	if (actionSpec.continuousActionCount() > 0)
+	if (m_ContinuousActionCount.item<int32>() > 0)
 	{
 		m_ContinuousLayer = normalLayer(numInput, actionSpec.continuousActionCount());
-
 		// Register the module
 		register_module("Continuous Layer", m_ContinuousLayer);
-
 	}
 
 	// Create the discrete actions
-	if (actionSpec.discreteActionCount() > 0)
+	if (m_DiscreteActionCount.item<int32>() > 0)
 	{
 		// Copy the values from the action spec into a new vector to be passed
 		std::vector<int64> branches;
-		for (size_t i = 0; i < actionSpec.discreteActionCount(); i++)
+		for (size_t i = 0; i < m_DiscreteActionCount.item<int32>(); i++)
 			branches.push_back(actionSpec.branchSizes()[i]);
 
 		// Create the layer
 		m_DiscreteLayer = multicategoricalLayer(numInput, branches);
-
 		// Register the module
 		register_module("Discrete Layer", m_DiscreteLayer);
 	}
+
+
+	register_buffer("Continuous Action Count", m_ContinuousActionCount);
+	register_buffer("Discrete Action Count", m_DiscreteActionCount);
 }
 
 std::tuple<GRAVEngine::AI::Models::ActorCritic::agentAction, GRAVEngine::AI::Models::ActorCritic::agentLogProbs, torch::Tensor> GRAVEngine::AI::Models::Decoders::actionLayerImpl::forward(torch::Tensor hidden)
@@ -38,7 +42,7 @@ std::tuple<GRAVEngine::AI::Models::ActorCritic::agentAction, GRAVEngine::AI::Mod
 	std::vector<torch::Tensor> entropies;
 
 	// If there are continuous actions
-	if (m_ActionSpec.continuousActionCount() > 0)
+	if (m_ContinuousActionCount.item<int32>() > 0)
 	{
 		// Get the distribution
 		auto continuousDist = m_ContinuousLayer->forward(hidden);
@@ -55,7 +59,7 @@ std::tuple<GRAVEngine::AI::Models::ActorCritic::agentAction, GRAVEngine::AI::Mod
 	}
 
 	// If there are discrete actions
-	if (m_ActionSpec.discreteActionCount() > 0)
+	if (m_DiscreteActionCount.item<int32>() > 0)
 	{
 		// Get the distributions
 		auto discreteDist = m_DiscreteLayer->forward(hidden);
@@ -96,7 +100,7 @@ GRAVEngine::AI::Models::ActorCritic::agentLogProbs GRAVEngine::AI::Models::Decod
 	std::vector<torch::Tensor> logProbDiscrete;
 
 	// If there are continuous actions
-	if (m_ActionSpec.continuousActionCount() > 0)
+	if (m_ContinuousActionCount.item<int32>() > 0)
 	{
 		// Get the distribution
 		auto continuousDist = m_ContinuousLayer->forward(hidden);
@@ -106,7 +110,7 @@ GRAVEngine::AI::Models::ActorCritic::agentLogProbs GRAVEngine::AI::Models::Decod
 	}
 
 	// If there are discrete actions
-	if (m_ActionSpec.discreteActionCount() > 0)
+	if (m_DiscreteActionCount.item<int32>() > 0)
 	{
 		// Get the distributions
 		auto discreteDist = m_DiscreteLayer->forward(hidden);

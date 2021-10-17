@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-#include "io/textFile.h"
+#include "io/files/textFile.h"
 #include "types/vecs/vecs.h"
 #include "objModel.h"
 

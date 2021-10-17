@@ -17,7 +17,7 @@ torch::Tensor GRAVEngine::AI::Models::networkImpl::forward(std::vector<torch::Te
 	torch::Tensor encodedInputs = m_InputLayer->forward(inputs);
 
 	// Take the encoded inputs and pass them through the linear layers
-	torch::Tensor encodedOutputs = m_LinearLayers(encodedInputs);
+	torch::Tensor encodedOutputs = m_LinearLayers->forward(encodedInputs);
 
 	return encodedOutputs;
 }

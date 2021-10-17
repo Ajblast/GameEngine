@@ -17,10 +17,10 @@ namespace GRAVEngine
 				// Create an action buffer with buffer segments. Must not be null
 				actionBuffer(ref<actionBufferSegment<float>> continuousActions, ref<actionBufferSegment<int32>> discreteActions);
 				actionBuffer(const actionBuffer& other);
-				actionBuffer(const actionBuffer&& other) noexcept;
+				actionBuffer(actionBuffer&& other) noexcept;
 
 				actionBuffer& operator=(const actionBuffer& other);
-				actionBuffer& operator=(const actionBuffer&& other) noexcept;
+				actionBuffer& operator=(actionBuffer&& other) noexcept;
 
 				void copy(actionBuffer buffer);
 

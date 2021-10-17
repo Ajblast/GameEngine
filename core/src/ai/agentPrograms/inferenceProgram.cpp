@@ -4,12 +4,16 @@
 
 GRAVEngine::AI::inferenceProgram::inferenceProgram(ref<Models::model> model) : m_Model(model)
 {
-    if (model == nullptr)
+	GRAV_PROFILE_FUNCTION();
+	
+	if (model == nullptr)
         throw Exceptions::invalidArgumentException("Model is null");
 }
 
 void GRAVEngine::AI::inferenceProgram::requestDecision(agentInfo info, scope<ref<Sensors::ISensor>[]>& sensors, size_t count)
 {
+	GRAV_PROFILE_FUNCTION();
+	
 	std::vector<torch::Tensor> observations;
 	for (size_t i = 0; i < count; i++)
 	{

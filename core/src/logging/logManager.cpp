@@ -25,8 +25,8 @@ void GRAVEngine::Logging::logManager::startUp(ref<Logging::Sinks::sink>defaultLo
 
 	// Set the static instance
 	s_Instance = this;
+	m_IsValid.store(true, std::memory_order_relaxed);
 }
-
 void GRAVEngine::Logging::logManager::startUp(ref<Logging::logger> defaultLogger)
 {
 	// Only one instance possible
@@ -40,8 +40,8 @@ void GRAVEngine::Logging::logManager::startUp(ref<Logging::logger> defaultLogger
 
 	// Set the static instance;
 	s_Instance = this;
+	m_IsValid.store(true, std::memory_order_relaxed);
 }
-
 void GRAVEngine::Logging::logManager::shutDown()
 {
 	GRAV_PROFILE_FUNCTION();
@@ -49,6 +49,8 @@ void GRAVEngine::Logging::logManager::shutDown()
 	GRAV_LOG_LINE_DEBUG("%s: Shutting down Log Manager", GRAV_CLEAN_FUNC_SIG);
 
 	GRAV_ASSERT(s_Instance);
+
+	m_IsValid.store(false, std::memory_order_release);
 
 	// Remove all of the loggers
 	removeAll();
@@ -70,7 +72,6 @@ void GRAVEngine::Logging::logManager::registerLogger(ref<logger> logger)
 
 	m_Loggers[loggerName] = std::move(logger);
 }
-
 void GRAVEngine::Logging::logManager::initializeLogger(ref<logger> logger)
 {
 	Locks::scopedLock<decltype(m_MapLock)> lock(m_MapLock);
@@ -102,7 +103,6 @@ GRAVEngine::ref<GRAVEngine::Logging::logger> GRAVEngine::Logging::logManager::ge
 	auto found = m_Loggers.find(loggerName);
 	return found == m_Loggers.end() ? nullptr : found->second;
 }
-
 GRAVEngine::ref<GRAVEngine::Logging::logger> GRAVEngine::Logging::logManager::defaultLogger()
 {
 	GRAV_ASSERT(s_Instance);
@@ -138,7 +138,6 @@ void GRAVEngine::Logging::logManager::setVerbosity(Logging::verbosity verbosity)
 
 	m_Verbosity.store(static_cast<int>(verbosity));
 }
-
 void GRAVEngine::Logging::logManager::setFlushVerbosity(Logging::verbosity verbosity)
 {
 	GRAV_ASSERT(s_Instance);
@@ -150,7 +149,6 @@ void GRAVEngine::Logging::logManager::setFlushVerbosity(Logging::verbosity verbo
 
 	m_FlushVerbosity.store(static_cast<int>(verbosity));
 }
-
 void GRAVEngine::Logging::logManager::flushAll()
 {
 	GRAV_ASSERT(s_Instance);
@@ -172,7 +170,6 @@ void GRAVEngine::Logging::logManager::removeLogger(const std::string& loggerName
 	if (m_DefaultLogger && m_DefaultLogger->name() == loggerName)
 		m_DefaultLogger.reset();
 }
-
 void GRAVEngine::Logging::logManager::removeAll()
 {
 	GRAV_ASSERT(s_Instance);
@@ -190,7 +187,6 @@ void GRAVEngine::Logging::logManager::setAutomaticRegistration(bool automaticReg
 
 	m_AutomaticRegistration = automaticRegistraction;
 }
-
 void GRAVEngine::Logging::logManager::setVerbosities(std::unordered_map<std::string, Logging::verbosity> verbosities, bool setUnspecified, Logging::verbosity& verbosity)
 {
 	GRAV_ASSERT(s_Instance);
